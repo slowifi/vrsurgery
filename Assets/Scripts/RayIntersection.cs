@@ -8,12 +8,13 @@ using UnityEngine.UI;
 public class RayIntersection : MonoBehaviour
 {
 
-    public struct Edge
+    public class Edge
     {
-        public int vtx1;// { get; set; }
-        public int vtx2;// { get; set; }
-        public int tri1;// { get; set; }
-        public int tri2;// { get; set; }
+        public int vtx1 { get; set; }
+        public int vtx2 { get; set; }
+        public int tri1 { get; set; }
+        public int tri2 { get; set; }
+        
 
         public Edge(int v1, int v2, int t1, int t2)
         {
@@ -23,6 +24,10 @@ public class RayIntersection : MonoBehaviour
             tri2 = t2;
         }
     }
+
+    public GameObject CutManager;
+    public GameObject PatchManager;
+    public GameObject MeasureManager;
 
     private Mesh newMesh;
 
@@ -51,7 +56,6 @@ public class RayIntersection : MonoBehaviour
     private bool reCalculate;
     private int patchNumber;
     private int sphereNumber;
-    private int distanceNumber;
     private float heartScale;
     public Text m_distance;
     public GameObject sp1;
@@ -284,59 +288,54 @@ public class RayIntersection : MonoBehaviour
                 {
                     if (edgeList[item].vtx1 == edgeList[insideItem].vtx2 && edgeList[item].vtx2 == edgeList[insideItem].vtx1)
                     {
-                        edgeList[item] = new Edge(edgeList[item].vtx1, edgeList[item].vtx2, edgeList[item].tri1, insideItem);
-                        edgeList[insideItem] = new Edge(edgeList[insideItem].vtx1, edgeList[insideItem].vtx2, edgeList[insideItem].tri1, item);
+                        edgeList[item].tri2 = insideItem;
+                        edgeList[insideItem].tri2 = item;
                     }
                     else if (edgeList[item + 1].vtx1 == edgeList[insideItem].vtx2 && edgeList[item + 1].vtx2 == edgeList[insideItem].vtx1)
                     {
-                        edgeList[item+1] = new Edge(edgeList[item + 1].vtx1, edgeList[item + 1].vtx2, edgeList[item + 1].tri1, insideItem);
-                        edgeList[insideItem] = new Edge(edgeList[insideItem].vtx1, edgeList[insideItem].vtx2, edgeList[insideItem].tri1, item);
+                        edgeList[item + 1].tri2 = insideItem;
+                        edgeList[insideItem].tri2 = item;
                     }
                     else if (edgeList[item + 2].vtx1 == edgeList[insideItem].vtx2 && edgeList[item + 2].vtx2 == edgeList[insideItem].vtx1)
                     {
-                        edgeList[item+2] = new Edge(edgeList[item + 2].vtx1, edgeList[item + 2].vtx2, edgeList[item + 2].tri1, insideItem);
-                        edgeList[insideItem] = new Edge(edgeList[insideItem].vtx1, edgeList[insideItem].vtx2, edgeList[insideItem].tri1, item);
+                        edgeList[item + 2].tri2 = insideItem;
+                        edgeList[insideItem].tri2 = item;
                     }
 
                     else if (edgeList[item].vtx1 == edgeList[insideItem + 1].vtx2 && edgeList[item].vtx2 == edgeList[insideItem + 1].vtx1)
                     {
-                        edgeList[item] = new Edge(edgeList[item].vtx1, edgeList[item].vtx2, edgeList[item].tri1, insideItem);
-                        edgeList[insideItem+1] = new Edge(edgeList[insideItem + 1].vtx1, edgeList[insideItem + 1].vtx2, edgeList[insideItem + 1].tri1, item);
+                        edgeList[item].tri2 = insideItem;
+                        edgeList[insideItem+1].tri2 = item;
                     }
                     else if (edgeList[item + 1].vtx1 == edgeList[insideItem + 1].vtx2 && edgeList[item + 1].vtx2 == edgeList[insideItem + 1].vtx1)
                     {
-                        edgeList[item + 1] = new Edge(edgeList[item + 1].vtx1, edgeList[item + 1].vtx2, edgeList[item + 1].tri1, insideItem);
-                        edgeList[insideItem + 1] = new Edge(edgeList[insideItem + 1].vtx1, edgeList[insideItem + 1].vtx2, edgeList[insideItem + 1].tri1, item);
+                        edgeList[item + 1].tri2 = insideItem;
+                        edgeList[insideItem+1].tri2 = item;
                     }
                     else if (edgeList[item + 2].vtx1 == edgeList[insideItem + 1].vtx2 && edgeList[item + 2].vtx2 == edgeList[insideItem + 1].vtx1)
                     {
-                        edgeList[item + 2] = new Edge(edgeList[item + 2].vtx1, edgeList[item + 2].vtx2, edgeList[item + 2].tri1, insideItem);
-                        edgeList[insideItem + 1] = new Edge(edgeList[insideItem + 1].vtx1, edgeList[insideItem + 1].vtx2, edgeList[insideItem + 1].tri1, item);
+                        edgeList[item + 2].tri2 = insideItem;
+                        edgeList[insideItem+1].tri2 = item;
                     }
 
                     else if (edgeList[item].vtx1 == edgeList[insideItem + 2].vtx2 && edgeList[item + 2].vtx2 == edgeList[insideItem + 2].vtx1)
                     {
-                        edgeList[item] = new Edge(edgeList[item].vtx1, edgeList[item].vtx2, edgeList[item].tri1, insideItem);
-                        edgeList[insideItem+2] = new Edge(edgeList[insideItem + 2].vtx1, edgeList[insideItem + 2].vtx2, edgeList[insideItem + 2].tri1, item);
+                        edgeList[item].tri2 = insideItem;
+                        edgeList[insideItem+2].tri2 = item;
                     }
                     else if (edgeList[item + 1].vtx1 == edgeList[insideItem + 2].vtx2 && edgeList[item + 1].vtx2 == edgeList[insideItem + 2].vtx1)
                     {
-                        edgeList[item + 1] = new Edge(edgeList[item + 1].vtx1, edgeList[item + 1].vtx2, edgeList[item + 1].tri1, insideItem);
-                        edgeList[insideItem + 2] = new Edge(edgeList[insideItem + 2].vtx1, edgeList[insideItem + 2].vtx2, edgeList[insideItem + 2].tri1, item);
+                        edgeList[item + 1].tri2 = insideItem;
+                        edgeList[insideItem+2].tri2 = item;
                     }
                     else if (edgeList[item + 2].vtx1 == edgeList[insideItem + 2].vtx2 && edgeList[item + 2].vtx2 == edgeList[insideItem + 2].vtx1)
                     {
-                        edgeList[item + 2] = new Edge(edgeList[item + 2].vtx1, edgeList[item + 2].vtx2, edgeList[item + 2].tri1, insideItem);
-                        edgeList[insideItem + 2] = new Edge(edgeList[insideItem + 2].vtx1, edgeList[insideItem + 2].vtx2, edgeList[insideItem + 2].tri1, item);
+                        edgeList[item + 2].tri2 = insideItem;
+                        edgeList[insideItem+2].tri2 = item;
                     }
                 }
             }
         }
-    }
-
-    public void BoundaryCuttingOn()
-    {
-
     }
 
     public void CuttingOn()
@@ -441,50 +440,6 @@ public class RayIntersection : MonoBehaviour
             Mesh_Initialize();
         }
         
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            Debug.Log("Cutting");
-            CuttingOn();
-            // boundaryVertices.Clear();
-        }
-        else if (Input.GetKeyDown(KeyCode.W))
-        {
-            Debug.Log("Measuring");
-            MeasuringOn();
-        }
-        else if (Input.GetKeyDown(KeyCode.E))
-        {
-            Debug.Log("Patching");
-            PatchingOn();
-        }
-        else if (Input.GetKeyDown(KeyCode.R))
-        {
-            SetColor();
-            MeshRecalculate();
-        }
-
-
-        if (check_function)
-        {
-            // update vertices
-            MeshRecalculate();
-            check_function = false;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            // testInsideSet();
-            // RendererOverlapping();
-            // MeshRecalculate();
-            // SetColor();
-            ConnectedVertices();
-            ConnectedTriangles();
-            GenerateEdgeList();
-            
-            rayincision = true;
-            MeshRecalculate();
-        }
-
         if (extending)
         {
             if (oldExtendValue == m_Extend.value)
@@ -675,6 +630,7 @@ public class RayIntersection : MonoBehaviour
             // 쪼개는것까지 한 프레임에 끝내고 BFS 돌리는건 다음 프레임부터 실행
             connectedVertices.Clear();
             ConnectedVertices();
+            // Initialize.Instance.Initializing();
             MeshRecalculate();
             SetColor();
 
@@ -806,12 +762,9 @@ public class RayIntersection : MonoBehaviour
             foreach (int item in wholeTriangleIndexSet)
             {
                 wholeTriangles.Add(item);
-                // wholeTriangles.Add(triangles[item+1]);
-                // wholeTriangles.Add(triangles[item+2]);
             }
 
             RemoveTriangles();
-            // DisconnectedTriangles();
             Connected_Initialize(); // 초기화
             ConnectedVertices(); // connectedVertices 재계산
             ConnectedTriangles(); // connectedTriangles 재계산
@@ -1507,64 +1460,33 @@ public class RayIntersection : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("get mouse button down");
-                Debug.Log(Input.mousePosition);
-                Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
+                // Vector3 pointPosition = MeasureManager.GetComponent<Measure>().MeasurePosition(obj.GetComponent<MeshFilter>().mesh.triangles, cam.ScreenPointToRay(Input.mousePosition), test_world);
+                Vector3 pointPosition = Measure.Instance.MeasurePosition(obj.GetComponent<MeshFilter>().mesh.triangles, cam.ScreenPointToRay(Input.mousePosition), test_world);
+                if (pointPosition == Vector3.zero)
+                    return;
                 
-                float dst_min = 1000000;
-                int[] temp = obj.GetComponent<MeshFilter>().mesh.triangles;
-                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-                Debug.DrawRay(ray.origin, ray.direction * 1000, Color.yellow);
-                Debug.Log(ray.direction);
-                for (int i = 0; i < temp.Length; i += 3)
+                if(!measured_check)
                 {
-                    if (RayTriangleIntersection(test_world[temp[i]], test_world[temp[i + 1]], test_world[temp[i + 2]], cam.ScreenPointToRay(Input.mousePosition)))
-                    {
-                        float dst_temp = Vector3.Magnitude(cam.ScreenPointToRay(Input.mousePosition).origin - intersectionTemp);
-                        if (dst_min > dst_temp)
-                        {
-                            intersectionPoint = intersectionTemp;
-                            dst_min = dst_temp;
-                        }
-                    }
+                    sp1.active = true;
+                    sp2.active = false;
+                    Destroy(GameObject.Find("distance"));
+                    sp1.transform.position = pointPosition;
+                    measured_check = true;
                 }
-
-                if (dst_min != 1000000)
+                else
                 {
-                    if (!measured_check)
-                    {
-                        // Destroy(GameObject.FindObjectsOfTypeAll(PrimitiveType.Sphere));
-                        sp1.active = true;
-                        sp2.active = false;
-                        Destroy(GameObject.Find("distance"));
-                        GameObject anyobj = new GameObject("p1");
-                        anyobj = sp1;
-                        p1_vec = intersectionPoint;
-                        anyobj.transform.localPosition = intersectionPoint;
-                        
-                        measured_check = true;
-                    }
-                    else
-                    {
-                        sp2.active = true;
-                        GameObject anyobj = new GameObject("p2");
-                        anyobj = sp2;
-                        anyobj.transform.localPosition = intersectionPoint;
-                        measured_check = false;
-                        float dst = Vector3.Distance(p1_vec, intersectionPoint);
-                        heartScale = obj.transform.lossyScale.z;
-                        dst = dst / heartScale;
-                        m_distance.text = dst + "mm";
-                        Debug.Log("거리 : " + dst);
-                        
-                        var boundaryLine = new GameObject("distance");
-                        var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
-                        lineRenderer.material.color = Color.black;
-                        lineRenderer.SetPositions(new Vector3[] { p1_vec, intersectionPoint });
-                        distanceNumber++;
-                        Destroy(GameObject.Find("/p1"));
-                        Destroy(GameObject.Find("/p2"));
-                    }
+                    sp2.active = true;
+                    sp2.transform.position = pointPosition;
+                    measured_check = false;
+                    float dst = Vector3.Distance(sp1.transform.position, sp2.transform.position);
+                    dst = dst / obj.transform.lossyScale.z;
+                    m_distance.text = dst + "mm";
+                    Debug.Log("거리 : " + dst);
+
+                    var boundaryLine = new GameObject("distance");
+                    var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
+                    lineRenderer.material.color = Color.black;
+                    lineRenderer.SetPositions(new Vector3[] { p1_vec, intersectionPoint });
                 }
             }
         }
@@ -1590,7 +1512,6 @@ public class RayIntersection : MonoBehaviour
             if (Input.GetMouseButton(0) && !Input.GetMouseButtonUp(0))
             // if(Input.GetTouch(0).phase == TouchPhase.Began || Input.GetTouch(0).phase == TouchPhase.Moved)
             {
-                Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
                 float dst_min = 1000000;
                 int[] temp = obj.GetComponent<MeshFilter>().mesh.triangles;
 
@@ -1639,9 +1560,6 @@ public class RayIntersection : MonoBehaviour
                     lineRenderer.material.color = Color.black;
                     lineRenderer.SetPositions(new Vector3[] { OldIntersectionPoint, intersectionPoint });
 
-                    // lineRenderer.SetPositions(new Vector3[] { oldScreenPoint, cam.ScreenPointToRay(Input.mousePosition).origin });
-                    // oldScreenPoint = cam.ScreenPointToRay(Input.mousePosition).origin;
-
                     OldIntersectionPoint = intersectionPoint;
                     patchVertices.Add(intersectionPoint);
                     return;
@@ -1662,9 +1580,6 @@ public class RayIntersection : MonoBehaviour
             }
         }
     }
-
-    
-
 
     private void ConnectedTriangles()
     {
@@ -1743,7 +1658,6 @@ public class RayIntersection : MonoBehaviour
 
         mesh.triangles = newTriangles;
         return;
-
     }
 
     private void GeneratePatchTriangles()
@@ -1986,7 +1900,6 @@ public class RayIntersection : MonoBehaviour
 
     private void BFS_Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, bool _left)
     {
-        // 지금 여기에 오류가 있는데 찾을 수가 없네
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
         
