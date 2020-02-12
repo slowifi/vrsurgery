@@ -4,17 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class RayIntersection : MonoBehaviour
 {
-
     public class Edge
     {
         public int vtx1 { get; set; }
         public int vtx2 { get; set; }
         public int tri1 { get; set; }
         public int tri2 { get; set; }
-        
 
         public Edge(int v1, int v2, int t1, int t2)
         {
@@ -92,9 +89,6 @@ public class RayIntersection : MonoBehaviour
     public HashSet<int> innerBoundaryTriangleIndexSet;
     public HashSet<int> outerBoundaryTriangleIndexSet;
 
-    public LinkedList<int> ll_innerContourVertices;
-    public LinkedList<int> ll_outerContourVertices;
-
     // patch
     public float oldValue_curve;
     public float oldValue_height;
@@ -136,6 +130,8 @@ public class RayIntersection : MonoBehaviour
     private Vector3 screenStartDirection;
     private Vector3 screenEndDirection;
 
+    private Vector3 screenMiddleOrigin;
+
     private Vector3 incisionOuterStartPoint;
     private Vector3 incisionOuterEndPoint;
 
@@ -149,14 +145,23 @@ public class RayIntersection : MonoBehaviour
     private int incisionInnerEndPointIdx;
 
     // boundary cut
-    private Vector3 boundaryOuterFirstPoint;
-    private Vector3 boundaryInnerFirstPoint;
+    private Vector3 boundaryOuterLastPoint;
+    private Vector3 boundaryInnerLastPoint;
+
+    private Vector3 screenLastOrigin;
+    private Vector3 screenLastDirection;
+
+    private int boundaryOuterLastPointIdx;
+    private int boundaryInnerLastPointIdx;
 
     private Vector3 boundaryOuterStartPoint;
     private Vector3 boundaryOuterEndPoint;
 
     private Vector3 boundaryInnerStartPoint;
     private Vector3 boundaryInnerEndPoint;
+
+    private int boundaryOuterFirstVtx;
+    private int boundaryInnerFirstVtx;
 
     private int boundaryOuterEndVtx;
     private int boundaryInnerEndVtx;
@@ -167,7 +172,9 @@ public class RayIntersection : MonoBehaviour
     private int boundaryInnerStartPointIdx;
     private int boundaryInnerEndPointIdx;
     private bool firstBoundary;
+    private bool lastBoundary;
     private bool boundaryCut;
+    private bool boundaryCutMode;
     private bool firstRay;
 
     private Vector3 intersectionTemp;
@@ -195,7 +202,9 @@ public class RayIntersection : MonoBehaviour
         rayincision = false;
         incision = false;
         boundaryCut = false;
+        boundaryCutMode = false;
         firstBoundary = true;
+        lastBoundary = false;
         firstRay = true;
 
         cam = GetComponent<Camera>();
@@ -253,6 +262,7 @@ public class RayIntersection : MonoBehaviour
         // boundary cut
         boundaryCut = false;
         firstBoundary = true;
+        lastBoundary = false;
 
         // patchVertices.Clear();
         patchVertices = new List<Vector3>();
@@ -261,8 +271,6 @@ public class RayIntersection : MonoBehaviour
         removedInnerTriangles = new List<int>();
         removedOuterTriangles = new List<int>();
 
-        ll_innerContourVertices = new LinkedList<int>();
-        ll_outerContourVertices = new LinkedList<int>();
 
         connectedVertices = new Dictionary<int, HashSet<int>>();
         connectedTriangles = new Dictionary<int, HashSet<int>>();
@@ -340,7 +348,9 @@ public class RayIntersection : MonoBehaviour
 
     public void CuttingOn()
     {
-        cutting = true;
+        cutting = false;
+        cutmode = false;
+        boundaryCutMode = true;
         measuring = false;
         patching = false;
         reCalculate = false;
@@ -424,8 +434,8 @@ public class RayIntersection : MonoBehaviour
 
     public void RendererOverlapping()
     {
-        MeshRenderer ren = GameObject.Find("Patch" + patchNumber).GetComponent<MeshRenderer>();
-        ren.material.color = new Color32(115, 0, 0, 255);
+        // MeshRenderer ren = GameObject.Find("Patch" + patchNumber).GetComponent<MeshRenderer>();
+        // ren.material.color = new Color32(115, 0, 0, 255);
         // Material yourMaterial = (Material)Resources.Load("2019_Heart", typeof(Material));
         // ren.material = yourMaterial;
     }
@@ -440,6 +450,7 @@ public class RayIntersection : MonoBehaviour
             Mesh_Initialize();
         }
         
+        // incision
         if (extending)
         {
             if (oldExtendValue == m_Extend.value)
@@ -753,10 +764,11 @@ public class RayIntersection : MonoBehaviour
             }
         }
 
+        // filling cut
         if (cutmode)
         {
             cutmode = false;
-            
+
             int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
 
             foreach (int item in wholeTriangleIndexSet)
@@ -780,379 +792,6 @@ public class RayIntersection : MonoBehaviour
             GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
         }
 
-        if (boundaryCut)
-        {
-            int verticesLength = obj.GetComponent<MeshFilter>().mesh.vertices.Length;
-            int outerIntersectionCount = 0, innerIntersectionCount = 0;
-            int outerSide = 0, innerSide = 0;
-            int outerTriangleIdx = -1, innerTriangleIdx = -1;
-            // edge index
-            int outerEdgeIdx = -1, innerEdgeIdx = -1;
-            // DivideTest(incisionOuterStartPoint, incisionOuterStartPointIdx);
-
-            Vector3 outerStartEdgePoint = Vector3.zero;
-            Vector3 innerStartEdgePoint = Vector3.zero;
-
-            // 여기다가 조건을 넣어서 첫 스타트가 아닌 경우 end point를 start point에 넣어야됨.
-            if (firstBoundary)
-            {
-                outerIntersectionCount = TriangleEdgeIntersection(ref outerSide, ref outerEdgeIdx, ref outerStartEdgePoint, boundaryOuterStartPoint, boundaryOuterEndPoint, boundaryOuterStartPointIdx);
-                innerIntersectionCount = TriangleEdgeIntersection(ref innerSide, ref innerEdgeIdx, ref innerStartEdgePoint, boundaryInnerStartPoint, boundaryInnerEndPoint, boundaryInnerStartPointIdx);
-            }
-            else
-            {
-                // 지금 intersection 되지 않는 문제 있음.
-                // 처음 start에서의 문제만 잡으면 나머지는 이상 없음.
-
-                // outer
-                int checkIntersectionCount = 2;
-                foreach (int item in connectedTriangles[boundaryOuterEndVtx])
-                {
-                    checkIntersectionCount = 2;
-                    // 여기서 각 edge에 대해 intersection 체크 필요.
-                    outerTriangleIdx = item;
-                    if (edgeList[item].vtx1 != boundaryOuterEndVtx && edgeList[item].vtx2 != boundaryOuterEndVtx)
-                    {
-                        if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                outerStartEdgePoint = intersectionTemp;
-                                outerEdgeIdx = item;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-
-                        if (RayTriangleIntersection(screenEndOrigin, boundaryOuterEndPoint + screenEndDirection * 5, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                outerStartEdgePoint = intersectionTemp;
-                                outerEdgeIdx = item;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-                    }
-                    else if (edgeList[item + 1].vtx1 != boundaryOuterEndVtx && edgeList[item + 1].vtx2 != boundaryOuterEndVtx)
-                    {
-                        if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                outerStartEdgePoint = intersectionTemp;
-                                outerEdgeIdx = item+1;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-
-                        if (RayTriangleIntersection(screenEndOrigin, boundaryOuterEndPoint + screenEndDirection * 5, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                outerStartEdgePoint = intersectionTemp;
-                                outerEdgeIdx = item+1;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-                    }
-                    else if (edgeList[item + 2].vtx1 != boundaryOuterEndVtx && edgeList[item + 2].vtx2 != boundaryOuterEndVtx)
-                    {
-                        if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                outerStartEdgePoint = intersectionTemp;
-                                outerEdgeIdx = item+2;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-
-                        if (RayTriangleIntersection(screenEndOrigin, boundaryOuterEndPoint + screenEndDirection * 5, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                outerStartEdgePoint = intersectionTemp;
-                                outerEdgeIdx = item+2;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-                    }
-                }
-
-                if (checkIntersectionCount != 0)
-                {
-                    outerIntersectionCount = 1;
-                }
-                else
-                {
-                    Debug.Log("intersection error");
-                    // return;
-                }
-
-                // inner
-                foreach (int item in connectedTriangles[boundaryInnerEndVtx])
-                {
-                    checkIntersectionCount = 2;
-                    innerTriangleIdx = item;
-                    // 여기서 각 edge에 대해 intersection 체크 필요.
-                    if (edgeList[item].vtx1 != boundaryInnerEndVtx && edgeList[item].vtx2 != boundaryInnerEndVtx)
-                    {
-                        if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                innerStartEdgePoint = intersectionTemp;
-                                innerEdgeIdx = item;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-
-                        if (RayTriangleIntersection(screenEndOrigin, boundaryInnerEndPoint + screenEndDirection * 5, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                innerStartEdgePoint = intersectionTemp;
-                                innerEdgeIdx = item;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-                    }
-                    else if (edgeList[item + 1].vtx1 != boundaryInnerEndVtx && edgeList[item + 1].vtx2 != boundaryInnerEndVtx)
-                    {
-                        if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                innerStartEdgePoint = intersectionTemp;
-                                innerEdgeIdx = item+1;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-
-                        if (RayTriangleIntersection(screenEndOrigin, boundaryInnerEndPoint + screenEndDirection * 5, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                innerStartEdgePoint = intersectionTemp;
-                                innerEdgeIdx = item+1;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-                    }
-                    else if (edgeList[item + 1].vtx1 != boundaryInnerEndVtx && edgeList[item + 1].vtx2 != boundaryInnerEndVtx)
-                    {
-                        if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                innerStartEdgePoint = intersectionTemp;
-                                innerEdgeIdx = item+2;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-
-                        if (RayTriangleIntersection(screenEndOrigin, boundaryInnerEndPoint + screenEndDirection * 5, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
-                        {
-                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
-                                checkIntersectionCount--;
-                            else
-                            {
-                                innerStartEdgePoint = intersectionTemp;
-                                innerEdgeIdx = item+2;
-                                break;
-                            }
-                        }
-                        else
-                            checkIntersectionCount--;
-                    }
-                }
-
-                if (checkIntersectionCount != 0)
-                {
-                    innerIntersectionCount = 1;
-                }
-                else
-                {
-                    Debug.Log("intersection error");
-                    // return;
-                }
-            }
-
-            // triangle / edge intersection
-            if (outerIntersectionCount == 0 || innerIntersectionCount == 0)
-            {
-                Debug.Log("error 띄워야됨. intersect 되지 않음. ");
-            }
-            else if (outerIntersectionCount == 1 && innerIntersectionCount == 1)
-            {
-                int[] temp = obj.GetComponent<MeshFilter>().mesh.triangles;
-                int _outerVtxIdx = -1, _innerVtxIdx = -1;
-
-                // 처음과 달라야됨
-                if (firstBoundary)
-                {
-                    // outer
-                    for (int i = 0; i < 3; i++)
-                        if (temp[boundaryOuterStartPointIdx + i] != edgeList[outerEdgeIdx].vtx1 && temp[boundaryOuterStartPointIdx + i] != edgeList[outerEdgeIdx].vtx2)
-                            _outerVtxIdx = temp[boundaryOuterStartPointIdx + i];
-
-                    // inner
-                    for (int i = 0; i < 3; i++)
-                        if (temp[boundaryInnerStartPointIdx + i] != edgeList[innerEdgeIdx].vtx1 && temp[boundaryInnerStartPointIdx + i] != edgeList[innerEdgeIdx].vtx2)
-                            _innerVtxIdx = temp[boundaryInnerStartPointIdx + i];
-
-                    // start
-                    // outer
-                    DivideTrianglesStart(boundaryOuterStartPoint, outerStartEdgePoint, boundaryOuterStartPointIdx, outerEdgeIdx, _outerVtxIdx, 0);
-                    // inner
-                    DivideTrianglesStart(boundaryInnerStartPoint, innerStartEdgePoint, boundaryInnerStartPointIdx, innerEdgeIdx, _innerVtxIdx, 1);
-                    firstBoundary = false;
-                    Debug.Log("first boundary");
-                }
-                else
-                {
-                    // 처음이 아닌경우 start point가 정점에서 시작할 때
-                    DivideTrianglesStartFromVtx(boundaryOuterEndVtx, outerStartEdgePoint, outerTriangleIdx, outerEdgeIdx);
-                    DivideTrianglesStartFromVtx(boundaryInnerEndVtx, innerStartEdgePoint, innerTriangleIdx, innerEdgeIdx);
-                }
-
-                int start = 0;
-                bool outerEnd = false, innerEnd = false;
-                while (true)
-                {
-                    Vector3 _outerNewEdgePoint = Vector3.zero;
-                    Vector3 _innerNewEdgePoint = Vector3.zero;
-
-                    start++;
-
-                    outerIntersectionCount = 0;
-                    innerIntersectionCount = 0;
-
-                    int outerTemp = 0;
-                    int innerTemp = 0;
-
-                    if (edgeList[outerEdgeIdx].tri2 == boundaryOuterEndPointIdx && !outerEnd)
-                    {
-                        if (innerEnd)
-                            DivideTrianglesEnd(boundaryOuterEndPoint, boundaryOuterEndPointIdx, outerEdgeIdx, outerSide, 0, 0);
-                        else
-                            DivideTrianglesEnd(boundaryOuterEndPoint, boundaryOuterEndPointIdx, outerEdgeIdx, outerSide, 0, 2);
-                        
-                        outerEnd = true;
-                        outerTemp++;
-                    }
-                    else if (!outerEnd)
-                        outerIntersectionCount = TriangleEdgeIntersection(ref outerSide, ref outerEdgeIdx, ref _outerNewEdgePoint, boundaryOuterStartPoint, boundaryOuterEndPoint, edgeList[outerEdgeIdx].tri2);
-
-                    if (edgeList[innerEdgeIdx].tri2 == boundaryInnerEndPointIdx && !innerEnd)
-                    {
-                        DivideTrianglesEnd(boundaryInnerEndPoint, boundaryInnerEndPointIdx, innerEdgeIdx, innerSide, 1, outerTemp);
-                        innerEnd = true;
-                        innerTemp++;
-                    }
-                    else if (!innerEnd)
-                        innerIntersectionCount = TriangleEdgeIntersection(ref innerSide, ref innerEdgeIdx, ref _innerNewEdgePoint, boundaryInnerStartPoint, boundaryInnerEndPoint, edgeList[innerEdgeIdx].tri2);
-
-                    if (start >= 50 || (outerEnd && innerEnd && innerTemp == 0 && outerTemp == 0))
-                        break;
-
-                    int vtxLength = obj.GetComponent<MeshFilter>().mesh.vertices.Length;
-
-                    int numTemp = outerTemp + innerTemp;
-                    if (outerIntersectionCount == 1)
-                    {
-                        if (start == 1)
-                        {
-                            // 만약에 inner side가 일찍 end point에 도달한다면? 달라지겠지
-                            if (outerSide == 1)
-                                DivideTrianglesClockWise(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, vtxLength - (5 + numTemp), vtxLength - (4 + numTemp), 0);
-                            else if (outerSide == 2)
-                                DivideTrianglesCounterClockWise(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, vtxLength - (5 + numTemp), vtxLength - (4 + numTemp), 0);
-                        }
-                        else
-                        {
-                            if (outerSide == 1 && innerEnd && innerTemp == 0)
-                                DivideTrianglesClockWise(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, vtxLength - 2, vtxLength - 1, 0);
-                            else if (outerSide == 2 && innerEnd && innerTemp == 0)
-                                DivideTrianglesCounterClockWise(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, vtxLength - 2, vtxLength - 1, 0);
-                            else if (outerSide == 1)
-                                DivideTrianglesClockWise(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, vtxLength - (4 + numTemp), vtxLength - (3 + numTemp), 0);
-                            else if (outerSide == 2)
-                                DivideTrianglesCounterClockWise(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, vtxLength - (4 + numTemp), vtxLength - (3 + numTemp), 0);
-                        }
-                    }
-
-                    // 여기 위에서 두개가 생성되니까 하지만 그거랑 상관없이 기존의 vtx index는 유지해야되지않나?
-                    if (innerIntersectionCount == 1)
-                    {
-                        if (innerSide == 1)
-                            DivideTrianglesClockWise(_innerNewEdgePoint, edgeList[innerEdgeIdx].tri1, innerEdgeIdx, vtxLength - (2 + numTemp), vtxLength - (1 + numTemp), 1);
-                        else if (innerSide == 2)
-                            DivideTrianglesCounterClockWise(_innerNewEdgePoint, edgeList[innerEdgeIdx].tri1, innerEdgeIdx, vtxLength - (2 + numTemp), vtxLength - (1 + numTemp), 1);
-                    }
-                }
-                Debug.Log("end the loop");
-            }
-
-            // 이 부분이 문제인데 어떻게 해야 하지 나뭉린물이ㅜㄴ라ㅣㄴ위
-            boundaryOuterStartPoint = boundaryOuterEndPoint;
-            boundaryInnerStartPoint = boundaryInnerEndPoint;
-
-            connectedTriangles.Clear();
-            ConnectedTriangles();
-            connectedVertices.Clear();
-            ConnectedVertices();
-            GenerateEdgeList();
-            MeshRecalculate();
-            screenStartOrigin = screenEndOrigin;
-            screenStartDirection = screenEndDirection;
-        }
-    
-        /*
         if (cutting && !cutmode)
         {
             // 조건 정리 해야됨.
@@ -1254,15 +893,15 @@ public class RayIntersection : MonoBehaviour
                         colors[vtx3_2nd] = Color.black;
                         mesh.colors = colors;
                     }
-                    else if(m_cuttingSizeBar.value<=0.5)
+                    else if (m_cuttingSizeBar.value <= 0.5)
                     {
                         foreach (int item in connectedTriangles[vtx1])
                         {
                             // outerBoundaryTriangleIndexSet.Add(item);
                             wholeTriangleIndexSet.Add(item);
                             colors[temp[item]] = Color.black;
-                            colors[temp[item+1]] = Color.black;
-                            colors[temp[item+2]] = Color.black;
+                            colors[temp[item + 1]] = Color.black;
+                            colors[temp[item + 2]] = Color.black;
                         }
 
                         foreach (int item in connectedTriangles[vtx1_2nd])
@@ -1274,18 +913,18 @@ public class RayIntersection : MonoBehaviour
                             colors[temp[item + 2]] = Color.black;
                         }
                         mesh.colors = colors;
-                    } 
-                    else if(m_cuttingSizeBar.value<=0.75)
+                    }
+                    else if (m_cuttingSizeBar.value <= 0.75)
                     {
                         for (int i = 0; i < 3; i++)
                         {
                             int a, b;
-                            if(i==0)
+                            if (i == 0)
                             {
                                 a = vtx1;
                                 b = vtx1_2nd;
                             }
-                            else if(i==1)
+                            else if (i == 1)
                             {
                                 a = vtx2;
                                 b = vtx2_2nd;
@@ -1315,7 +954,7 @@ public class RayIntersection : MonoBehaviour
                         mesh.colors = colors;
                     }
 
-                    else if (m_cuttingSizeBar.value<=1.0)
+                    else if (m_cuttingSizeBar.value <= 1.0)
                     {
                         foreach (int item in connectedVertices[vtx1])
                         {
@@ -1343,9 +982,325 @@ public class RayIntersection : MonoBehaviour
                 }
             }
         } // cutMode
-        */
 
-        if (cutting && !cutmode)
+        // boundary cut
+        if (boundaryCut)
+        {
+            int verticesLength = obj.GetComponent<MeshFilter>().mesh.vertices.Length;
+            int outerIntersectionCount = 0, innerIntersectionCount = 0;
+            int outerSide = 0, innerSide = 0;
+            int outerTriangleIdx = -1, innerTriangleIdx = -1;
+            // edge index
+            int outerEdgeIdx = -1, innerEdgeIdx = -1;
+
+            Vector3 outerStartEdgePoint = Vector3.zero;
+            Vector3 innerStartEdgePoint = Vector3.zero;
+
+            // 여기다가 조건을 넣어서 첫 스타트가 아닌 경우 end point를 start point에 넣어야됨.
+            if (firstBoundary)
+            {
+                outerIntersectionCount = TriangleEdgeIntersectionBoundary(ref outerSide, ref outerEdgeIdx, ref outerStartEdgePoint, boundaryOuterStartPoint, boundaryOuterEndPoint, boundaryOuterStartPointIdx);
+                innerIntersectionCount = TriangleEdgeIntersectionBoundary(ref innerSide, ref innerEdgeIdx, ref innerStartEdgePoint, boundaryInnerStartPoint, boundaryInnerEndPoint, boundaryInnerStartPointIdx);
+            }
+            else
+            {
+                // outer
+                bool checkIntersection = true;
+                foreach (int item in connectedTriangles[boundaryOuterEndVtx])
+                {
+                    checkIntersection = true;
+                    // 여기서 각 edge에 대해 intersection 체크 필요.
+                    outerTriangleIdx = item;
+                    if (edgeList[item].vtx1 != boundaryOuterEndVtx && edgeList[item].vtx2 != boundaryOuterEndVtx)
+                    {
+                        if (RayTriangleIntersection(screenMiddleOrigin, boundaryOuterEndPoint + screenEndDirection * 5, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
+                        {
+                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
+                                checkIntersection = false;
+                            else
+                            {
+                                outerStartEdgePoint = intersectionTemp;
+                                outerEdgeIdx = item;
+                                break;
+                            }
+                        }
+                        else
+                            checkIntersection = false;
+                    }
+                    else if (edgeList[item + 1].vtx1 != boundaryOuterEndVtx && edgeList[item + 1].vtx2 != boundaryOuterEndVtx)
+                    {
+                        if (RayTriangleIntersection(screenMiddleOrigin, boundaryOuterEndPoint + screenEndDirection * 5, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
+                        {
+                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
+                                checkIntersection = false;
+                            else
+                            {
+                                outerStartEdgePoint = intersectionTemp;
+                                outerEdgeIdx = item+1;
+                                break;
+                            }
+                        }
+                        else
+                            checkIntersection = false;
+                    }
+                    else if (edgeList[item + 2].vtx1 != boundaryOuterEndVtx && edgeList[item + 2].vtx2 != boundaryOuterEndVtx)
+                    {
+                        if (RayTriangleIntersection(screenMiddleOrigin, boundaryOuterEndPoint + screenEndDirection * 5, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
+                        {
+                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
+                                checkIntersection = false;
+                            else
+                            {
+                                outerStartEdgePoint = intersectionTemp;
+                                outerEdgeIdx = item+2;
+                                break;
+                            }
+                        }
+                        else
+                            checkIntersection = false;
+                    }
+                }
+
+                if (checkIntersection)
+                    outerIntersectionCount = 1;
+                else
+                    Debug.Log("intersection error");
+
+                // inner
+                foreach (int item in connectedTriangles[boundaryInnerEndVtx])
+                {
+                    checkIntersection = true;
+                    innerTriangleIdx = item;
+                    // 여기서 각 edge에 대해 intersection 체크 필요.
+                    if (edgeList[item].vtx1 != boundaryInnerEndVtx && edgeList[item].vtx2 != boundaryInnerEndVtx)
+                    {
+                        if (RayTriangleIntersection(screenMiddleOrigin, boundaryInnerEndPoint + screenEndDirection * 5, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
+                        {
+                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
+                                checkIntersection = false;
+                            else
+                            {
+                                innerStartEdgePoint = intersectionTemp;
+                                innerEdgeIdx = item;
+                                break;
+                            }
+                        }
+                        else
+                            checkIntersection = false;
+
+                    }
+                    else if (edgeList[item + 1].vtx1 != boundaryInnerEndVtx && edgeList[item + 1].vtx2 != boundaryInnerEndVtx)
+                    {
+                        if (RayTriangleIntersection(screenMiddleOrigin, boundaryInnerEndPoint + screenEndDirection * 5, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
+                        {
+                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
+                                checkIntersection = false;
+                            else
+                            {
+                                innerStartEdgePoint = intersectionTemp;
+                                innerEdgeIdx = item+1;
+                                break;
+                            }
+                        }
+                        else
+                            checkIntersection = false;
+
+                    }
+                    else if (edgeList[item + 1].vtx1 != boundaryInnerEndVtx && edgeList[item + 1].vtx2 != boundaryInnerEndVtx)
+                    {
+                        if (RayTriangleIntersection(screenMiddleOrigin, boundaryInnerEndPoint + screenEndDirection * 5, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
+                        {
+                            if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
+                                checkIntersection = false;
+                            else
+                            {
+                                innerStartEdgePoint = intersectionTemp;
+                                innerEdgeIdx = item+2;
+                                break;
+                            }
+                        }
+                        else
+                            checkIntersection = false;
+
+                    }
+                }
+
+                if (checkIntersection)
+                    innerIntersectionCount = 1;
+                else
+                    Debug.Log("intersection error");
+            }
+            
+            // triangle / edge intersection
+            if (outerIntersectionCount == 0 || innerIntersectionCount == 0)
+            {
+                Debug.Log("error 띄워야됨. intersect 되지 않음. ");
+            }
+            else if (outerIntersectionCount == 1 && innerIntersectionCount == 1)
+            {
+                int[] temp = obj.GetComponent<MeshFilter>().mesh.triangles;
+                int _outerVtxIdx = -1, _innerVtxIdx = -1;
+                int _outerVtxIdxBeforeDivide = -1, _innerVtxIdxBeforeDivide = -1;
+                // 처음과 달라야됨
+                if (firstBoundary)
+                {
+                    // outer
+                    for (int i = 0; i < 3; i++)
+                        if (temp[boundaryOuterStartPointIdx + i] != edgeList[outerEdgeIdx].vtx1 && temp[boundaryOuterStartPointIdx + i] != edgeList[outerEdgeIdx].vtx2)
+                            _outerVtxIdx = temp[boundaryOuterStartPointIdx + i];
+
+                    // inner
+                    for (int i = 0; i < 3; i++)
+                        if (temp[boundaryInnerStartPointIdx + i] != edgeList[innerEdgeIdx].vtx1 && temp[boundaryInnerStartPointIdx + i] != edgeList[innerEdgeIdx].vtx2)
+                            _innerVtxIdx = temp[boundaryInnerStartPointIdx + i];
+
+                    // start
+                    // outer
+                    DivideTrianglesStartBoundary(boundaryOuterStartPoint, outerStartEdgePoint, boundaryOuterStartPointIdx, outerEdgeIdx, _outerVtxIdx, 0);
+                    // inner
+                    DivideTrianglesStartBoundary(boundaryInnerStartPoint, innerStartEdgePoint, boundaryInnerStartPointIdx, innerEdgeIdx, _innerVtxIdx, 1);
+
+                    Debug.Log("first boundary");
+                }
+                else
+                {
+                    // 처음이 아닌경우 start point가 정점에서 시작할 때
+                    DivideTrianglesStartFromVtx(boundaryOuterEndVtx, outerStartEdgePoint, outerTriangleIdx, outerEdgeIdx, ref _outerVtxIdxBeforeDivide);
+                    DivideTrianglesStartFromVtx(boundaryInnerEndVtx, innerStartEdgePoint, innerTriangleIdx, innerEdgeIdx, ref _innerVtxIdxBeforeDivide);
+                }
+
+                int start = 0;
+
+                // outer
+                while(true)
+                {
+                    Vector3 _outerNewEdgePoint = Vector3.zero;
+                    start++;
+                    outerIntersectionCount = 0;
+                    bool outerEnd = false;
+                    int vtxLength = obj.GetComponent<MeshFilter>().mesh.vertices.Length;
+                    
+                    if (edgeList[outerEdgeIdx].tri2 == boundaryOuterEndPointIdx  && lastBoundary)
+                    {
+                        DivideTrianglesEndToVtx(boundaryOuterFirstVtx, boundaryOuterEndPointIdx, outerEdgeIdx, vtxLength - 1);
+                        outerEnd = true;
+                    }
+                    else if (edgeList[outerEdgeIdx].tri2 == boundaryOuterEndPointIdx  && !lastBoundary)
+                    {
+                        DivideTrianglesEndBoundary(boundaryOuterEndPoint, boundaryOuterEndPointIdx, outerEdgeIdx, vtxLength - 1, 0);
+                        outerEnd = true;
+                    }
+                    else if (!outerEnd)
+                        outerIntersectionCount = TriangleEdgeIntersectionBoundary(ref outerSide, ref outerEdgeIdx, ref _outerNewEdgePoint, boundaryOuterStartPoint, boundaryOuterEndPoint, edgeList[outerEdgeIdx].tri2);
+
+                    if (outerEnd || start==30)
+                        break;
+
+                    if (outerIntersectionCount == 1)
+                    {
+                        if(firstBoundary && start == 1)
+                        {
+                            if (outerSide == 1)
+                                DivideTrianglesClockWiseBoundary(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, boundaryOuterFirstVtx + 1);
+                            else if (outerSide == 2)
+                                DivideTrianglesCounterClockWiseBoundary(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, boundaryOuterFirstVtx + 1);
+                        }
+                        else if(start == 1)
+                        {
+                            if (outerSide == 1)
+                                DivideTrianglesClockWiseBoundary(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, _outerVtxIdxBeforeDivide);
+                            else if (outerSide == 2)
+                                DivideTrianglesCounterClockWiseBoundary(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, _outerVtxIdxBeforeDivide);
+                        }
+                        else
+                        {
+                            if (outerSide == 1)
+                                DivideTrianglesClockWiseBoundary(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, vtxLength - 1);
+                            else if (outerSide == 2)
+                                DivideTrianglesCounterClockWiseBoundary(_outerNewEdgePoint, edgeList[outerEdgeIdx].tri1, outerEdgeIdx, vtxLength - 1);
+                        }
+                    }
+
+                }
+                Debug.Log("end the outer loop");
+
+
+
+                start = 0;
+                // inner
+                while (true)
+                {
+                    // 구조를 좀 바보같이 짠거 같기도함. outer inner를 그냥 따로 반복 시키면 되지 않았을까?
+                    // 따로 나눴더라면 훨씬 쉽게 작업할 수 있었음.
+                    Vector3 _innerNewEdgePoint = Vector3.zero;
+                    bool innerEnd = false;
+                    start++;
+                    innerIntersectionCount = 0;
+                    
+                    int vtxLength = obj.GetComponent<MeshFilter>().mesh.vertices.Length;
+
+                    if (edgeList[innerEdgeIdx].tri2 == boundaryInnerEndPointIdx && lastBoundary)
+                    {
+                        DivideTrianglesEndToVtx(boundaryInnerFirstVtx, boundaryInnerEndPointIdx, innerEdgeIdx, vtxLength-1);
+                        innerEnd = true;
+                    }
+                    else if (edgeList[innerEdgeIdx].tri2 == boundaryInnerEndPointIdx && !lastBoundary)
+                    {
+                        DivideTrianglesEndBoundary(boundaryInnerEndPoint, boundaryInnerEndPointIdx, innerEdgeIdx, vtxLength - 1, 1);
+                        innerEnd = true;
+                    }
+                    else if (!innerEnd)
+                        innerIntersectionCount = TriangleEdgeIntersectionBoundary(ref innerSide, ref innerEdgeIdx, ref _innerNewEdgePoint, boundaryInnerStartPoint, boundaryInnerEndPoint, edgeList[innerEdgeIdx].tri2);
+                    
+                    if (innerEnd || start == 30)
+                        break;
+                                        
+                    if (innerIntersectionCount == 1)
+                    {
+                        if (firstBoundary && start == 1)
+                        {
+                            if (innerSide == 1)
+                                DivideTrianglesClockWiseBoundary(_innerNewEdgePoint, edgeList[innerEdgeIdx].tri1, innerEdgeIdx, boundaryInnerFirstVtx + 1);
+                            else if (innerSide == 2)
+                                DivideTrianglesCounterClockWiseBoundary(_innerNewEdgePoint, edgeList[innerEdgeIdx].tri1, innerEdgeIdx, boundaryInnerFirstVtx + 1);
+                            firstBoundary = false;
+                        }
+                        else if(start==1)
+                        {
+                            if (innerSide == 1)
+                                DivideTrianglesClockWiseBoundary(_innerNewEdgePoint, edgeList[innerEdgeIdx].tri1, innerEdgeIdx, _innerVtxIdxBeforeDivide);
+                            else if (innerSide == 2)
+                                DivideTrianglesCounterClockWiseBoundary(_innerNewEdgePoint, edgeList[innerEdgeIdx].tri1, innerEdgeIdx, _innerVtxIdxBeforeDivide);
+                        }
+                        else
+                        {
+                            if (innerSide == 1)
+                                DivideTrianglesClockWiseBoundary(_innerNewEdgePoint, edgeList[innerEdgeIdx].tri1, innerEdgeIdx, vtxLength -1);
+                            else if (innerSide == 2)
+                                DivideTrianglesCounterClockWiseBoundary(_innerNewEdgePoint, edgeList[innerEdgeIdx].tri1, innerEdgeIdx, vtxLength - 1);
+                        }
+                    }
+                }
+                Debug.Log("end the inner loop");
+            }
+            boundaryCut = false;
+            // 이 부분이 문제인데 어떻게 해야 하지 나뭉린물이ㅜㄴ라ㅣㄴ위
+            
+            boundaryOuterStartPoint = boundaryOuterEndPoint;
+            boundaryInnerStartPoint = boundaryInnerEndPoint;
+
+            screenStartOrigin = screenEndOrigin;
+            screenStartDirection = screenEndDirection;
+            
+            connectedTriangles.Clear();
+            ConnectedTriangles();
+            connectedVertices.Clear();
+            ConnectedVertices();
+            GenerateEdgeList();
+            MeshRecalculate();
+        }
+        
+        if (boundaryCutMode)
         {
             Debug.Log("cutmode ininiin");
             if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
@@ -1360,8 +1315,6 @@ public class RayIntersection : MonoBehaviour
 
                 int triangleIndex_outer = -1;
                 int triangleIndex_inner = -1;
-                int vtx1 = 0, vtx2 = 0, vtx3 = 0;
-                int vtx1_2nd = 0, vtx2_2nd = 0, vtx3_2nd = 0;
 
                 for (int i = 0; i < temp.Length; i += 3)
                 {
@@ -1378,16 +1331,12 @@ public class RayIntersection : MonoBehaviour
                                 triangleIndex_inner = triangleIndex_outer;
                                 innerIntersectionPoint = outerIntersectionPoint;
                                 dst_2nd = dst_min;
-                                vtx1_2nd = vtx1;
-                                vtx2_2nd = vtx2;
-                                vtx3_2nd = vtx3;
+
                             }
                             triangleIndex_outer = i;
                             dst_min = dst_temp;
                             outerIntersectionPoint = intersectionTemp;
-                            vtx1 = temp[i];
-                            vtx2 = temp[i + 1];
-                            vtx3 = temp[i + 2];
+
                             continue;
                         }
                         if (dst_2nd > dst_temp)
@@ -1395,9 +1344,7 @@ public class RayIntersection : MonoBehaviour
                             triangleIndex_inner = i;
                             innerIntersectionPoint = intersectionTemp;
                             dst_2nd = dst_temp;
-                            vtx1_2nd = temp[i];
-                            vtx2_2nd = temp[i + 1];
-                            vtx3_2nd = temp[i + 2];
+
                         }
                     }
                 }
@@ -1405,7 +1352,44 @@ public class RayIntersection : MonoBehaviour
                 if (dst_min != 10000000)
                 {
                     // 각 point에 대한 정보만 받아 놓고 실시간으로 ray만 뿌려주고 endpoint까지 찍은 후 나눈다.
-                    if (firstRay)
+                    if(Input.GetMouseButtonUp(0))
+                    {
+                        Debug.Log("찐막On");
+
+                        // 손 뗐을때, 마지막 지점에서 start지점으로 잇는다.
+                        // 뗀 지점이 start가 됨.
+                        screenStartOrigin = screenEndOrigin;
+                        screenStartDirection = screenEndDirection;
+
+                        boundaryOuterStartPoint = boundaryOuterEndPoint;
+                        boundaryInnerStartPoint = boundaryInnerEndPoint;
+
+                        boundaryOuterStartPointIdx = boundaryOuterEndPointIdx;
+                        boundaryInnerStartPointIdx = boundaryInnerEndPointIdx;
+
+                        screenEndOrigin = screenLastOrigin;
+                        screenEndDirection = screenLastDirection;
+
+                        boundaryOuterEndPoint = boundaryOuterLastPoint;
+                        boundaryInnerEndPoint = boundaryInnerLastPoint;
+
+                        boundaryOuterEndPointIdx = boundaryOuterLastPointIdx;
+                        boundaryInnerEndPointIdx = boundaryInnerLastPointIdx;
+                        screenMiddleOrigin = Vector3.Lerp(screenStartOrigin, screenEndOrigin, 0.5f);
+                        // test
+
+                        var boundaryLine = new GameObject("Incision line");
+                        var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
+                        lineRenderer.material.color = Color.black;
+                        lineRenderer.SetPositions(new Vector3[] { boundaryOuterStartPoint - screenStartDirection, boundaryOuterEndPoint - screenEndDirection });
+
+                        // 여기서 해야될건 
+                        FindTriangleEdgeIntersection(boundaryOuterFirstVtx, boundaryInnerFirstVtx);
+                        boundaryCut = true;
+                        boundaryCutMode = false;
+                        lastBoundary = true;
+                    }
+                    else if (firstRay)
                     {
                         Debug.Log("mouse button down");
                         // 여기다가 start point에 대한 정보 triangle 등
@@ -1413,21 +1397,30 @@ public class RayIntersection : MonoBehaviour
                         screenStartOrigin = cam.ScreenPointToRay(Input.mousePosition).origin;
                         screenStartDirection = cam.ScreenPointToRay(Input.mousePosition).direction;
 
+                        screenLastOrigin = screenStartOrigin;
+                        screenLastDirection = screenStartDirection;
+
                         // 이름들 다 바꾸는게 좋음.
                         boundaryOuterStartPoint = outerIntersectionPoint;
                         boundaryInnerStartPoint = innerIntersectionPoint;
 
+                        boundaryOuterLastPoint = boundaryOuterStartPoint;
+                        boundaryInnerLastPoint = boundaryInnerStartPoint;
+
                         boundaryOuterStartPointIdx = triangleIndex_outer;
                         boundaryInnerStartPointIdx = triangleIndex_inner;
+
+                        boundaryOuterLastPointIdx = boundaryOuterStartPointIdx;
+                        boundaryInnerLastPointIdx = boundaryInnerStartPointIdx;
 
                         // 여기서 line renderer 시작 
                         Debug.Log("boundary cut start");
                         Debug.Log("start triangle idx : " + boundaryOuterStartPointIdx);
+                        Debug.Log(screenStartOrigin);
                         firstRay = false;
                     }
-                    // 이 조건을 up 했을때가 아니라 일정거리가 멀어졌을때 해야됨.
-                    else if (Vector3.Distance(outerIntersectionPoint, boundaryOuterStartPoint) > 5.0f)
-                    // if(Input.GetTouch(0).phase == TouchPhase.Ended)
+                    
+                    else if (Vector3.Distance(outerIntersectionPoint, boundaryOuterStartPoint) > 6.0f)
                     {
                         Debug.Log("inininininininininin");
                         screenEndOrigin = cam.ScreenPointToRay(Input.mousePosition).origin;
@@ -1442,6 +1435,7 @@ public class RayIntersection : MonoBehaviour
                         Debug.Log("boundary end");
                         Debug.Log("start point : " + boundaryOuterStartPoint);
                         Debug.Log("end point : " + boundaryOuterEndPoint);
+                        screenMiddleOrigin = Vector3.Lerp(screenStartOrigin, screenEndOrigin, 0.5f);
                         // 여기서 incision false 값으로 바뀌고, triangle division 실행 
                         var boundaryLine = new GameObject("Incision line");
                         var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
@@ -1456,6 +1450,7 @@ public class RayIntersection : MonoBehaviour
             }
         } // boundary cut mode
 
+        // measure
         if (measuring)
         {
             if (Input.GetMouseButtonDown(0))
@@ -1491,6 +1486,7 @@ public class RayIntersection : MonoBehaviour
             }
         }
 
+        // patch
         if (reCalculate)
         {
             if(m_Posbar.value != oldValue_height || m_bar.value != oldValue_curve)
@@ -1983,22 +1979,68 @@ public class RayIntersection : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 각 triangle 별로 side 구분 해야됨.
+    /// 여기서 반환해야하는 값은 intersection된 edgeIdx, _new의 index값 두 개(left, right side)
 
-    
-        /// <summary>
-        /// 각 triangle 별로 side 구분 해야됨.
-        /// 여기서 반환해야하는 값은 intersection된 edgeIdx, _new의 index값 두 개(left, right side)
+    /// </summary>
+    /// <param name="_center"> start point 좌표</param>
+    /// <param name="_new"> intersection point 좌표</param>
+    /// <param name="_triangleIdx"> 현재 triangle index</param>
+    /// <param name="_edgeIdx"> intersection된 edge</param>
+    /// <param name="_vtxIdx"> intersection된 edge의 반대편 vtx</param>
+    /// 
 
-        /// </summary>
-        /// <param name="_center"> start point 좌표</param>
-        /// <param name="_new"> intersection point 좌표</param>
-        /// <param name="_triangleIdx"> 현재 triangle index</param>
-        /// <param name="_edgeIdx"> intersection된 edge</param>
-        /// <param name="_vtxIdx"> intersection된 edge의 반대편 vtx</param>
-        /// 
+    // boundary cut
+    public void DivideTrianglesStartBoundary(Vector3 _center, Vector3 _new, int _triangleIdx, int _edgeIdx, int _vtxIdx, int _isInner)
+    {
+        Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
+        int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
+        int[] newTriangles = new int[triangles.Length + 9];
+        Vector3[] vertices = obj.GetComponent<MeshFilter>().mesh.vertices;
+        Vector3[] newVertices;
+        newVertices = new Vector3[vertices.Length + 2];
 
-    // incision
-    public void DivideTrianglesStartFromVtx(int _centerIdx, Vector3 _new, int _triangleIdx, int _edgeIdx)
+        for (int i = 0; i < triangles.Length; i++)
+            newTriangles[i] = triangles[i];
+
+        for (int i = 0; i < vertices.Length; i++)
+            newVertices[i] = vertices[i];
+
+        if (_isInner == 0)
+        {
+            // outer
+            boundaryOuterFirstVtx = vertices.Length;
+        }
+        else
+        {
+            boundaryInnerFirstVtx = vertices.Length;
+        }
+
+        newVertices[vertices.Length] = obj.transform.InverseTransformPoint(new Vector3(_center.x, _center.y, _center.z));
+        newVertices[vertices.Length + 1] = obj.transform.InverseTransformPoint(_new);
+        newTriangles[_triangleIdx] = vertices.Length;
+        newTriangles[_triangleIdx + 1] = edgeList[_edgeIdx].vtx1;
+        newTriangles[_triangleIdx + 2] = vertices.Length + 1;
+
+        int _triLen = triangles.Length;
+        newTriangles[_triLen++] = vertices.Length;
+        newTriangles[_triLen++] = vertices.Length + 1;
+        newTriangles[_triLen++] = edgeList[_edgeIdx].vtx2;
+
+        newTriangles[_triLen++] = vertices.Length;
+        newTriangles[_triLen++] = edgeList[_edgeIdx].vtx2;
+        newTriangles[_triLen++] = _vtxIdx;
+
+        newTriangles[_triLen++] = vertices.Length;
+        newTriangles[_triLen++] = _vtxIdx;
+        newTriangles[_triLen] = edgeList[_edgeIdx].vtx1;
+        
+        mesh.vertices = newVertices;
+        mesh.triangles = newTriangles;
+    }
+
+    public void DivideTrianglesStartFromVtx(int _centerIdx, Vector3 _new, int _triangleIdx, int _edgeIdx, ref int _vtxIdxBeforeDivide)
     {
         Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
         int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
@@ -2011,7 +2053,7 @@ public class RayIntersection : MonoBehaviour
 
         for (int i = 0; i < vertices.Length; i++)
             newVertices[i] = vertices[i];
-
+        _vtxIdxBeforeDivide = vertices.Length;
         newVertices[vertices.Length] = obj.transform.InverseTransformPoint(_new);
 
         newTriangles[_triangleIdx] = _centerIdx;
@@ -2027,13 +2069,176 @@ public class RayIntersection : MonoBehaviour
         mesh.triangles = newTriangles;
     }
 
+    public void DivideTrianglesEndToVtx(int _endVtxIdx, int _triangleIdx, int _edgeIdx, int _edgeVtxIdx)
+    {
+        Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
+        int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
+        int[] newTriangles = new int[triangles.Length + 3];
+        Vector3[] vertices = obj.GetComponent<MeshFilter>().mesh.vertices;
+
+        for (int i = 0; i < triangles.Length; i++)
+            newTriangles[i] = triangles[i];
+
+        // edge idx도 가져오고 edge를 구성하는 vtx idx도 필요함.
+        newTriangles[_triangleIdx] = _edgeVtxIdx;
+        newTriangles[_triangleIdx + 1] = edgeList[_edgeIdx].vtx2;
+        newTriangles[_triangleIdx + 2] = _endVtxIdx;
+
+        int _triLen = triangles.Length;
+        newTriangles[_triLen++] = _edgeVtxIdx;
+        newTriangles[_triLen++] = _endVtxIdx;
+        newTriangles[_triLen++] = edgeList[_edgeIdx].vtx1;
+
+        mesh.triangles = newTriangles;
+    }
+
+    public void DivideTrianglesEndBoundary(Vector3 _newCenter, int _triangleIdx, int _edgeIdx, int _edgeVtxIdx, int _isInner)
+    {
+        Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
+        int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
+        int[] newTriangles = new int[triangles.Length + 9];
+        Vector3[] vertices = obj.GetComponent<MeshFilter>().mesh.vertices;
+        Vector3[] newVertices = new Vector3[vertices.Length + 1];
+
+        for (int i = 0; i < triangles.Length; i++)
+            newTriangles[i] = triangles[i];
+
+        for (int i = 0; i < vertices.Length; i++)
+            newVertices[i] = vertices[i];
+
+        newVertices[vertices.Length] = obj.transform.InverseTransformPoint(_newCenter);
+
+        int newEdgeIdx = -1, newVtxIdx = -1;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (triangles[_triangleIdx + i] != edgeList[_edgeIdx].vtx2 && triangles[_triangleIdx + i] != edgeList[_edgeIdx].vtx1)
+                newVtxIdx = triangles[_triangleIdx + i];
+            if (edgeList[_triangleIdx + i].vtx1 == edgeList[_edgeIdx].vtx2 && edgeList[_triangleIdx + i].vtx2 == edgeList[_edgeIdx].vtx1)
+                newEdgeIdx = _triangleIdx + i;
+        }
+
+        if (_isInner == 0)
+        {
+            // outer
+            boundaryOuterEndVtx = vertices.Length;
+        }
+        else
+        {
+            // inner
+            boundaryInnerEndVtx = vertices.Length;
+        }
+
+        newTriangles[_triangleIdx] = vertices.Length;
+        newTriangles[_triangleIdx + 1] = _edgeVtxIdx;
+        newTriangles[_triangleIdx + 2] = edgeList[newEdgeIdx].vtx2;
+
+        int _triLen = triangles.Length;
+
+        newTriangles[_triLen++] = vertices.Length;
+        newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx2;
+        newTriangles[_triLen++] = newVtxIdx;
+
+        newTriangles[_triLen++] = vertices.Length;
+        newTriangles[_triLen++] = newVtxIdx;
+        newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx1;
+
+        newTriangles[_triLen++] = vertices.Length;
+        newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx1;
+        newTriangles[_triLen] = _edgeVtxIdx;
+
+        mesh.vertices = newVertices;
+        mesh.triangles = newTriangles;
+    }
+
+    public void DivideTrianglesClockWiseBoundary(Vector3 _new, int _triangleIdx, int _intersectEdgeIdx, int _edgeVtxIdx)
+    {
+        
+        Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
+        int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
+        int[] newTriangles = new int[triangles.Length + 6];
+        Vector3[] vertices = obj.GetComponent<MeshFilter>().mesh.vertices;
+        Vector3[] newVertices;
+        newVertices = new Vector3[vertices.Length + 1];
+        
+        int nextLength = -2;
+        if (_intersectEdgeIdx - _triangleIdx != 2)
+            nextLength = 1;
+        
+        for (int i = 0; i < triangles.Length; i++)
+            newTriangles[i] = triangles[i];
+
+        for (int i = 0; i < vertices.Length; i++)
+            newVertices[i] = vertices[i];
+
+        newVertices[vertices.Length] = obj.transform.InverseTransformPoint(_new);
+        
+        newTriangles[_triangleIdx] = _edgeVtxIdx;
+        newTriangles[_triangleIdx + 1] = edgeList[_intersectEdgeIdx].vtx1;
+        newTriangles[_triangleIdx + 2] = vertices.Length;
+
+        int _triLen = triangles.Length;
+        newTriangles[_triLen++] = _edgeVtxIdx;
+        newTriangles[_triLen++] = vertices.Length;
+        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx].vtx2;
+        newTriangles[_triLen++] = _edgeVtxIdx;
+        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx1;
+        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx2;
+
+        mesh.vertices = newVertices;
+        mesh.triangles = newTriangles;
+    }
+
+    public void DivideTrianglesCounterClockWiseBoundary(Vector3 _new, int _triangleIdx, int _intersectEdgeIdx, int _edgeVtxIdx)
+    {
+        Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
+        int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
+        int[] newTriangles = new int[triangles.Length + 6];
+        Vector3[] vertices = obj.GetComponent<MeshFilter>().mesh.vertices;
+        Vector3[] newVertices = new Vector3[vertices.Length + 1];
+
+        int nextLength = 2;
+        if (_intersectEdgeIdx - _triangleIdx != 0)
+            nextLength = -1;
+
+        for (int i = 0; i < triangles.Length; i++)
+            newTriangles[i] = triangles[i];
+
+        for (int i = 0; i < vertices.Length; i++)
+            newVertices[i] = vertices[i];
+
+        newVertices[vertices.Length] = obj.transform.InverseTransformPoint(_new);
+        
+        newTriangles[_triangleIdx] = _edgeVtxIdx;
+        newTriangles[_triangleIdx + 1] = vertices.Length;
+        newTriangles[_triangleIdx + 2] = edgeList[_intersectEdgeIdx].vtx2;
+
+        int _triLen = triangles.Length;
+
+        newTriangles[_triLen++] = _edgeVtxIdx;
+        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx].vtx1;
+        newTriangles[_triLen++] = vertices.Length;
+
+        newTriangles[_triLen++] = _edgeVtxIdx;
+        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx1;
+        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx2;
+
+        mesh.vertices = newVertices;
+        mesh.triangles = newTriangles;
+    }
+
+    // incision
     public void DivideTrianglesStart(Vector3 _center, Vector3 _new, int _triangleIdx, int _edgeIdx, int _vtxIdx, int _isInner)
     {
         Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
         int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
         int[] newTriangles = new int[triangles.Length + 9];
         Vector3[] vertices = obj.GetComponent<MeshFilter>().mesh.vertices;
-        Vector3[] newVertices = new Vector3[vertices.Length + 3];
+        Vector3[] newVertices;
+        if (boundaryCut)
+            newVertices = new Vector3[vertices.Length + 2];
+        else
+            newVertices = new Vector3[vertices.Length + 3];
 
         for (int i = 0; i < triangles.Length; i++)
             newTriangles[i] = triangles[i];
@@ -2044,49 +2249,92 @@ public class RayIntersection : MonoBehaviour
         if (_isInner == 0)
         {
             // outer
-            leftSide.Add(vertices.Length + 1);
-            rightSide.Add(vertices.Length + 2);
+            if (boundaryCut)
+            {
+                boundaryOuterFirstVtx = vertices.Length;
+            }
+            else
+            {
+                leftSide.Add(vertices.Length + 1);
+                rightSide.Add(vertices.Length + 2);
 
-            leftSide.Add(edgeList[_edgeIdx].vtx1);
-            rightSide.Add(edgeList[_edgeIdx].vtx2);
-
+                leftSide.Add(edgeList[_edgeIdx].vtx1);
+                rightSide.Add(edgeList[_edgeIdx].vtx2);
+            }
         }
         else
         {
             // inner
-            rightSide.Add(vertices.Length + 1);
-            leftSide.Add(vertices.Length + 2);
+            if(boundaryCut)
+            {
+                boundaryInnerFirstVtx = vertices.Length;
+            }
+            else
+            {
+                rightSide.Add(vertices.Length + 1);
+                leftSide.Add(vertices.Length + 2);
 
-            rightSide.Add(edgeList[_edgeIdx].vtx1);
-            leftSide.Add(edgeList[_edgeIdx].vtx2);
-
+                rightSide.Add(edgeList[_edgeIdx].vtx1);
+                leftSide.Add(edgeList[_edgeIdx].vtx2);
+            }
+                
         }
 
         newVertices[vertices.Length] = obj.transform.InverseTransformPoint(new Vector3(_center.x, _center.y, _center.z));
-        // left side vtx
-        newVertices[vertices.Length + 1] = obj.transform.InverseTransformPoint(_new);
-        // right side vtx
-        newVertices[vertices.Length + 2] = obj.transform.InverseTransformPoint(_new);
+        if(boundaryCut)
+        {
+            newVertices[vertices.Length + 1] = obj.transform.InverseTransformPoint(_new);
+        }
+        else
+        {
+            // left side vtx
+            newVertices[vertices.Length + 1] = obj.transform.InverseTransformPoint(_new);
+            // right side vtx
+            newVertices[vertices.Length + 2] = obj.transform.InverseTransformPoint(_new);
+        }
 
-        // 이 triangle은 지금 left side
-        newTriangles[_triangleIdx] = vertices.Length;
-        newTriangles[_triangleIdx + 1] = edgeList[_edgeIdx].vtx1;
-        newTriangles[_triangleIdx + 2] = vertices.Length + 1;
+        if(boundaryCut)
+        {
+            newTriangles[_triangleIdx] = vertices.Length;
+            newTriangles[_triangleIdx + 1] = edgeList[_edgeIdx].vtx1;
+            newTriangles[_triangleIdx + 2] = vertices.Length + 1;
 
-        int _triLen = triangles.Length;
-        // 이 triangle은 지금 right side
-        newTriangles[_triLen++] = vertices.Length;
-        newTriangles[_triLen++] = vertices.Length + 2;
-        newTriangles[_triLen++] = edgeList[_edgeIdx].vtx2;
+            int _triLen = triangles.Length;
+            newTriangles[_triLen++] = vertices.Length;
+            newTriangles[_triLen++] = vertices.Length + 1;
+            newTriangles[_triLen++] = edgeList[_edgeIdx].vtx2;
 
-        // 밑에 두개 triangle은 무시 한다. 
-        newTriangles[_triLen++] = vertices.Length;
-        newTriangles[_triLen++] = edgeList[_edgeIdx].vtx2;
-        newTriangles[_triLen++] = _vtxIdx;
+            newTriangles[_triLen++] = vertices.Length;
+            newTriangles[_triLen++] = edgeList[_edgeIdx].vtx2;
+            newTriangles[_triLen++] = _vtxIdx;
 
-        newTriangles[_triLen++] = vertices.Length;
-        newTriangles[_triLen++] = _vtxIdx;
-        newTriangles[_triLen] = edgeList[_edgeIdx].vtx1;
+            newTriangles[_triLen++] = vertices.Length;
+            newTriangles[_triLen++] = _vtxIdx;
+            newTriangles[_triLen] = edgeList[_edgeIdx].vtx1;
+        }
+        else
+        {
+            // 이 triangle은 지금 left side
+            newTriangles[_triangleIdx] = vertices.Length;
+            newTriangles[_triangleIdx + 1] = edgeList[_edgeIdx].vtx1;
+            newTriangles[_triangleIdx + 2] = vertices.Length + 1;
+
+            int _triLen = triangles.Length;
+            // 이 triangle은 지금 right side
+            newTriangles[_triLen++] = vertices.Length;
+            newTriangles[_triLen++] = vertices.Length + 2;
+            newTriangles[_triLen++] = edgeList[_edgeIdx].vtx2;
+
+            // 밑에 두개 triangle은 무시 한다. 
+            newTriangles[_triLen++] = vertices.Length;
+            newTriangles[_triLen++] = edgeList[_edgeIdx].vtx2;
+            newTriangles[_triLen++] = _vtxIdx;
+
+            newTriangles[_triLen++] = vertices.Length;
+            newTriangles[_triLen++] = _vtxIdx;
+            newTriangles[_triLen] = edgeList[_edgeIdx].vtx1;
+        }
+        
 
         mesh.vertices = newVertices;
         mesh.triangles = newTriangles;
@@ -2168,7 +2416,9 @@ public class RayIntersection : MonoBehaviour
         int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
         int[] newTriangles = new int[triangles.Length + 6];
         Vector3[] vertices = obj.GetComponent<MeshFilter>().mesh.vertices;
-        Vector3[] newVertices = new Vector3[vertices.Length + 2];
+        Vector3[] newVertices;
+        newVertices = new Vector3[vertices.Length + 2];
+
         int nextLength = -2;
         if (_intersectEdgeIdx - _triangleIdx != 2)
             nextLength = 1;
@@ -2179,36 +2429,33 @@ public class RayIntersection : MonoBehaviour
         for (int i = 0; i < vertices.Length; i++)
             newVertices[i] = vertices[i];
 
-        if(_isInner==0)
+        if (_isInner == 0)
         {
             leftSide.Add(vertices.Length);
             rightSide.Add(vertices.Length + 1);
-            
+
             leftSide.Add(edgeList[_intersectEdgeIdx].vtx1);
             rightSide.Add(edgeList[_intersectEdgeIdx].vtx2);
             rightSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx2);
-            
+
         }
         else
         {
             rightSide.Add(vertices.Length);
             leftSide.Add(vertices.Length + 1);
-            
+
             rightSide.Add(edgeList[_intersectEdgeIdx].vtx1);
             leftSide.Add(edgeList[_intersectEdgeIdx].vtx2);
             leftSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx2);
-            
+
         }
+        
+        
         // left
         newVertices[vertices.Length] = obj.transform.InverseTransformPoint(_new);
-        
         // right
-        newVertices[vertices.Length+1] = obj.transform.InverseTransformPoint(_new);
+        newVertices[vertices.Length + 1] = obj.transform.InverseTransformPoint(_new);
         
-
-        // triangle 만드는 과정을 제대로 해야됨
-        // 이 triangle은 지금 left side
-        // intersectEdgeIdx는 지금 old edge임.
         newTriangles[_triangleIdx] = _leftVtxIdx;
         newTriangles[_triangleIdx + 1] = edgeList[_intersectEdgeIdx].vtx1;
         newTriangles[_triangleIdx + 2] = vertices.Length;
@@ -2216,11 +2463,12 @@ public class RayIntersection : MonoBehaviour
 
         // 이 triangles는 right side
         newTriangles[_triLen++] = _rightVtxIdx;
-        newTriangles[_triLen++] = vertices.Length+1;
+        newTriangles[_triLen++] = vertices.Length + 1;
         newTriangles[_triLen++] = edgeList[_intersectEdgeIdx].vtx2;
         newTriangles[_triLen++] = _rightVtxIdx;
         newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx1;
         newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx2;
+        
         mesh.vertices = newVertices;
         mesh.triangles = newTriangles;
     }
@@ -2289,6 +2537,285 @@ public class RayIntersection : MonoBehaviour
         mesh.triangles = newTriangles;
     }
 
+
+    private void FindTriangleEdgeIntersection(int boundaryOuterVtx, int boundaryInnerVtx)
+    {
+        int outerTriangleIdx = -1, innerTriangleIdx = -1;
+        Vector3 outerStartEdgePoint = Vector3.zero;
+        Vector3 innerStartEdgePoint = Vector3.zero;
+        
+        // edge index
+        int outerEdgeIdx = -1, innerEdgeIdx = -1;
+        // outer
+        int checkIntersectionCount = 2;
+        foreach (int item in connectedTriangles[boundaryOuterVtx])
+        {
+            checkIntersectionCount = 2;
+            // 여기서 각 edge에 대해 intersection 체크 필요.
+            outerTriangleIdx = item;
+            if (edgeList[item].vtx1 != boundaryOuterVtx && edgeList[item].vtx2 != boundaryOuterVtx)
+            {
+                if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        outerStartEdgePoint = intersectionTemp;
+                        outerEdgeIdx = item;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+
+                if (RayTriangleIntersection(screenEndOrigin, boundaryOuterEndPoint + screenEndDirection * 5, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        outerStartEdgePoint = intersectionTemp;
+                        outerEdgeIdx = item;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+            }
+            else if (edgeList[item + 1].vtx1 != boundaryOuterVtx && edgeList[item + 1].vtx2 != boundaryOuterVtx)
+            {
+                if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        outerStartEdgePoint = intersectionTemp;
+                        outerEdgeIdx = item + 1;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+
+                if (RayTriangleIntersection(screenEndOrigin, boundaryOuterEndPoint + screenEndDirection * 5, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        outerStartEdgePoint = intersectionTemp;
+                        outerEdgeIdx = item + 1;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+            }
+            else if (edgeList[item + 2].vtx1 != boundaryOuterVtx && edgeList[item + 2].vtx2 != boundaryOuterVtx)
+            {
+                if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        outerStartEdgePoint = intersectionTemp;
+                        outerEdgeIdx = item + 2;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+
+                if (RayTriangleIntersection(screenEndOrigin, boundaryOuterEndPoint + screenEndDirection * 5, boundaryOuterStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        outerStartEdgePoint = intersectionTemp;
+                        outerEdgeIdx = item + 2;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+            }
+        }
+
+        if (checkIntersectionCount != 0)
+        {
+            boundaryOuterLastPointIdx = outerTriangleIdx;
+        }
+        else
+        {
+            Debug.Log("intersection error");
+            // return;
+        }
+
+        // inner
+        foreach (int item in connectedTriangles[boundaryInnerVtx])
+        {
+            checkIntersectionCount = 2;
+            innerTriangleIdx = item;
+            // 여기서 각 edge에 대해 intersection 체크 필요.
+            if (edgeList[item].vtx1 != boundaryInnerVtx && edgeList[item].vtx2 != boundaryInnerVtx)
+            {
+                if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        innerStartEdgePoint = intersectionTemp;
+                        innerEdgeIdx = item;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+
+                if (RayTriangleIntersection(screenEndOrigin, boundaryInnerEndPoint + screenEndDirection * 5, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item].vtx1], test_world[edgeList[item].vtx2] - test_world[edgeList[item].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item].vtx1].x, test_world[edgeList[item].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        innerStartEdgePoint = intersectionTemp;
+                        innerEdgeIdx = item;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+            }
+            else if (edgeList[item + 1].vtx1 != boundaryInnerVtx && edgeList[item + 1].vtx2 != boundaryInnerVtx)
+            {
+                if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        innerStartEdgePoint = intersectionTemp;
+                        innerEdgeIdx = item + 1;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+
+                if (RayTriangleIntersection(screenEndOrigin, boundaryInnerEndPoint + screenEndDirection * 5, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 1].vtx1], test_world[edgeList[item + 1].vtx2] - test_world[edgeList[item + 1].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 1].vtx1].x, test_world[edgeList[item + 1].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        innerStartEdgePoint = intersectionTemp;
+                        innerEdgeIdx = item + 1;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+            }
+            else if (edgeList[item + 1].vtx1 != boundaryInnerVtx && edgeList[item + 1].vtx2 != boundaryInnerVtx)
+            {
+                if (RayTriangleIntersection(screenStartOrigin, screenEndOrigin, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        innerStartEdgePoint = intersectionTemp;
+                        innerEdgeIdx = item + 2;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+
+                if (RayTriangleIntersection(screenEndOrigin, boundaryInnerEndPoint + screenEndDirection * 5, boundaryInnerStartPoint + screenStartDirection * 5, test_world[edgeList[item + 2].vtx1], test_world[edgeList[item + 2].vtx2] - test_world[edgeList[item + 2].vtx1]))
+                {
+                    if (intersectionTemp.x < Mathf.Min(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[item + 2].vtx1].x, test_world[edgeList[item + 2].vtx2].x))
+                        checkIntersectionCount--;
+                    else
+                    {
+                        innerStartEdgePoint = intersectionTemp;
+                        innerEdgeIdx = item + 2;
+                        break;
+                    }
+                }
+                else
+                    checkIntersectionCount--;
+            }
+        }
+
+        if (checkIntersectionCount != 0)
+        {
+            boundaryInnerLastPointIdx = innerTriangleIdx;
+        }
+        else
+        {
+            Debug.Log("intersection error");
+            // return;
+        }
+
+        return;
+    }
+
+    private int TriangleEdgeIntersectionBoundary(ref int side, ref int edgeIdx, ref Vector3 edgePoint, Vector3 incisionStartPoint, Vector3 incisionEndPoint, int incisionPointIdx)
+    {
+        int intersectionCount = 0;
+        int tempEdge = edgeIdx;
+
+        Vector3 intersectionPoint = Vector3.zero;
+        Vector3[] vertices = obj.GetComponent<MeshFilter>().sharedMesh.vertices;
+        for (int i = 0; i < 3; i++)
+        {
+            bool checkIntersection = true;
+            if (tempEdge != -1 && edgeList[tempEdge].vtx1 == edgeList[incisionPointIdx + i].vtx2 && edgeList[tempEdge].vtx2 == edgeList[incisionPointIdx + i].vtx1)
+                continue;
+            // triangle : 1) s origin, e origin, incision start 2) e origin, incision start, incision end
+            // intersectionTemp : test_world[edgeList[incisionPointIdx + i].vtx1], test_world[edgeList[incisionPointIdx + i].vtx2] - test_world[edgeList[incisionPointIdx + i].vtx1]
+            if (RayTriangleIntersection(screenMiddleOrigin, incisionEndPoint + screenEndDirection * 5, incisionStartPoint + screenStartDirection * 5, test_world[edgeList[incisionPointIdx + i].vtx1], test_world[edgeList[incisionPointIdx + i].vtx2] - test_world[edgeList[incisionPointIdx + i].vtx1]))
+            {
+                Debug.Log("ray triangle intersection");
+                if (intersectionTemp.x < Mathf.Min(test_world[edgeList[incisionPointIdx + i].vtx1].x, test_world[edgeList[incisionPointIdx + i].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[incisionPointIdx + i].vtx1].x, test_world[edgeList[incisionPointIdx + i].vtx2].x))
+                    checkIntersection = false;
+                else
+                    intersectionPoint = intersectionTemp;
+            }
+            else
+                checkIntersection = false;
+
+            if (checkIntersection)
+            {
+                edgeIdx = incisionPointIdx + i;
+                edgePoint = intersectionPoint;
+                intersectionCount++;
+            }
+        }
+
+        if (tempEdge == -1)
+        {
+            return intersectionCount;
+        }
+        else if (edgeList[tempEdge].vtx1 == edgeList[edgeIdx].vtx1)
+        {
+            side = 1;
+            // counter clock wise
+            // 어떤값을 넘기지?
+        }
+        else if (edgeList[tempEdge].vtx2 == edgeList[edgeIdx].vtx2)
+        {
+            // clock wise
+            side = 2;
+        }
+        return intersectionCount;
+    }
 
     private int TriangleEdgeIntersection(ref int side, ref int edgeIdx, ref Vector3 edgePoint, Vector3 incisionStartPoint, Vector3 incisionEndPoint, int incisionPointIdx)
     {
