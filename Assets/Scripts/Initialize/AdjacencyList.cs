@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Initialize : Singleton<Initialize>
+public class AdjacencyList : Singleton<AdjacencyList>
 {
     public Dictionary<int, HashSet<int>> connectedVertices;
     public Dictionary<int, HashSet<int>> connectedTriangles;
@@ -27,12 +27,13 @@ public class Initialize : Singleton<Initialize>
 
     public void Initializing()
     {
+        MeshManager.Instance.MeshUpdate();
         connectedVertices = new Dictionary<int, HashSet<int>>();
         connectedTriangles = new Dictionary<int, HashSet<int>>();
         edgeList = new List<Edge>();
 
-        int vertexCount = ObjManager.Instance.mesh.vertexCount;
-        int[] triangles = ObjManager.Instance.mesh.triangles;
+        int vertexCount = MeshManager.Instance.vertexCount;
+        int[] triangles = MeshManager.Instance.triangles;
 
         LocalToWorldPosition();
         ConnectedVerticesAndTriangles(vertexCount, triangles);
@@ -41,7 +42,7 @@ public class Initialize : Singleton<Initialize>
 
     private void LocalToWorldPosition()
     {
-        worldPositionVertices = ObjManager.Instance.mesh.vertices;
+        worldPositionVertices = MeshManager.Instance.vertices;
         Transform objTransform = ObjManager.Instance.objTransform;
         for (int i = 0; i < worldPositionVertices.Length; i++)
         {

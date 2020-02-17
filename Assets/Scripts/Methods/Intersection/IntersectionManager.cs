@@ -82,14 +82,14 @@ public class IntersectionManager : Singleton<IntersectionManager>
 
     private int TriangleEdgeIntersection(ref int side, ref int edgeIdx, ref Vector3 edgePoint, Vector3 incisionStartPoint, Vector3 incisionEndPoint, int incisionPointIdx, Ray screenStartRay, Ray screenEndRay)
     {
-        List<Initialize.Edge> edgeList = Initialize.Instance.edgeList;
-        Vector3[] worldVertices = Initialize.Instance.worldPositionVertices;
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        Vector3[] worldVertices = AdjacencyList.Instance.worldPositionVertices;
         int intersectionCount = 0;
         int tempEdge = edgeIdx;
 
         Vector3 intersectionPoint = Vector3.zero;
         Vector3 intersectionTemp = Vector3.zero;
-        Vector3[] vertices = ObjManager.Instance.mesh.vertices;
+        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         for (int i = 0; i < 3; i++)
         {
             int checkIntersectionCount = 2;

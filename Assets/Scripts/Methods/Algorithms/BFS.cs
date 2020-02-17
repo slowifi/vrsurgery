@@ -49,7 +49,7 @@ public class BFS : MonoBehaviour
     {
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
-        Vector3[] worldVertices = Initialize.Instance.worldPositionVertices;
+        Vector3[] worldVertices = AdjacencyList.Instance.worldPositionVertices;
         // vertex_num
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
@@ -76,7 +76,7 @@ public class BFS : MonoBehaviour
 
         while (temp.Count != 0)
         {
-            foreach (int item in Initialize.Instance.connectedVertices[temp.Dequeue()])
+            foreach (int item in AdjacencyList.Instance.connectedVertices[temp.Dequeue()])
             {
                 Debug.Log(item);
                 bool temp_check = false;

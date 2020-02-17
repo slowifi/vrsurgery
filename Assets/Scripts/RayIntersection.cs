@@ -22,47 +22,28 @@ public class RayIntersection : MonoBehaviour
         }
     }
 
-    public GameObject CutManager;
-    public GameObject PatchManager;
-    public GameObject MeasureManager;
-
-    private Mesh newMesh;
-
-    private int bef_outervtx1;
-    private int bef_outervtx2;
-    private int bef_outervtx3;
-
-    private int bef_innervtx1;
-    private int bef_innervtx2;
-    private int bef_innervtx3;
-
-    private bool first;
-
-    private List<int> inner_ShortestPath;
-    private List<int> outer_ShortestPath;
-
-
+    // UI
     public Scrollbar m_cuttingSizeBar;
     public Scrollbar m_bar;
     public Scrollbar m_Posbar;
     public Scrollbar m_Extend;
+    public Text m_distance;
 
+    // Patch things
     public float patchWeight = 20.0f;
     private Vector3 avgNorm;
     private Vector3 weightCenterPos;
     private bool reCalculate;
     private int patchNumber;
     private int sphereNumber;
+
+
     private float heartScale;
-    public Text m_distance;
+
+    // Measure
     public GameObject sp1;
     public GameObject sp2;
-
-
-    private bool rayincision;
-    private bool incision;
-
-    private bool firstInit;
+    
     // cut
     public int cutNum;
        
@@ -71,23 +52,9 @@ public class RayIntersection : MonoBehaviour
 
     public List<Edge> edgeList;
 
-    public List<int> boundaryVertices;
-    public HashSet<int> hashBoundaryVertices;
-
-    public List<int> innerBoundaryVertices;
-    public HashSet<int> innerHashBoundaryVertices;
-
-    public List<int> removedOuterTriangles;
-    public List<int> removedInnerTriangles;
-
-    public List<int> innerBoundaryTriangles;
-    public List<int> outerBoundaryTriangles;
-
     public List<int> wholeTriangles;
     public HashSet<int> wholeTriangleIndexSet;
 
-    public HashSet<int> innerBoundaryTriangleIndexSet;
-    public HashSet<int> outerBoundaryTriangleIndexSet;
 
     // patch
     public float oldValue_curve;
@@ -110,6 +77,8 @@ public class RayIntersection : MonoBehaviour
     private Color[] colors;
 
     // incision
+    private bool rayincision;
+    private bool incision;
 
     private int outerLeftVtxIdx;
     private int outerRightVtxIdx;
@@ -202,7 +171,6 @@ public class RayIntersection : MonoBehaviour
         // CombineMeshes();
         patchNumber = 0;
         measured_check = false;
-        firstInit = true;
         cutting = false;
         measuring = false;
         patching = false;
@@ -218,39 +186,23 @@ public class RayIntersection : MonoBehaviour
         cam = GetComponent<Camera>();
         check_function = true;
         Mesh_Initialize();
-        
+        MeshRecalculate();
         ConnectedVertices();
         ConnectedTriangles();
         
         StartCoroutine(CreateVerticesToObj());
-        newMesh = obj.GetComponent<MeshFilter>().mesh;
         SetColor();
-    }
-
-    private void Connected_Initialize()
-    {
-        connectedTriangles = new Dictionary<int, HashSet<int>>();
-        connectedVertices = new Dictionary<int, HashSet<int>>();
-        return;
     }
 
     private void Mesh_Initialize()
     {
-        first = true;
         patchedCount = 0;
         cutNum = 3;
         _onlyOnce = false;
-        hashBoundaryVertices = new HashSet<int>();
-        innerHashBoundaryVertices = new HashSet<int>();
 
         // cut
         wholeTriangleIndexSet = new HashSet<int>();
         wholeTriangles = new List<int>();
-        innerBoundaryTriangleIndexSet = new HashSet<int>();
-        outerBoundaryTriangleIndexSet = new HashSet<int>();
-
-        innerBoundaryTriangles = new List<int>();
-        outerBoundaryTriangles = new List<int>();
 
         intersectionTemp = Vector3.zero;
         intersectionPoint = Vector3.zero;
@@ -258,9 +210,6 @@ public class RayIntersection : MonoBehaviour
         innerIntersectionPoint = Vector3.zero;
         OldIntersectionPoint = Vector3.zero;
         patchCenterPos = Vector3.zero;
-
-        inner_ShortestPath = new List<int>();
-        outer_ShortestPath = new List<int>();
 
         // incision
         extending = false;
@@ -278,22 +227,14 @@ public class RayIntersection : MonoBehaviour
         patchVertices = new List<Vector3>();
         insidePatchVertices = new List<Vector3>[5];
 
-        removedInnerTriangles = new List<int>();
-        removedOuterTriangles = new List<int>();
-
-
         connectedVertices = new Dictionary<int, HashSet<int>>();
         connectedTriangles = new Dictionary<int, HashSet<int>>();
         edgeList = new List<Edge>();
-
-        boundaryVertices = new List<int>();
-        innerBoundaryVertices = new List<int>();
-
     }
 
     public void CuttingOn()
     {
-        cutting = false;
+        // cutting = true;
         cutmode = false;
         boundaryCutMode = true;
         measuring = false;
@@ -304,11 +245,12 @@ public class RayIntersection : MonoBehaviour
         Destroy(GameObject.Find("distance"));
         MeshRecalculate();
         Mesh_Initialize();
-        ConnectedVertices();
-        ConnectedTriangles();
+        ConnectedVerticesAndTriangles();
+        // ConnectedVertices();
+        // ConnectedTriangles();
         GenerateEdgeList();
-        sp1.active = false;
-        sp2.active = false;
+        ObjManager.Instance.startMeasurePoint.SetActive(false);
+        ObjManager.Instance.endMeasurePoint.SetActive(false);
     }
 
     public void PatchingOn()
@@ -323,8 +265,8 @@ public class RayIntersection : MonoBehaviour
         Mesh_Initialize();
         Destroy(GameObject.Find("/p1"));
         Destroy(GameObject.Find("distance"));
-        sp1.active = false;
-        sp2.active = false;
+        ObjManager.Instance.startMeasurePoint.SetActive(false);
+        ObjManager.Instance.endMeasurePoint.SetActive(false);
     }
     
     public void MeasuringOn()
@@ -333,12 +275,13 @@ public class RayIntersection : MonoBehaviour
         measuring = true;
         patching = false;
         reCalculate = false;
-        sp1.active = false;
-        sp2.active = false;
         Destroy(GameObject.Find("/p1"));
         Destroy(GameObject.Find("distance"));
         Mesh_Initialize();
         MeshRecalculate();
+
+        ObjManager.Instance.Initializing();
+        AdjacencyList.Instance.Initializing();
     }
     
     public void Initializing()
@@ -353,9 +296,12 @@ public class RayIntersection : MonoBehaviour
         Mesh_Initialize();
         Destroy(GameObject.Find("/p1"));
         Destroy(GameObject.Find("distance"));
-        sp1.active = false;
-        sp2.active = false;
         Destroy(GameObject.Find("Incision line"));
+        ObjManager.Instance.Initializing();
+        AdjacencyList.Instance.Initializing();
+
+        ObjManager.Instance.startMeasurePoint.SetActive(false);
+        ObjManager.Instance.endMeasurePoint.SetActive(false);
     }
 
     private void Incisioning()
@@ -367,20 +313,18 @@ public class RayIntersection : MonoBehaviour
         measured_check = false;
         Destroy(GameObject.Find("/p1"));
         Destroy(GameObject.Find("distance"));
-        sp1.active = false;
-        sp2.active = false;
-        ConnectedVertices();
-        ConnectedTriangles();
+        ConnectedVerticesAndTriangles();
+        ObjManager.Instance.startMeasurePoint.SetActive(false);
+        ObjManager.Instance.endMeasurePoint.SetActive(false);
         GenerateEdgeList();
-        // edgeTest();
         rayincision = true;
         MeshRecalculate();
     }
 
     public void RendererOverlapping()
     {
-        // MeshRenderer ren = GameObject.Find("Patch" + patchNumber).GetComponent<MeshRenderer>();
-        // ren.material.color = new Color32(115, 0, 0, 255);
+        //MeshRenderer ren = GameObject.Find("Patch" + patchNumber).GetComponent<MeshRenderer>();
+        //ren.material.color = new Color32(115, 0, 0, 255);
         // Material yourMaterial = (Material)Resources.Load("2019_Heart", typeof(Material));
         // ren.material = yourMaterial;
     }
@@ -388,13 +332,6 @@ public class RayIntersection : MonoBehaviour
 
     public void Update()
     {
-        if(firstInit)
-        {
-            firstInit = false;
-            MeshRecalculate();
-            Mesh_Initialize();
-        }
-        // 조건문은 하나만 유지하면 되도록 만들어야됨.
         // incision
         if (extending)
         {
@@ -650,17 +587,6 @@ public class RayIntersection : MonoBehaviour
                             vtx3_2nd = temp[i + 2];
                         }
                     }
-
-                    /*
-                    colors[vtx1] = Color.black;
-                    colors[vtx2] = Color.black;
-                    colors[vtx3] = Color.black;
-
-                    colors[vtx1_2nd] = Color.black;
-                    colors[vtx2_2nd] = Color.black;
-                    colors[vtx3_2nd] = Color.black;
-                    */
-                    // mesh.colors = colors;
                 }
 
                 if (dst_min != 10000000)
@@ -709,7 +635,7 @@ public class RayIntersection : MonoBehaviour
             }
         }
 
-        // filling cut
+        // Erase
         if (cutmode)
         {
             cutmode = false;
@@ -722,10 +648,7 @@ public class RayIntersection : MonoBehaviour
             }
 
             RemoveTriangles();
-            Connected_Initialize(); // 초기화
-            ConnectedVertices(); // connectedVertices 재계산
-            ConnectedTriangles(); // connectedTriangles 재계산
-            
+            // ConnectedVerticesAndTriangles();
             SetColor();
             MeshRecalculate();
             Initializing();
@@ -802,18 +725,6 @@ public class RayIntersection : MonoBehaviour
                     // if(Input.GetTouch(0).phase == TouchPhase.Ended)
                     {
 
-                        foreach (int item in hashBoundaryVertices)
-                        {
-                            boundaryVertices.Add(item);
-                        }
-                        hashBoundaryVertices.Clear();
-
-                        foreach (int item in innerHashBoundaryVertices)
-                        {
-                            innerBoundaryVertices.Add(item);
-                        }
-                        innerHashBoundaryVertices.Clear();
-
                         check_function = true;
                         cutmode = true;
                         cutting = false;
@@ -826,8 +737,6 @@ public class RayIntersection : MonoBehaviour
                     {
                         wholeTriangleIndexSet.Add(triangleIndex_inner);
                         wholeTriangleIndexSet.Add(triangleIndex_outer);
-                        // innerBoundaryTriangleIndexSet.Add(triangleIndex_inner);
-                        // outerBoundaryTriangleIndexSet.Add(triangleIndex_outer);
 
                         colors[vtx1] = Color.black;
                         colors[vtx2] = Color.black;
@@ -929,7 +838,7 @@ public class RayIntersection : MonoBehaviour
         } // cutMode
 
         // boundary cut
-        if(boundaryBFS)
+        if (boundaryBFS)
         {
             Debug.Log("boundary BFS ininin");
             if (Input.GetMouseButtonDown(0))
@@ -1300,7 +1209,6 @@ public class RayIntersection : MonoBehaviour
         
         if (boundaryCutMode)
         {
-            Debug.Log("cutmode ininiin");
             if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
             {
                 float dst_min = 10000000;
@@ -1310,7 +1218,7 @@ public class RayIntersection : MonoBehaviour
 
                 int triangleIndex_outer = -1;
                 int triangleIndex_inner = -1;
-
+                int outerVtx1 = -1, outerVtx2 = -1, outerVtx3 = -1, innerVtx1 = -1, innerVtx2 = -1, innerVtx3 = -1; 
                 for (int i = 0; i < temp.Length; i += 3)
                 {
                     // ray triangle intersection 할 때 vertex 좌표들은 world 좌표로 받아야함.
@@ -1326,11 +1234,16 @@ public class RayIntersection : MonoBehaviour
                                 triangleIndex_inner = triangleIndex_outer;
                                 innerIntersectionPoint = outerIntersectionPoint;
                                 dst_2nd = dst_min;
+                                innerVtx1 = outerVtx1;
+                                innerVtx2 = outerVtx2;
+                                innerVtx3 = outerVtx3;
                             }
                             triangleIndex_outer = i;
                             dst_min = dst_temp;
                             outerIntersectionPoint = intersectionTemp;
-
+                            outerVtx1 = temp[i];
+                            outerVtx2 = temp[i+1];
+                            outerVtx3 = temp[i+2];
                             continue;
                         }
                         if (dst_2nd > dst_temp)
@@ -1338,7 +1251,9 @@ public class RayIntersection : MonoBehaviour
                             triangleIndex_inner = i;
                             innerIntersectionPoint = intersectionTemp;
                             dst_2nd = dst_temp;
-
+                            innerVtx1 = temp[i];
+                            innerVtx2 = temp[i + 1];
+                            innerVtx3 = temp[i + 2];
                         }
                     }
                 }
@@ -1348,6 +1263,7 @@ public class RayIntersection : MonoBehaviour
                     // 각 point에 대한 정보만 받아 놓고 실시간으로 ray만 뿌려주고 endpoint까지 찍은 후 나눈다.
                     if(Input.GetMouseButtonUp(0))
                     {
+                        /*
                         Debug.Log("찐막On");
 
                         screenStartOrigin = screenEndOrigin;
@@ -1382,6 +1298,7 @@ public class RayIntersection : MonoBehaviour
                         boundaryCut = true;
                         boundaryCutMode = false;
                         lastBoundary = true;
+                        */
                     }
                     else if (firstRay)
                     {
@@ -1413,10 +1330,16 @@ public class RayIntersection : MonoBehaviour
                         Debug.Log(screenStartOrigin);
                         firstRay = false;
                     }
-                    
-                    else if (Vector3.Distance(outerIntersectionPoint, boundaryOuterStartPoint) > 6.0f)
+                    else if (Vector3.Distance(outerIntersectionPoint, boundaryOuterStartPoint) > 1.0f)
                     {
-                        Debug.Log("inininininininininin");
+                        
+                        // 처음 true가 찍히니 다행
+                        Debug.Log(CheckConnectedTriangles(outerVtx1, outerVtx2, outerVtx3, boundaryOuterStartPointIdx));
+                        Debug.Log(CheckConnectedTriangles(innerVtx1, innerVtx2, innerVtx3, boundaryInnerStartPointIdx));
+
+
+
+                        // outer / inner 각각 false 일 때를 알아야 함. 
                         screenEndOrigin = cam.ScreenPointToRay(Input.mousePosition).origin;
                         screenEndDirection = cam.ScreenPointToRay(Input.mousePosition).direction;
 
@@ -1425,10 +1348,14 @@ public class RayIntersection : MonoBehaviour
 
                         boundaryOuterEndPointIdx = triangleIndex_outer;
                         boundaryInnerEndPointIdx = triangleIndex_inner;
+                        
 
+
+                        /*
                         Debug.Log("boundary end");
                         Debug.Log("start point : " + boundaryOuterStartPoint);
                         Debug.Log("end point : " + boundaryOuterEndPoint);
+                        */
                         screenMiddleOrigin = Vector3.Lerp(screenStartOrigin, screenEndOrigin, 0.5f);
                         // 여기서 incision false 값으로 바뀌고, triangle division 실행 
                         var boundaryLine = new GameObject("Incision line");
@@ -1436,7 +1363,7 @@ public class RayIntersection : MonoBehaviour
                         lineRenderer.material.color = Color.black;
                         lineRenderer.SetPositions(new Vector3[] { boundaryOuterStartPoint - screenStartDirection, boundaryOuterEndPoint - screenEndDirection });
                         
-                        boundaryCut = true;
+                        // boundaryCut = true;
                     }
                     else
                         boundaryCut = false;
@@ -1447,36 +1374,12 @@ public class RayIntersection : MonoBehaviour
         // measure
         if (measuring)
         {
-            if (Input.GetMouseButtonDown(0))
+            if(Input.GetMouseButtonDown(0))
             {
-                // Vector3 pointPosition = MeasureManager.GetComponent<Measure>().MeasurePosition(obj.GetComponent<MeshFilter>().mesh.triangles, cam.ScreenPointToRay(Input.mousePosition), test_world);
-                Vector3 pointPosition = Measure.Instance.MeasurePosition(obj.GetComponent<MeshFilter>().mesh.triangles, cam.ScreenPointToRay(Input.mousePosition), test_world);
-                if (pointPosition == Vector3.zero)
-                    return;
-                
-                if(!measured_check)
-                {
-                    sp1.active = true;
-                    sp2.active = false;
-                    Destroy(GameObject.Find("distance"));
-                    sp1.transform.position = pointPosition;
-                    measured_check = true;
-                }
-                else
-                {
-                    sp2.active = true;
-                    sp2.transform.position = pointPosition;
-                    measured_check = false;
-                    float dst = Vector3.Distance(sp1.transform.position, sp2.transform.position);
-                    dst = dst / obj.transform.lossyScale.z;
-                    m_distance.text = dst + "mm";
-                    Debug.Log("거리 : " + dst);
-
-                    var boundaryLine = new GameObject("distance");
-                    var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
-                    lineRenderer.material.color = Color.black;
-                    lineRenderer.SetPositions(new Vector3[] { p1_vec, intersectionPoint });
-                }
+                Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                float dst = MeasureManager.Instance.MeasureDistance(vertexPosition);
+                dst = dst / obj.transform.lossyScale.z;
+                m_distance.text = dst + "mm";
             }
         }
 
@@ -1496,7 +1399,7 @@ public class RayIntersection : MonoBehaviour
             Debug.Log(patchWeight);
             RecalculateNormal();
         }
-         
+
         if (patching)
         {
             if (Input.GetMouseButton(0) && !Input.GetMouseButtonUp(0))
@@ -1504,9 +1407,6 @@ public class RayIntersection : MonoBehaviour
             {
                 float dst_min = 1000000;
                 int[] temp = obj.GetComponent<MeshFilter>().mesh.triangles;
-
-                Vector3 incisionInnerPoint = Vector3.zero;
-                Vector3 incisionOuterPoint = Vector3.zero;
 
                 for (int i = 0; i < temp.Length; i += 3)
                 {
@@ -1519,10 +1419,8 @@ public class RayIntersection : MonoBehaviour
                         if (dst_min > dst_temp)
                         {
                             intersectionPoint = intersectionTemp;
-                            incisionInnerPoint = incisionOuterPoint;
                             dst_min = dst_temp;
                         }
-                        incisionOuterPoint = intersectionTemp;
                     }
                 }
 
@@ -1532,8 +1430,6 @@ public class RayIntersection : MonoBehaviour
                     if (patchedCount == 1)
                     {
                         OldIntersectionPoint = intersectionPoint;
-                        // oldScreenPoint = cam.ScreenPointToRay(Input.mousePosition).origin;
-
                         patchVertices.Add(intersectionPoint);
 
                         return;
@@ -1547,8 +1443,12 @@ public class RayIntersection : MonoBehaviour
 
                     var boundaryLine = new GameObject("Line"+patchedCount);
                     var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
+                    Vector3 lineOld = OldIntersectionPoint;
+                    Vector3 lineIntersection = intersectionPoint;
+                    lineOld.z += 1f;
+                    lineIntersection.z += 1f;
                     lineRenderer.material.color = Color.black;
-                    lineRenderer.SetPositions(new Vector3[] { OldIntersectionPoint, intersectionPoint });
+                    lineRenderer.SetPositions(new Vector3[] { lineOld, lineIntersection });
 
                     OldIntersectionPoint = intersectionPoint;
                     patchVertices.Add(intersectionPoint);
@@ -1571,8 +1471,30 @@ public class RayIntersection : MonoBehaviour
         }
     }
 
+    private bool CheckConnectedTriangles(int vtx1, int vtx2, int vtx3, int triangleIndex)
+    {
+        // vtx1,2,3 은 이전 triangle의 vtx들 이어야 함. 이게 false일 경우 둘 사이를 이어주어야 함.
+        foreach (var item in connectedTriangles[vtx1])
+            if (item == triangleIndex)
+                return true;
+
+        foreach (var item in connectedTriangles[vtx2])
+            if (item == triangleIndex)
+                return true;
+
+        foreach (var item in connectedTriangles[vtx3])
+            if (item == triangleIndex)
+                return true;
+
+        return false;
+    }
+
+
+
     private void ConnectedVerticesAndTriangles()
     {
+        connectedVertices.Clear();
+        connectedTriangles.Clear();
         int verticesLength = obj.GetComponent<MeshFilter>().mesh.vertexCount;
         int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
         for (int j = 0; j < verticesLength; j++)
@@ -1939,7 +1861,6 @@ public class RayIntersection : MonoBehaviour
     {
 
         Debug.Log("mesh recalculate");
-        int j = 0;
         Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
         test = mesh.vertices;
         test_world = mesh.vertices;
@@ -2048,10 +1969,11 @@ public class RayIntersection : MonoBehaviour
         Debug.Log(vertex_num);
         temp.Enqueue(vertex_num);
         // outerVertices.Add(vertex_num);
+        /*
         GameObject v_t = new GameObject();
         v_t = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         v_t.transform.position = test_world[vertex_num];
-
+        */
         while (temp.Count != 0)
         {
             foreach (int item in connectedVertices[temp.Dequeue()])
@@ -2081,10 +2003,11 @@ public class RayIntersection : MonoBehaviour
                             duplicateCheck.Add(item);
                             temp.Enqueue(item);
                             leftSide.Add(item);
-
+                            /*
                             GameObject v_test = new GameObject();
                             v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                             v_test.transform.position = test_world[item];
+                            */
                         }
                         else
                             continue;
@@ -2096,9 +2019,11 @@ public class RayIntersection : MonoBehaviour
                             duplicateCheck.Add(item);
                             temp.Enqueue(item);
                             rightSide.Add(item);
+                            /*
                             GameObject v_test = new GameObject();
                             v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
                             v_test.transform.position = test_world[item];
+                            */
                         }
                         else
                             continue;
@@ -2129,13 +2054,14 @@ public class RayIntersection : MonoBehaviour
         Vector3[] vertices = mesh.vertices;
         int[] newTriangles = new int[triangles.Length + boundaryNewTrianglesList.Count];
         Vector3[] newVertices = new Vector3[vertices.Length + boundaryNewVerticesList.Count];
-
+        
         for (int i = 0; i < triangles.Length; i++)
             newTriangles[i] = triangles[i];
 
         for (int i = 0; i < vertices.Length; i++)
             newVertices[i] = vertices[i];
-
+        
+        // 지금 비어있는 공간이 있을거 같은데
         foreach (var item in boundaryNewVerticesList)
             newVertices[item.Key] = item.Value;
         foreach (var item in boundaryNewTrianglesList)
@@ -2143,7 +2069,10 @@ public class RayIntersection : MonoBehaviour
 
         mesh.vertices = newVertices;
         mesh.triangles = newTriangles;
-        // boundaryNewVerticesList
+        Debug.Log(triangles.Length + boundaryNewTrianglesList.Count);
+        Debug.Log(newTriangles.Length);
+        Debug.Log(mesh.triangles.Length);
+        Debug.Log(boundaryNewTrianglesList);
     }
 
     public void DivideTrianglesStartBoundary(Vector3 _center, Vector3 _new, int _triangleIdx, int _edgeIdx, int _vtxIdx, ref int verticesLength, ref int triangleCount, int _isInner)

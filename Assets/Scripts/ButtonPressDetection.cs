@@ -185,6 +185,7 @@ public class ButtonPressDetection : MonoBehaviour, IPointerDownHandler, IPointer
             GameObject.Find("Incision button_").GetComponent<Button>().colors = cb;
 
             cb.normalColor = new Color32(137, 96, 96, 255);
+            GameObject.Find("Main Camera").gameObject.SendMessage("RendererOverlapping");
             GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
             GameObject.Find("Patching button_").GetComponent<Button>().colors = cb;
             GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;

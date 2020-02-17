@@ -395,22 +395,37 @@ public class TouchInput : MonoBehaviour
         float XResolution = resolutions.width;
         float YResolution = resolutions.height;
 
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow))
         {
-            float XaxisRotation = 10f;            
+            float XaxisRotation = 1f;            
             pivot.transform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation);
 
             updatePlaneModel();
         }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        else if (Input.GetKey(KeyCode.UpArrow))
         {
-            float YaxisRotation = 10f;
+            float YaxisRotation = 1f;
             pivot.transform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation);
 
             updatePlaneModel();
 
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            float XaxisRotation = -1f;
+            pivot.transform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation);
+
+            updatePlaneModel();
+
+        }
+        else if (Input.GetKey(KeyCode.DownArrow))
+        {
+            float YaxisRotation = -1f;
+            pivot.transform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation);
+
+            updatePlaneModel();
+        }
+        else if(Input.GetKey(KeyCode.Q))
         {
             InitScale += zoomConstant;
             TargetScale += zoomConstant;
@@ -418,7 +433,7 @@ public class TouchInput : MonoBehaviour
 
             Breathing();
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        else if(Input.GetKey(KeyCode.W))
         {
             InitScale -= zoomConstant;
             TargetScale -= zoomConstant;
@@ -524,9 +539,9 @@ public class TouchInput : MonoBehaviour
             TargetScale *= zoomConstant;
             _currentScale *= zoomConstant;
 
-            if (TargetScale >= 4.0f)
+            if (TargetScale >= 6.0f)
             {
-                TargetScale = 4.0f;
+                TargetScale = 6.0f;
                 InitScale = 3.9f;
                 _currentScale = 3.9f;
             }

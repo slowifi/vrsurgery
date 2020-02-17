@@ -13,12 +13,12 @@ public class DivideTriangle : MonoBehaviour
     
     public void DivideTrianglesStartFromVtx(int _centerIdx, Vector3 _new, int _triangleIdx, int _edgeIdx)
     {
-        int[] triangles = ObjManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         int[] newTriangles = new int[triangles.Length + 3];
-        Vector3[] vertices = ObjManager.Instance.mesh.vertices;
+        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         Vector3[] newVertices = new Vector3[vertices.Length + 1];
         
-        List<Initialize.Edge> edgeList = Initialize.Instance.edgeList;
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
 
         for (int i = 0; i < triangles.Length; i++)
             newTriangles[i] = triangles[i];
@@ -31,25 +31,25 @@ public class DivideTriangle : MonoBehaviour
 
         newTriangles[_triangleIdx] = _centerIdx;
         newTriangles[_triangleIdx + 1] = vertices.Length;
-        newTriangles[_triangleIdx + 2] = Initialize.Instance.edgeList[_edgeIdx].vtx2;
+        newTriangles[_triangleIdx + 2] = AdjacencyList.Instance.edgeList[_edgeIdx].vtx2;
 
         int _triLen = triangles.Length;
         newTriangles[_triLen++] = _centerIdx;
-        newTriangles[_triLen++] = Initialize.Instance.edgeList[_edgeIdx].vtx1;
+        newTriangles[_triLen++] = AdjacencyList.Instance.edgeList[_edgeIdx].vtx1;
         newTriangles[_triLen++] = vertices.Length;
 
-        ObjManager.Instance.mesh.vertices = newVertices;
-        ObjManager.Instance.mesh.triangles = newTriangles;
+        MeshManager.Instance.mesh.vertices = newVertices;
+        MeshManager.Instance.mesh.triangles = newTriangles;
     }
 
     public void DivideTrianglesStart(Vector3 _center, Vector3 _new, int _triangleIdx, int _edgeIdx, int _vtxIdx, int _isInner)
     {
-        int[] triangles = ObjManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         int[] newTriangles = new int[triangles.Length + 9];
-        Vector3[] vertices = ObjManager.Instance.mesh.vertices;
+        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         Vector3[] newVertices = new Vector3[vertices.Length + 3];
 
-        List<Initialize.Edge> edgeList = Initialize.Instance.edgeList;
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Transform objTransform = ObjManager.Instance.objTransform;
 
         
@@ -66,8 +66,8 @@ public class DivideTriangle : MonoBehaviour
             IncisionManager.Instance.leftSide.Add(vertices.Length + 1);
             IncisionManager.Instance.rightSide.Add(vertices.Length + 2);
 
-            IncisionManager.Instance.leftSide.Add(Initialize.Instance.edgeList[_edgeIdx].vtx1);
-            IncisionManager.Instance.rightSide.Add(Initialize.Instance.edgeList[_edgeIdx].vtx2);
+            IncisionManager.Instance.leftSide.Add(AdjacencyList.Instance.edgeList[_edgeIdx].vtx1);
+            IncisionManager.Instance.rightSide.Add(AdjacencyList.Instance.edgeList[_edgeIdx].vtx2);
 
         }
         else
@@ -76,8 +76,8 @@ public class DivideTriangle : MonoBehaviour
             IncisionManager.Instance.rightSide.Add(vertices.Length + 1);
             IncisionManager.Instance.leftSide.Add(vertices.Length + 2);
 
-            IncisionManager.Instance.rightSide.Add(Initialize.Instance.edgeList[_edgeIdx].vtx1);
-            IncisionManager.Instance.leftSide.Add(Initialize.Instance.edgeList[_edgeIdx].vtx2);
+            IncisionManager.Instance.rightSide.Add(AdjacencyList.Instance.edgeList[_edgeIdx].vtx1);
+            IncisionManager.Instance.leftSide.Add(AdjacencyList.Instance.edgeList[_edgeIdx].vtx2);
         }
 
         newVertices[vertices.Length] = objTransform.InverseTransformPoint(new Vector3(_center.x, _center.y, _center.z));
@@ -106,18 +106,18 @@ public class DivideTriangle : MonoBehaviour
         newTriangles[_triLen++] = _vtxIdx;
         newTriangles[_triLen] = edgeList[_edgeIdx].vtx1;
 
-        ObjManager.Instance.mesh.vertices = newVertices;
-        ObjManager.Instance.mesh.triangles = newTriangles;
+        MeshManager.Instance.mesh.vertices = newVertices;
+        MeshManager.Instance.mesh.triangles = newTriangles;
     }
 
     public void DivideTrianglesEnd(Vector3 _newCenter, int _triangleIdx, int _edgeIdx, int side, int _isInner, int check)
     {
-        int[] triangles = ObjManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         int[] newTriangles = new int[triangles.Length + 9];
-        Vector3[] vertices = ObjManager.Instance.mesh.vertices;
+        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         Vector3[] newVertices = new Vector3[vertices.Length + 1];
 
-        List<Initialize.Edge> edgeList = Initialize.Instance.edgeList;
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Transform objTransform = ObjManager.Instance.objTransform;
 
         for (int i = 0; i < triangles.Length; i++)
@@ -175,18 +175,18 @@ public class DivideTriangle : MonoBehaviour
         newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx1;
         newTriangles[_triLen] = _rightVtxIdx;
 
-        ObjManager.Instance.mesh.vertices = newVertices;
-        ObjManager.Instance.mesh.triangles = newTriangles;
+        MeshManager.Instance.mesh.vertices = newVertices;
+        MeshManager.Instance.mesh.triangles = newTriangles;
     }
 
     public void DivideTrianglesClockWise(Vector3 _new, int _triangleIdx, int _intersectEdgeIdx, int _leftVtxIdx, int _rightVtxIdx, int _isInner)
     {
-        int[] triangles = ObjManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         int[] newTriangles = new int[triangles.Length + 6];
-        Vector3[] vertices = ObjManager.Instance.mesh.vertices;
+        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         Vector3[] newVertices = new Vector3[vertices.Length + 2];
         int nextLength = -2;
-        List<Initialize.Edge> edgeList = Initialize.Instance.edgeList;
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Transform objTransform = ObjManager.Instance.objTransform;
         if (_intersectEdgeIdx - _triangleIdx != 2)
             nextLength = 1;
@@ -240,18 +240,18 @@ public class DivideTriangle : MonoBehaviour
         newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx1;
         newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx2;
 
-        ObjManager.Instance.mesh.vertices = newVertices;
-        ObjManager.Instance.mesh.triangles = newTriangles;
+        MeshManager.Instance.mesh.vertices = newVertices;
+        MeshManager.Instance.mesh.triangles = newTriangles;
     }
 
     public void DivideTrianglesCounterClockWise(Vector3 _new, int _triangleIdx, int _intersectEdgeIdx, int _leftVtxIdx, int _rightVtxIdx, int _isInner)
     {
-        int[] triangles = ObjManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         int[] newTriangles = new int[triangles.Length + 6];
-        Vector3[] vertices = ObjManager.Instance.mesh.vertices;
+        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         Vector3[] newVertices = new Vector3[vertices.Length + 2];
         int nextLength = 2;
-        List<Initialize.Edge> edgeList = Initialize.Instance.edgeList;
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Transform objTransform = ObjManager.Instance.objTransform;
 
         if (_intersectEdgeIdx - _triangleIdx != 0)
@@ -305,7 +305,7 @@ public class DivideTriangle : MonoBehaviour
         newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx1;
         newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx2;
 
-        ObjManager.Instance.mesh.vertices = newVertices;
-        ObjManager.Instance.mesh.triangles = newTriangles;
+        MeshManager.Instance.mesh.vertices = newVertices;
+        MeshManager.Instance.mesh.triangles = newTriangles;
     }
 }

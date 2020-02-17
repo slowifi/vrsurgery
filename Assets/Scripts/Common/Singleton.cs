@@ -1,30 +1,66 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
-public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
-    private static T instance;
+    public bool IsInitialized { get; private set; }
+    private static T _instance = null;
+    private static object _syncobj = new object();
+    //private static bool appIsClosing = false;
 
     public static T Instance
     {
         get
         {
-            GameObject obj;
-            obj = GameObject.Find(typeof(T).Name);
-            if(instance == null)
+            //if (appIsClosing)
+            //    return null;
+
+            lock (_syncobj)
             {
-                obj = new GameObject(typeof(T).Name);
-                instance = obj.AddComponent<T>();
+                if (_instance == null)
+                {
+                    
+                    T[] objs = FindObjectsOfType<T>();
+                    if (objs.Length > 0)
+                        _instance = objs[0];
+
+                    //if(objs.Length > 1)
+
+                    if (_instance == null)
+                    {
+                        string goName = typeof(T).ToString();
+                        GameObject go = GameObject.Find(goName);
+                        if (go == null)
+                            go = new GameObject(goName);
+                        _instance = go.AddComponent<T>();
+
+                    }
+
+                }
+                return _instance;
             }
-            else
-            {
-                instance = obj.GetComponent<T>();
-            }
-            return instance;
         }
     }
 
-    public void Awake()
+    protected virtual void OnApplicationQuit()
     {
-        DontDestroyOnLoad(gameObject);
+        //appIsClosing = true;
     }
+
+    public void Initialize()
+    {
+        if (IsInitialized) return;
+        InitializeChild();
+        IsInitialized = true;
+    }
+
+    public void Initialize<P>(P param) where P : class
+    {
+        if (IsInitialized) return;
+        InitializeChild<P>(param);
+        IsInitialized = true;
+    }                            
+
+    protected virtual void InitializeChild() { }
+    protected virtual void InitializeChild<P>(P arg) where P : class{ }
 }

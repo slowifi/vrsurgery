@@ -1,14 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ObjManager : Singleton<ObjManager>
 {
-    public Mesh mesh { get; set; }
+    public Camera cam;
     public Transform objTransform;
-    private new void Awake()
+    public GameObject startMeasurePoint;
+    public GameObject endMeasurePoint;
+
+    public void Initializing()
     {
-        mesh = GameObject.Find("heart_2").GetComponent<MeshFilter>().mesh;
+        cam = GameObject.Find("Main Camera").GetComponent<Camera>();
         objTransform = GameObject.Find("heart_2").transform;
     }
 }
