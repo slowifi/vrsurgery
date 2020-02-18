@@ -3,56 +3,75 @@ using System.Collections.Generic;
 
 public class GeneratePatch : MonoBehaviour
 {
-    private List<Vector3>[] insidePatchVertices = new List<Vector3>[5];
+    private Vector3 _patchVertexPosition;
+    private List<Vector3> _patchVertices;
+    private List<Vector3>[] _insidePatchVertices;
+    private int _patchIndex;
 
-    private void AddPatchVerticesList(Vector3 vertexPosition)
+    public void GenerateInit()
     {
-        Vector3 patchVertexPosition = PatchManager.Instance.patchVertexPosition;
-        // 입력받는걸 다른 곳에서 계속 받을까
+        PatchManager.Instance.newPatch.Add(new GameObject("Patch", typeof(MeshFilter), typeof(MeshRenderer)));
+        PatchManager.Instance.avgNorm.Add(Vector3.zero);
+        PatchManager.Instance.weightCenterPos.Add(Vector3.zero);
+        PatchManager.Instance.patchCenterPos.Add(Vector3.zero);
+        PatchManager.Instance.insidePatchVertices.Add(new List<Vector3>[5]);
+        PatchManager.Instance.patchVerticesIntervalValue = 3.0f;
+
+        _patchVertexPosition = Vector3.zero;
+        _patchVertices = new List<Vector3>();
+        _insidePatchVertices = new List<Vector3>[5];
+        _patchIndex = PatchManager.Instance.newPatch.Count-1;
+
+        for (int i = 0; i < 5; i++)
+            _insidePatchVertices[i] = new List<Vector3>();
+    }
+
+    public void AddPatchVerticesList(Vector3 newVertexPosition)
+    {
+        Debug.Log(newVertexPosition);
+        Vector3 patchVertexPosition = _patchVertexPosition;
+        
         if (patchVertexPosition == Vector3.zero)
         {
-            patchVertexPosition = vertexPosition;
-            PatchManager.Instance.patchVertices.Add(patchVertexPosition);
+            
+            _patchVertexPosition = newVertexPosition;
+            _patchVertices.Add(patchVertexPosition);
         }
-        else if (Vector3.Distance(patchVertexPosition, vertexPosition) > PatchManager.Instance.patchVerticesIntervalValue)
+        else if (Vector3.Distance(patchVertexPosition, newVertexPosition) > PatchManager.Instance.patchVerticesIntervalValue)
         {
-            patchVertexPosition = vertexPosition;
-            PatchManager.Instance.patchVertices.Add(patchVertexPosition);
+            _patchVertexPosition = newVertexPosition;
+            _patchVertices.Add(patchVertexPosition);
         }
     }
 
-    private void GeneratePatchTriangle()
+    public void GeneratePatchTriangle()
     {
-        List<Vector3> patchVertices = PatchManager.Instance.patchVertices;
-        Vector3 patchCenterPos = PatchManager.Instance.patchCenterPos;
+        Vector3 _patchCenterPos = PatchManager.Instance.patchCenterPos[_patchIndex];
+        Vector3[] vtrList = new Vector3[_patchVertices.Count];
 
-        List<Vector3>[] insidePatchVertices = new List<Vector3>[5];
-        Vector3[] vtrList = new Vector3[patchVertices.Count];
         float minDst = 1000000;
 
-        for (int i = 0; i < patchVertices.Count; i++)
-            patchCenterPos += patchVertices[i];
-        patchCenterPos /= patchVertices.Count;
-        PatchManager.Instance.patchCenterPos = patchCenterPos;
+        for (int i = 0; i < _patchVertices.Count; i++)
+            _patchCenterPos += _patchVertices[i];
+        _patchCenterPos /= _patchVertices.Count;
 
-        for (int i = 0; i < patchVertices.Count; i++)
+        PatchManager.Instance.patchCenterPos[_patchIndex] = _patchCenterPos;
+
+        for (int i = 0; i < _patchVertices.Count; i++)
         {
-            vtrList[i] = patchCenterPos - patchVertices[i];
-            float dst = Vector3.Distance(patchVertices[i], patchCenterPos);
+            vtrList[i] = _patchCenterPos - _patchVertices[i];
+            float dst = Vector3.Distance(_patchVertices[i], _patchCenterPos);
             if (dst < minDst)
                 minDst = dst;
         }
 
-        for (int i = 0; i < 5; i++)
-            insidePatchVertices[i] = new List<Vector3>();
-
-        for (int i = 0; i < patchVertices.Count; i++)
+        for (int i = 0; i < _patchVertices.Count; i++)
         {
-            insidePatchVertices[0].Add(patchVertices[i]);
-            insidePatchVertices[1].Add(patchVertices[i] + (vtrList[i] / 5 * 1));
-            insidePatchVertices[2].Add(patchVertices[i] + (vtrList[i] / 5 * 2));
-            insidePatchVertices[3].Add(patchVertices[i] + (vtrList[i] / 5 * 3));
-            insidePatchVertices[4].Add(patchVertices[i] + (vtrList[i] / 5 * 4));
+            _insidePatchVertices[0].Add(_patchVertices[i]);
+            _insidePatchVertices[1].Add(_patchVertices[i] + (vtrList[i] / 5 * 1));
+            _insidePatchVertices[2].Add(_patchVertices[i] + (vtrList[i] / 5 * 2));
+            _insidePatchVertices[3].Add(_patchVertices[i] + (vtrList[i] / 5 * 3));
+            _insidePatchVertices[4].Add(_patchVertices[i] + (vtrList[i] / 5 * 4));
         }
         GeneratePatchObj();
     }
@@ -64,7 +83,7 @@ public class GeneratePatch : MonoBehaviour
         Mesh mesh = new Mesh();
         patchObj.GetComponent<MeshFilter>().mesh = mesh;
         patchObj.transform.parent = GameObject.Find("HumanHeart").transform;
-        int patchVertexCount = PatchManager.Instance.patchVertices.Count;
+        int patchVertexCount = _patchVertices.Count;
 
         Renderer rend = patchObj.GetComponent<Renderer>();
         rend.material.color = Color.white;
@@ -74,14 +93,15 @@ public class GeneratePatch : MonoBehaviour
 
         for (int j = 0; j < 5; j++)
             for (int i = patchVertexCount * j; i < patchVertexCount * (j + 1); i++)
-                points[i] = insidePatchVertices[j][i % patchVertexCount];
+                points[i] = _insidePatchVertices[j][i % patchVertexCount];
 
-        points[patchVertexCount * 5] = PatchManager.Instance.patchCenterPos;
+        points[patchVertexCount * 5] = PatchManager.Instance.patchCenterPos[_patchIndex];
 
         BuildMesh(ref triangles, 5 - 1, patchVertexCount);
 
         mesh.vertices = points;
         mesh.triangles = triangles;
+        CalculateNormal();
     }
 
     private void BuildMesh(ref int[] triangles, int loopCount, int patchVertexCount)
@@ -127,60 +147,66 @@ public class GeneratePatch : MonoBehaviour
         }
         return;
     }
-    
-    /*
-    private void RecalculateNormal(int patchIndex)
-    {
-        Mesh mesh = GameObject.Find("Patch" + PatchManager.Instance.patchIndex).GetComponent<MeshFilter>().mesh;
-        int patchVertexCount = PatchManager.Instance.patchVertices.Count;
-        Vector3[] asdf = mesh.vertices;
-        for (int i = 0; i < patchVertexCount; i++)
-        {
-            Vector3 p1 = insidePatchVertices[0][i];
-            Vector3 p2 = insidePatchVertices[2][i] + avgNorm * patchWeight;
-            Vector3 p3 = patchCenterPos;
-            asdf[i + patchVertexCount] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.2f), Vector3.Lerp(p2, p3, 0.2f), 0.2f);
-            asdf[i + patchVertexCount * 2] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.4f), Vector3.Lerp(p2, p3, 0.4f), 0.4f);
-            asdf[i + patchVertexCount * 3] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.6f), Vector3.Lerp(p2, p3, 0.6f), 0.6f);
-            asdf[i + patchVertexCount * 4] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.8f), Vector3.Lerp(p2, p3, 0.8f), 0.8f);
-        }
-
-        asdf[mesh.normals.Length - 1] = patchCenterPos;
-
-        mesh.vertices = asdf;
-        mesh.RecalculateNormals();
-    }
 
     private void CalculateNormal()
     {
-        Mesh mesh = GameObject.Find("Patch" + PatchManager.Instance.patchIndex).GetComponent<MeshFilter>().mesh;
-        mesh.RecalculateNormals();
-        int tempNum = patchVertices.Count;
-        avgNorm = new Vector3(0, 0, 0);
+        PatchManager.Instance.patchVerticesCount.Add(_patchVertices.Count);
+        PatchManager.Instance.insidePatchVertices[_patchIndex] = _insidePatchVertices;
 
+        Mesh mesh = PatchManager.Instance.newPatch[_patchIndex].GetComponent<MeshFilter>().mesh;
+        mesh.RecalculateNormals();
+
+        int tempNum = _patchVertices.Count;
+        Vector3 _avgNorm = Vector3.zero;
         for (int i = 0; i < mesh.normals.Length; i++)
-            avgNorm += mesh.normals[i];
-        avgNorm /= mesh.normals.Length;
-        patchCenterPos += 10 * avgNorm;
-        weightCenterPos = patchCenterPos;
-        Vector3[] asdf = mesh.vertices;
+            _avgNorm += mesh.normals[i];
+        _avgNorm /= mesh.normals.Length;
+
+        PatchManager.Instance.avgNorm[_patchIndex] = _avgNorm;
+        PatchManager.Instance.patchCenterPos[_patchIndex] += 10 * _avgNorm;
+        PatchManager.Instance.weightCenterPos = PatchManager.Instance.patchCenterPos;
+        Vector3[] patchVertexPosition = mesh.vertices;
+
         for (int i = 0; i < tempNum; i++)
         {
-            Vector3 p1 = insidePatchVertices[0][i];
-            Vector3 p2 = insidePatchVertices[2][i] + avgNorm * patchWeight;
-            Vector3 p3 = patchCenterPos;
-            asdf[i + tempNum] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.2f), Vector3.Lerp(p2, p3, 0.2f), 0.2f);
-            asdf[i + tempNum * 2] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.4f), Vector3.Lerp(p2, p3, 0.4f), 0.4f);
-            asdf[i + tempNum * 3] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.6f), Vector3.Lerp(p2, p3, 0.6f), 0.6f);
-            asdf[i + tempNum * 4] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.8f), Vector3.Lerp(p2, p3, 0.8f), 0.8f);
+            Vector3 p1 = _insidePatchVertices[0][i];
+            Vector3 p2 = _insidePatchVertices[2][i] + _avgNorm * PatchManager.Instance.patchWeight;
+            Vector3 p3 = PatchManager.Instance.patchCenterPos[_patchIndex];
+            patchVertexPosition[i + tempNum] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.2f), Vector3.Lerp(p2, p3, 0.2f), 0.2f);
+            patchVertexPosition[i + tempNum * 2] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.4f), Vector3.Lerp(p2, p3, 0.4f), 0.4f);
+            patchVertexPosition[i + tempNum * 3] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.6f), Vector3.Lerp(p2, p3, 0.6f), 0.6f);
+            patchVertexPosition[i + tempNum * 4] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.8f), Vector3.Lerp(p2, p3, 0.8f), 0.8f);
         }
 
-        asdf[mesh.normals.Length - 1] = patchCenterPos;
+        patchVertexPosition[mesh.normals.Length - 1] = PatchManager.Instance.patchCenterPos[_patchIndex];
 
-        mesh.vertices = asdf;
+        mesh.vertices = patchVertexPosition;
         mesh.RecalculateNormals();
         return;
     }
-    */
 
+    // 업데이트용
+    public void RecalculateNormal(int patchIndex)
+    {
+        Mesh mesh = PatchManager.Instance.newPatch[patchIndex].GetComponent<MeshFilter>().mesh;
+        int patchVertexCount = PatchManager.Instance.patchVerticesCount[patchIndex];
+        List<Vector3>[] _insidePatchVertices = PatchManager.Instance.insidePatchVertices[patchIndex];
+        Vector3[] patchVertexPosition = mesh.vertices;
+
+        for (int i = 0; i < patchVertexCount; i++)
+        {
+            Vector3 p1 = _insidePatchVertices[0][i];
+            Vector3 p2 = _insidePatchVertices[2][i] + PatchManager.Instance.avgNorm[patchIndex] * PatchManager.Instance.patchWeight;
+            Vector3 p3 = PatchManager.Instance.patchCenterPos[patchIndex];
+            patchVertexPosition[i + patchVertexCount] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.2f), Vector3.Lerp(p2, p3, 0.2f), 0.2f);
+            patchVertexPosition[i + patchVertexCount * 2] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.4f), Vector3.Lerp(p2, p3, 0.4f), 0.4f);
+            patchVertexPosition[i + patchVertexCount * 3] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.6f), Vector3.Lerp(p2, p3, 0.6f), 0.6f);
+            patchVertexPosition[i + patchVertexCount * 4] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.8f), Vector3.Lerp(p2, p3, 0.8f), 0.8f);
+        }
+        patchVertexPosition[mesh.normals.Length - 1] = PatchManager.Instance.patchCenterPos[patchIndex];
+
+        mesh.vertices = patchVertexPosition;
+        // mesh.RecalculateNormals();
+    }
 }
+

@@ -280,8 +280,8 @@ public class RayIntersection : MonoBehaviour
         Mesh_Initialize();
         MeshRecalculate();
 
-        ObjManager.Instance.Initializing();
-        AdjacencyList.Instance.Initializing();
+        // ObjManager.Instance.Initializing();
+        AdjacencyList.Instance.Initialize();
     }
     
     public void Initializing()
@@ -297,8 +297,8 @@ public class RayIntersection : MonoBehaviour
         Destroy(GameObject.Find("/p1"));
         Destroy(GameObject.Find("distance"));
         Destroy(GameObject.Find("Incision line"));
-        ObjManager.Instance.Initializing();
-        AdjacencyList.Instance.Initializing();
+        // ObjManager.Instance.Initializing();
+        AdjacencyList.Instance.Initialize();
 
         ObjManager.Instance.startMeasurePoint.SetActive(false);
         ObjManager.Instance.endMeasurePoint.SetActive(false);
@@ -1332,14 +1332,17 @@ public class RayIntersection : MonoBehaviour
                     }
                     else if (Vector3.Distance(outerIntersectionPoint, boundaryOuterStartPoint) > 1.0f)
                     {
-                        
                         // 처음 true가 찍히니 다행
-                        Debug.Log(CheckConnectedTriangles(outerVtx1, outerVtx2, outerVtx3, boundaryOuterStartPointIdx));
-                        Debug.Log(CheckConnectedTriangles(innerVtx1, innerVtx2, innerVtx3, boundaryInnerStartPointIdx));
+                        CheckConnectedTriangles(outerVtx1, outerVtx2, outerVtx3, boundaryOuterStartPointIdx);
+                        CheckConnectedTriangles(innerVtx1, innerVtx2, innerVtx3, boundaryInnerStartPointIdx);
 
 
 
-                        // outer / inner 각각 false 일 때를 알아야 함. 
+
+
+
+
+                        // outer / inner 가 false 일 때 각각을 line edge intersection 활용해야 함.
                         screenEndOrigin = cam.ScreenPointToRay(Input.mousePosition).origin;
                         screenEndDirection = cam.ScreenPointToRay(Input.mousePosition).direction;
 
@@ -1349,8 +1352,6 @@ public class RayIntersection : MonoBehaviour
                         boundaryOuterEndPointIdx = triangleIndex_outer;
                         boundaryInnerEndPointIdx = triangleIndex_inner;
                         
-
-
                         /*
                         Debug.Log("boundary end");
                         Debug.Log("start point : " + boundaryOuterStartPoint);

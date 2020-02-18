@@ -6,16 +6,23 @@ public class CHD : MonoBehaviour
     // main
     public bool isCutMode = false;
     public bool isMeasureMode = false;
-    public bool isPatchMode = false;
+    public bool isPatchMode = true;
 
     public bool isIncisionMode = false;
     public bool isEraseMode = false;
     public bool isBoundaryCutMode = false;
+    
+    // test
+    public bool isFirstPatch = true;
+    public bool isPatchUpdate = false;
 
     void Start()
     {
-        AdjacencyList.Instance.Initializing();
+        MeshManager.Instance.Initialize();
+        AdjacencyList.Instance.Initialize();
+        PatchManager.Instance.Initialize();
     }
+
 
     void Update()
     {
@@ -41,21 +48,35 @@ public class CHD : MonoBehaviour
                 Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
                 float dst = MeasureManager.Instance.MeasureDistance(vertexPosition);
                 dst = dst / ObjManager.Instance.objTransform.lossyScale.z;
-                // m_distance.text = dst + "mm";
+                UIManager.Instance.distance.text = dst + "mm";
             }
         }
         else if(isPatchMode)
         {
-            if(Input.GetMouseButtonUp(0))
+            // 처음에 실행되어야함.
+            if (isFirstPatch)
             {
-
+                isFirstPatch = false;
+                PatchManager.Instance.Generate();
+                return;
+            }
+            else if(isPatchUpdate)
+            {
+                Debug.Log("수정");
+                PatchManager.Instance.UpdateCurve(0);
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                PatchManager.Instance.GenerateMesh();
+                isPatchUpdate = true;
             }
             else if (Input.GetMouseButton(0))
             {
-                // Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-
-                
+                Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                PatchManager.Instance.AddVertex(vertexPosition);
             }
         }
     }
+
+
 }

@@ -17,5 +17,15 @@ public class MeshManager : Singleton<MeshManager>
         vertexCount = mesh.vertexCount;
         triangles = mesh.triangles;
         vertices = mesh.vertices;
+        mesh.RecalculateNormals();
+    }
+
+    protected override void InitializeChild()
+    {
+        mesh = heart.GetComponent<MeshFilter>().mesh;
+        vertexCount = mesh.vertexCount;
+        triangles = mesh.triangles;
+        vertices = mesh.vertices;
+        mesh.RecalculateNormals();
     }
 }
