@@ -7,19 +7,18 @@ public class PatchManager : Singleton<PatchManager>
     public List<Vector3> avgNorm;
     public List<Vector3> weightCenterPos;
     public List<Vector3> patchCenterPos;
-
     public List<List<Vector3>[]> insidePatchVertices;
     public List<int> patchVerticesCount;
+
     public float patchVerticesIntervalValue;
+    public float patchWeight;
+
     private GeneratePatch generatePatch;
 
-    public float patchWeight;
-    // patchWeight은 bar value * objManager.lossyscale * 20으로 만들어져야됨.
-    // scale이 들어가 있어서 매번 업데이트 되어야함.
 
     public void Generate()
     {
-        generatePatch = new GeneratePatch();
+        generatePatch = gameObject.AddComponent<GeneratePatch>();
         generatePatch.GenerateInit();
     }
 
@@ -38,8 +37,7 @@ public class PatchManager : Singleton<PatchManager>
         float heightValue = UIManager.Instance.heightBar.value;
         float curveValue = UIManager.Instance.curveBar.value;
 
-        patchCenterPos[patchIndex] = weightCenterPos[patchIndex] + ((heightValue - 0.4f) * 40) * avgNorm[patchIndex];
-        Debug.Log(weightCenterPos[patchIndex]);
+        patchCenterPos[patchIndex] = weightCenterPos[patchIndex] + ((heightValue - 0.5f) * 40) * avgNorm[patchIndex];
         patchWeight = curveValue * 20.0f * ObjManager.Instance.objTransform.lossyScale.z;
         generatePatch.RecalculateNormal(patchIndex);
     }

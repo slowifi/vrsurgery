@@ -62,7 +62,7 @@ public class CHD : MonoBehaviour
             }
             else if(isPatchUpdate)
             {
-                Debug.Log("수정");
+                // isPatchUpdate = false;
                 PatchManager.Instance.UpdateCurve(0);
             }
             else if (Input.GetMouseButtonUp(0))
