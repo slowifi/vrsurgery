@@ -14,10 +14,10 @@ public class MeshManager : Singleton<MeshManager>
     {
         // heart = GameObject.Find("heart_2");
         mesh = heart.GetComponent<MeshFilter>().mesh;
+        mesh.RecalculateNormals();
         vertexCount = mesh.vertexCount;
         triangles = mesh.triangles;
         vertices = mesh.vertices;
-        mesh.RecalculateNormals();
     }
 
     protected override void InitializeChild()

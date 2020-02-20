@@ -121,9 +121,9 @@ public class ButtonPressDetection : MonoBehaviour, IPointerDownHandler, IPointer
 
             GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = false;
             // GameObject.Find("Main Camera").GetComponent<RayIntersection>().enabled = true;
-            GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
+            //GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
             GameObject.Find("Main Camera").gameObject.SendMessage("CuttingOn");
-            GameObject.Find("Main Camera").gameObject.SendMessage("RendererOverlapping");
+            //GameObject.Find("Main Camera").gameObject.SendMessage("RendererOverlapping");
         }
         else if (this.name == "Patching button")
         {

@@ -7,5 +7,8 @@ public class ObjManager : Singleton<ObjManager>
     public GameObject startMeasurePoint;
     public GameObject endMeasurePoint;
 
-
+    public void ObjUpdate()
+    {
+        objTransform = objTransform.GetComponent<Transform>();
+    }
 }

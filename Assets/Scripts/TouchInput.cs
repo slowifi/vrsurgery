@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class TouchInput : MonoBehaviour
@@ -13,7 +14,11 @@ public class TouchInput : MonoBehaviour
     public Transform pivotOffset;
     public Touch touch1;
     public Touch touch2;
-    
+
+    public Scrollbar rotateBar;
+    public Scrollbar zoomBar;
+    public Scrollbar moveBar;
+
     public bool breathingEnabled = false;
 
     private float zoomConstant = 0.1f;
@@ -26,11 +31,9 @@ public class TouchInput : MonoBehaviour
     private float _dx;
     private bool _upScale;
     
-
     // Button status
     int[] mButtonStatus = new int[3];
 
-    
     // CurrentMode - 1: Partial(SMRA) 2: Partial SMRV 3: Partial SMLA, 4: Partial SMLV, 5: SMPA, 6: SMAORTA
     // 1 1 1 1 1 1  (All)    
     private long currentMode;
@@ -239,9 +242,7 @@ public class TouchInput : MonoBehaviour
         for (int i = 0; i < 3; i++)
             mButtonStatus[i] = 0;
 
-        
-
-        StartCoroutine(Breathing());
+        // StartCoroutine(Breathing());
         ResetPivot();
     }
     // Scaling
@@ -390,113 +391,43 @@ public class TouchInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float wheel = Input.GetAxis("Mouse ScrollWheel");
+        // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
+        transform.localScale += Vector3.one * (wheel * (0.2f + zoomBar.value/4));
+        if (transform.localScale.x <= 0.2f)
+            transform.localScale = Vector3.one *0.2f;
+        if (Input.GetMouseButton(1))
+        {
+            // 여기에 UI 추가.
+            float x = Input.GetAxis("Mouse X");
+            float y = Input.GetAxis("Mouse Y");
+            float sensitivityValue = rotateBar.value/10;
+            transform.RotateAround(Vector3.up, (-x * (0.03f + sensitivityValue))); 
+            transform.RotateAround(Vector3.right, (-y * (0.03f + sensitivityValue)));
+        }
+        else if(Input.GetMouseButton(2))
+        {
+            // 여기에 UI 추가.
+            // 전체 이동.
+            float xPos = Input.GetAxis("Mouse X");
+            float yPos = Input.GetAxis("Mouse Y");
+
+            float sensitivityValue = moveBar.value;
+            pivot.transform.position += Vector3.left * (xPos * ( 1f + sensitivityValue));
+            pivot.transform.position += Vector3.up * (yPos*(1f + sensitivityValue));
+
+        }
+
+
+
+
+
+#if UNITY_ANDROID
         int fingerCount = 0;
+        
         Resolution resolutions = Screen.currentResolution;
         float XResolution = resolutions.width;
         float YResolution = resolutions.height;
-
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            float XaxisRotation = 1f;            
-            pivot.transform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation);
-
-            updatePlaneModel();
-        }
-        else if (Input.GetKey(KeyCode.UpArrow))
-        {
-            float YaxisRotation = 1f;
-            pivot.transform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation);
-
-            updatePlaneModel();
-
-        }
-        else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            float XaxisRotation = -1f;
-            pivot.transform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation);
-
-            updatePlaneModel();
-
-        }
-        else if (Input.GetKey(KeyCode.DownArrow))
-        {
-            float YaxisRotation = -1f;
-            pivot.transform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation);
-
-            updatePlaneModel();
-        }
-        else if(Input.GetKey(KeyCode.Q))
-        {
-            InitScale += zoomConstant;
-            TargetScale += zoomConstant;
-            _currentScale += zoomConstant;
-
-            Breathing();
-        }
-        else if(Input.GetKey(KeyCode.W))
-        {
-            InitScale -= zoomConstant;
-            TargetScale -= zoomConstant;
-            _currentScale -= zoomConstant;
-
-            Breathing();
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            Debug.Log("Maharaga: Number 1, " + currentMode);
-            if (currentMode / 100000 == 1) currentMode = currentMode - 100000;
-            else currentMode = currentMode + 100000;
-            Debug.Log("Maharaga: Number 1 after, " + currentMode);
-            // setByMode();
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            Debug.Log("Maharaga: Number 2, " + currentMode);
-            if (currentMode % 100000 / 10000 == 1) currentMode -= 10000;
-            else currentMode += 10000;
-            Debug.Log("Maharaga: Number 2 after, " + currentMode);
-            // setByMode();
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            if (currentMode % 10000 / 1000 == 1) currentMode -= 1000;
-            else currentMode += 1000;
-            // setByMode();
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            if (currentMode % 1000 / 100 == 1) currentMode -= 100;
-            else currentMode += 100;
-            // setByMode();
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            if (currentMode % 100 / 10 == 1) currentMode -= 10;
-            else currentMode += 10;
-            // setByMode();
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha6))
-        {
-            if (currentMode % 10 == 1) currentMode -= 1;
-            else currentMode += 1;
-            // setByMode();
-        }
-        else if (Input.GetKeyDown(KeyCode.A)) 
-        {
-            Debug.Log("Maharaga: global Plane " + currentPlane.GetComponent<customPlaneManager>().mPlane.normal + currentPlane.GetComponent<customPlaneManager>().mPlane.distance);
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            Debug.Log("Maharaga: global Plane " + currentPlane.GetComponent<customPlaneManager>().mPlane.normal + currentPlane.GetComponent<customPlaneManager>().mPlane.distance);
-        }
-
-        foreach (Touch touch in Input.touches)
-        {
-            if (touch.phase != TouchPhase.Ended && touch.phase != TouchPhase.Canceled)
-                fingerCount++;
-
-        }
-
 
         if (fingerCount == 1) // For Touch Input with a finger
         // Drag: Convert 2D translational movement to 3D rotation
@@ -564,7 +495,7 @@ public class TouchInput : MonoBehaviour
                 pivot.transform.position += Vector3.up * yPos;
             }
         }
-
+#endif
 
     }
 }
