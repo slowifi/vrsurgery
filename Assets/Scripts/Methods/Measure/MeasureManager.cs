@@ -2,8 +2,9 @@
 public class MeasureManager : Singleton<MeasureManager>
 {
     public float distanceStartToEnd = 0f;
-
-    public float MeasureDistance(Vector3 vertexPosition)
+    public Vector3 measureStart;
+    public Vector3 measureEnd;
+    public float MeasureDistance(Vector3 vertexPosition, Ray cameraRay)
     {
         if (vertexPosition != Vector3.zero)
         {
@@ -11,6 +12,8 @@ public class MeasureManager : Singleton<MeasureManager>
             GameObject endPoint = ObjManager.Instance.endMeasurePoint;
             if (!startPoint.activeSelf)
             {
+                Destroy(GameObject.Find("MeasureLine"));
+                measureStart = cameraRay.direction;
                 startPoint.SetActive(true);
                 startPoint.transform.position = vertexPosition;
             }
@@ -18,10 +21,20 @@ public class MeasureManager : Singleton<MeasureManager>
             {
                 endPoint.SetActive(true);
                 endPoint.transform.position = vertexPosition;
+                measureEnd = cameraRay.direction;
+                // Debug.DrawLine(startPoint.transform.position, endPoint.transform.position, Color.yellow, 2, false);
+                GameObject lineRenderer = new GameObject("MeasureLine");
+                var line = lineRenderer.AddComponent<LineRenderer>();
+                line.material.color = Color.white;
+                line.SetWidth(0.6f, 0.6f);
+                line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 5f * ObjManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 5f * ObjManager.Instance.objTransform.lossyScale.z });
                 distanceStartToEnd = Vector3.Distance(endPoint.transform.position, startPoint.transform.position);
             }
             else
             {
+                Destroy(GameObject.Find("MeasureLine"));
+                measureStart = cameraRay.direction;
                 startPoint.transform.position = vertexPosition;
                 endPoint.SetActive(false);
             }

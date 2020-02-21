@@ -393,7 +393,7 @@ public class TouchInput : MonoBehaviour
     {
         float wheel = Input.GetAxis("Mouse ScrollWheel");
         // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
-        transform.localScale += Vector3.one * (wheel * (0.2f + zoomBar.value/4));
+        transform.localScale += Vector3.one * (wheel * (0.2f + zoomBar.value/2));
         if (transform.localScale.x <= 0.2f)
             transform.localScale = Vector3.one *0.2f;
         if (Input.GetMouseButton(1))

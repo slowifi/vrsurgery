@@ -46,9 +46,9 @@ public class CHD : MonoBehaviour
             if(Input.GetMouseButtonDown(0))
             {
                 Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                float dst = MeasureManager.Instance.MeasureDistance(vertexPosition);
-                dst = dst / ObjManager.Instance.objTransform.lossyScale.z;
-                UIManager.Instance.distance.text = dst + "mm";
+                //float dst = MeasureManager.Instance.MeasureDistance(vertexPosition);
+                //dst = dst / ObjManager.Instance.objTransform.lossyScale.z;
+                // UIManager.Instance.distance.text = dst + "mm";
             }
         }
         else if(isPatchMode)
