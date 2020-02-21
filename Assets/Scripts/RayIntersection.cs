@@ -1724,6 +1724,7 @@ public class RayIntersection : MonoBehaviour
                                 break;
 
                             TriangleEdgeIntersectionInBoundary(ref nextTriangleIndex, ref currentEdgeIndex, boundaryInnerStartPoint, boundaryInnerLastPoint);
+
                             boundaryInnerRemoveVertexIndex.Add(edgeList[currentEdgeIndex].vtx1);
                             boundaryInnerRemoveTriangleIndex.Add(nextTriangleIndex);
 
@@ -3714,7 +3715,10 @@ public class RayIntersection : MonoBehaviour
                     check -= 1;
             }
             if (check == 0)
+            {
+                // 바운더리 잘못 생성되었다고 throw 해야됨. 아니면 리셋해야지뭐.
                 Debug.Log("버텍스 모두 바운더리에 포함.");
+            }
             else if (check >= 100)
                 outerVtx = outerVtx1;
             else if (check >= 10)
@@ -3733,7 +3737,9 @@ public class RayIntersection : MonoBehaviour
                     check -= 1;
             }
             if (check == 0)
+            {
                 Debug.Log("버텍스 모두 바운더리에 포함.");
+            }
             else if (check >= 100)
                 innerVtx = innerVtx1;
             else if (check >= 10)
