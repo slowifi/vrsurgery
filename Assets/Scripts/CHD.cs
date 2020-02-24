@@ -6,9 +6,11 @@ public class CHD : MonoBehaviour
     // main
     public bool isCutMode = false;
     public bool isMeasureMode = false;
-    public bool isPatchMode = true;
+    public bool isPatchMode = false;
 
     public bool isIncisionMode = false;
+    public bool isExtend = false;
+
     public bool isEraseMode = false;
     public bool isBoundaryCutMode = false;
     
@@ -23,14 +25,25 @@ public class CHD : MonoBehaviour
         PatchManager.Instance.Initialize();
     }
 
-
     void Update()
     {
         if(isCutMode)
         {
             if(isIncisionMode)
             {
+                if(isExtend)
+                {
 
+                }
+                else if(Input.GetMouseButtonDown(0))
+                {
+                    IncisionManager.Instance.SetStartVertices();
+                }
+                else if(Input.GetMouseButtonUp(0))
+                {
+                    IncisionManager.Instance.SetEndVertices();
+                    isExtend = true;
+                }
             }
             else if(isEraseMode)
             {

@@ -13,23 +13,23 @@ public class PatchManager : Singleton<PatchManager>
     public float patchVerticesIntervalValue;
     public float patchWeight;
 
-    private GeneratePatch generatePatch;
+    private GeneratePatch _generatePatch;
 
 
     public void Generate()
     {
-        generatePatch = gameObject.AddComponent<GeneratePatch>();
-        generatePatch.GenerateInit();
+        _generatePatch = gameObject.AddComponent<GeneratePatch>();
+        _generatePatch.GenerateInit();
     }
 
     public void AddVertex(Vector3 newVertexPosition)
     {
-        generatePatch.AddPatchVerticesList(newVertexPosition);
+        _generatePatch.AddPatchVerticesList(newVertexPosition);
     }
 
     public void GenerateMesh()
     {
-        generatePatch.GeneratePatchTriangle();
+        _generatePatch.GeneratePatchTriangle();
     }
 
     public void UpdateCurve(int patchIndex)
@@ -39,7 +39,7 @@ public class PatchManager : Singleton<PatchManager>
 
         patchCenterPos[patchIndex] = weightCenterPos[patchIndex] + ((heightValue - 0.5f) * 40) * avgNorm[patchIndex];
         patchWeight = curveValue * 20.0f * ObjManager.Instance.objTransform.lossyScale.z;
-        generatePatch.RecalculateNormal(patchIndex);
+        _generatePatch.RecalculateNormal(patchIndex);
     }
 
     protected override void InitializeChild()

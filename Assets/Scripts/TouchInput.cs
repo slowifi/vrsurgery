@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 
 public class TouchInput : MonoBehaviour
 {
-    // Start is called before the first frame update
     public GameObject humanHeart;
     private GameObject pivot;
     private Transform originPivot;
@@ -33,11 +32,7 @@ public class TouchInput : MonoBehaviour
     
     // Button status
     int[] mButtonStatus = new int[3];
-
-    // CurrentMode - 1: Partial(SMRA) 2: Partial SMRV 3: Partial SMLA, 4: Partial SMLV, 5: SMPA, 6: SMAORTA
-    // 1 1 1 1 1 1  (All)    
     private long currentMode;
-    
 
     private Vector3 centerOfMass;
 
@@ -206,13 +201,11 @@ public class TouchInput : MonoBehaviour
         return bounds;
     }
 
-
     void Start()
     {
         currentMode = 11111111111;
         
         setByMode();
-
 
         // Estimating local bounds of a model set and setting a pivot point against the model
         humanHeart = GameObject.Find("HumanHeart");
@@ -228,7 +221,6 @@ public class TouchInput : MonoBehaviour
         transform.SetParent(pivot.transform);
         humanHeart.transform.position = -pivotOffset.position;
         Debug.Log("Maharaga: " + humanHeart.transform.position + pivotOffset.position);
-
         
         TargetScale = 1.1f;
         InitScale = 1f;
@@ -294,7 +286,6 @@ public class TouchInput : MonoBehaviour
             TargetScale += (humanHeart.transform.localScale.x - x)+0.4f;
             _currentScale += (humanHeart.transform.localScale.x - x)+0.4f;
         }
-
 
         updatePlaneModel();
     }

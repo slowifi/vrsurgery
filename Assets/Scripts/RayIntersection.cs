@@ -1634,35 +1634,11 @@ public class RayIntersection : MonoBehaviour
                             boundaryInnerOldTriangleIndex = triangleIndex_inner;
                         }
 
-
-
                         boundaryOuterStartPoint = outerIntersectionPoint;
                         boundaryInnerStartPoint = innerIntersectionPoint;
 
                         screenStartOrigin = screenEndOrigin;
                         screenStartDirection = screenEndDirection;
-                        // 여기서 incision false 값으로 바뀌고, triangle division 실행 
-
-
-
-
-                        //// outer / inner 가 false 일 때 각각을 line edge intersection 활용해야 함.
-                        //screenEndOrigin = cam.ScreenPointToRay(Input.mousePosition).origin;
-                        //screenEndDirection = cam.ScreenPointToRay(Input.mousePosition).direction;
-
-                        //boundaryOuterEndPoint = outerIntersectionPoint;
-                        //boundaryInnerEndPoint = innerIntersectionPoint;
-
-                        //boundaryOuterEndPointIdx = triangleIndex_outer;
-                        //boundaryInnerEndPointIdx = triangleIndex_inner;
-
-                        /*
-                        Debug.Log("boundary end");
-                        Debug.Log("start point : " + boundaryOuterStartPoint);
-                        Debug.Log("end point : " + boundaryOuterEndPoint);
-                        */
-
-                        // boundaryCut = true;
                     }
                 }
             }
@@ -1677,9 +1653,6 @@ public class RayIntersection : MonoBehaviour
                 // boundaryOuterLastPointIdx
                 if (boundaryOuterOldTriangleIndex != boundaryOuterLastPointIdx)
                 {
-                    // 다르다면 이거랑 상관없이 계속 진행되어야 하는게 맞는거 아닌가?
-                    //if (!CheckConnectedTriangles(triangles[boundaryOuterOldTriangleIndex], triangles[boundaryOuterOldTriangleIndex + 1], triangles[boundaryOuterOldTriangleIndex + 2], boundaryOuterLastPointIdx))
-                    //{
                     int nextTriangleIndex = boundaryOuterOldTriangleIndex;
                     int currentEdgeIndex = -1;
                     while (true)
@@ -1688,6 +1661,23 @@ public class RayIntersection : MonoBehaviour
                             break;
 
                         TriangleEdgeIntersectionInBoundary(ref nextTriangleIndex, ref currentEdgeIndex, boundaryOuterStartPoint, boundaryOuterLastPoint);
+                        if (currentEdgeIndex == -1 || nextTriangleIndex == -1)
+                        {
+                            Debug.Log("에러를 띄워야 할텐데.");
+                            boundaryCutMode = false;
+                            ResetBoundaryCutValues();
+                            for (int i = 0; i < boundaryLineRenderers.Count; i++)
+                                GameObject.Destroy(boundaryLineRenderers[i]);
+                            boundaryLineRenderers.Clear();
+
+                            GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
+                            ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
+                            cb.normalColor = new Color32(176, 48, 48, 255);
+                            GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+                            cb.normalColor = new Color32(137, 96, 96, 255);
+                            GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
+                            return;
+                        }
                         boundaryOuterRemoveVertexIndex.Add(edgeList[currentEdgeIndex].vtx2);
                         boundaryOuterRemoveTriangleIndex.Add(nextTriangleIndex);
 
@@ -1701,8 +1691,6 @@ public class RayIntersection : MonoBehaviour
                             }
                         }
                     }
-                    //}
-
                     // 요 라인들은 재정리 할 필요 있음.
                     int lineRendererIndex = boundaryLineRenderers.Count;
                     boundaryLineRenderers.Add(new GameObject("Boundary"));
@@ -1741,59 +1729,8 @@ public class RayIntersection : MonoBehaviour
                         }
                     }
                 }
-                //Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
-
-                //// int[] triangles = mesh.triangles;
-                //colors = new Color[mesh.vertexCount];
-                //for (int i = 0; i < mesh.vertexCount; i++)
-                //    colors[i] = Color.red;
-
-                //foreach (var item in boundaryOuterRemoveTriangleIndex)
-                //{
-                //    colors[triangles[item]] = Color.black;
-                //    colors[triangles[item + 1]] = Color.black;
-                //    colors[triangles[item + 2]] = Color.black;
-                //}
-                //mesh.colors = colors;
-                //Debug.Log(boundaryOuterRemoveTriangleIndex.Count);
                 boundaryBFS = true;
                 boundaryCutMode = false;
-                /*
-                Debug.Log("찐막On");
-
-                screenStartOrigin = screenEndOrigin;
-                screenStartDirection = screenEndDirection;
-
-                boundaryOuterStartPoint = boundaryOuterEndPoint;
-                boundaryInnerStartPoint = boundaryInnerEndPoint;
-
-                boundaryOuterStartPointIdx = boundaryOuterEndPointIdx;
-                boundaryInnerStartPointIdx = boundaryInnerEndPointIdx;
-
-                screenEndOrigin = screenLastOrigin;
-                screenEndDirection = screenLastDirection;
-
-                boundaryOuterEndPoint = boundaryOuterLastPoint;
-                boundaryInnerEndPoint = boundaryInnerLastPoint;
-
-                screenMiddleOrigin = Vector3.Lerp(screenStartOrigin, screenEndOrigin, 0.5f);
-                // test
-
-                var boundaryLine = new GameObject("Incision line");
-                var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
-                lineRenderer.material.color = Color.black;
-                lineRenderer.SetPositions(new Vector3[] { boundaryOuterStartPoint - screenStartDirection, boundaryOuterEndPoint - screenEndDirection });
-
-                // 여기서 해야될건 
-                FindTriangleEdgeIntersection(boundaryOuterFirstVtx, boundaryInnerFirstVtx);
-
-                boundaryOuterEndPointIdx = boundaryOuterLastPointIdx;
-                boundaryInnerEndPointIdx = boundaryInnerLastPointIdx;
-
-                boundaryCut = true;
-                boundaryCutMode = false;
-                lastBoundary = true;
-                */
             }
         } // boundary cut mode
 
@@ -1809,7 +1746,7 @@ public class RayIntersection : MonoBehaviour
                 m_distance.text = dst + "mm";
             }
         }
-
+            
         // patch
         if (reCalculate)
         {
@@ -2301,14 +2238,6 @@ public class RayIntersection : MonoBehaviour
         {
             test_world[i] = obj.transform.TransformPoint(test[i]);
         }
-        /*
-        foreach (Transform child in obj.GetComponent<Transform>())
-        {
-            test[j] = child.transform.localPosition;
-            test_world[j] = child.transform.position;
-            j++;
-        }
-        */
         mesh.vertices = test;
         mesh.RecalculateNormals();
         Debug.Log("트라이앵글 크기 : " + mesh.triangles.Length);
@@ -2351,7 +2280,7 @@ public class RayIntersection : MonoBehaviour
         }
     }
 
-    private void BFS_Boundary(int intersectionVtxIdx, bool isInner, ref List<int> removeTrianglesList)
+    private void BFS_Boundary(int intersectionVtxIdx, bool isInner, ref List<int> removeTrianglesList, ref int removeCount)
     {
         int[] triangles = obj.GetComponent<MeshFilter>().mesh.triangles;
         Queue<int> temp = new Queue<int>();
@@ -2372,12 +2301,12 @@ public class RayIntersection : MonoBehaviour
             foreach (var item in boundaryInnerRemoveVertexIndex)
                 duplicateCheck.Add(item);
         }
-        int asdf = 0;
+        removeCount = 0;
         // vertices 모아 놓음.
         while (temp.Count != 0)
         {
-            asdf++;
-            if (asdf == 3000)
+            removeCount++;
+            if (removeCount == 4000)
             {
                 Debug.Log("4천개임.");
                 break;
@@ -3610,10 +3539,6 @@ public class RayIntersection : MonoBehaviour
                 outerMinX = screenPoint.x;
             if (screenPoint.x > outerMaxX)
                 outerMaxX = screenPoint.x;
-            //if (screenPoint.y < outerMinY)
-            //    outerMinY = screenPoint.y;
-            //if (screenPoint.y > outerMaxY)
-            //    outerMaxY = screenPoint.y;
             outerEdgeVector.Add(screenPoint);
         }
 
@@ -3647,10 +3572,24 @@ public class RayIntersection : MonoBehaviour
             if (innerVtx == -1)
                 innerVtx = inner;
         }
-
+        if (outerVtx == -1)
+        {
+            Debug.Log("가운데에 있는 vtx는 바운더리 vtx");
+            return;
+        }
+        else if (innerVtx == -1)
+        {
+            Debug.Log("가운데에 있는 vtx는 바운더리 vtx");
+            return;
+        }
+        int removeCount = 0;
         List<int> _RemoveTriangles = new List<int>();
-        BFS_Boundary(outerVtx, false, ref _RemoveTriangles);
-        BFS_Boundary(innerVtx, true, ref _RemoveTriangles);
+        BFS_Boundary(outerVtx, false, ref _RemoveTriangles, ref removeCount);
+        if (removeCount == 4000)
+            return;
+        BFS_Boundary(innerVtx, true, ref _RemoveTriangles, ref removeCount);
+        if (removeCount == 4000)
+            return;
         RemoveTrianglesBoundary(_RemoveTriangles);
 
 
@@ -3717,7 +3656,8 @@ public class RayIntersection : MonoBehaviour
             if (check == 0)
             {
                 // 바운더리 잘못 생성되었다고 throw 해야됨. 아니면 리셋해야지뭐.
-                Debug.Log("버텍스 모두 바운더리에 포함.");
+                Debug.Log("바운더리안에 vtx가 겹침.");
+                return;
             }
             else if (check >= 100)
                 outerVtx = outerVtx1;
@@ -3738,7 +3678,8 @@ public class RayIntersection : MonoBehaviour
             }
             if (check == 0)
             {
-                Debug.Log("버텍스 모두 바운더리에 포함.");
+                Debug.Log("바운더리안에 vtx가 겹침.");
+                return;
             }
             else if (check >= 100)
                 innerVtx = innerVtx1;
