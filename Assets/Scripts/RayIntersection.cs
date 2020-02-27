@@ -37,7 +37,6 @@ public class RayIntersection : MonoBehaviour
     private int patchNumber;
     private int sphereNumber;
 
-
     private float heartScale;
     
     // cut
@@ -374,7 +373,10 @@ public class RayIntersection : MonoBehaviour
         measured_check = false;
         extending = false;
         firstRay = true;
+        _onlyOnce = false;
         Destroy(GameObject.Find("Incision line"));
+        leftSide.Clear();
+        rightSide.Clear();
         // ConnectedVerticesAndTriangles();
         ObjManager.Instance.startMeasurePoint.SetActive(false);
         ObjManager.Instance.endMeasurePoint.SetActive(false);
@@ -385,8 +387,13 @@ public class RayIntersection : MonoBehaviour
 
     public void RendererOverlapping()
     {
-        MeshRenderer ren = GameObject.Find("Patch" + patchNumber).GetComponent<MeshRenderer>();
-        ren.material.color = new Color32(115, 0, 0, 255);
+        GameObject patchObject = GameObject.Find("Patch" + patchNumber);
+        if (patchObject)
+        {
+            MeshRenderer ren = GameObject.Find("Patch" + patchNumber).GetComponent<MeshRenderer>();
+            ren.material.color = new Color32(115, 0, 0, 255);
+        }   
+        
         // Material yourMaterial = (Material)Resources.Load("2019_Heart", typeof(Material));
         // ren.material = yourMaterial;
     }
@@ -718,9 +725,9 @@ public class RayIntersection : MonoBehaviour
             MeshRecalculate();
             Initializing();
             GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-            ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
-            cb.normalColor = new Color32(176, 48, 48, 255);
-            GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+            ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
+            //cb.normalColor = new Color32(176, 48, 48, 255);
+            //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
             cb.normalColor = new Color32(137, 96, 96, 255);
             GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
         }
@@ -966,10 +973,10 @@ public class RayIntersection : MonoBehaviour
             boundaryBFS = false;
             ResetBoundaryCutValues();
             Initializing();
-            GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-            ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
-            cb.normalColor = new Color32(176, 48, 48, 255);
-            GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+            //GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
+            ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
+            //cb.normalColor = new Color32(176, 48, 48, 255);
+            //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
             cb.normalColor = new Color32(137, 96, 96, 255);
             GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
             //}
@@ -1353,13 +1360,12 @@ public class RayIntersection : MonoBehaviour
                     for (int i = 0; i < boundaryLineRenderers.Count; i++)
                         GameObject.Destroy(boundaryLineRenderers[i]);
                     boundaryLineRenderers.Clear();
-
-                    GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-                    ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
-                    cb.normalColor = new Color32(176, 48, 48, 255);
-                    GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+                    if (firstRay)
+                        return;
+                    ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
                     cb.normalColor = new Color32(137, 96, 96, 255);
                     GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
+
                     return;
                 }
                 else
@@ -1436,9 +1442,9 @@ public class RayIntersection : MonoBehaviour
                                     boundaryLineRenderers.Clear();
 
                                     GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-                                    ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
-                                    cb.normalColor = new Color32(176, 48, 48, 255);
-                                    GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+                                    ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
+                                    //cb.normalColor = new Color32(176, 48, 48, 255);
+                                    //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
                                     cb.normalColor = new Color32(137, 96, 96, 255);
                                     GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
                                     return;
@@ -1486,9 +1492,9 @@ public class RayIntersection : MonoBehaviour
                                         boundaryLineRenderers.Clear();
 
                                         GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-                                        ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
-                                        cb.normalColor = new Color32(176, 48, 48, 255);
-                                        GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+                                        ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
+                                        //cb.normalColor = new Color32(176, 48, 48, 255);
+                                        //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
                                         cb.normalColor = new Color32(137, 96, 96, 255);
                                         GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
                                         return;
@@ -1554,9 +1560,9 @@ public class RayIntersection : MonoBehaviour
                                     boundaryLineRenderers.Clear();
 
                                     GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-                                    ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
-                                    cb.normalColor = new Color32(176, 48, 48, 255);
-                                    GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+                                    ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
+                                    //cb.normalColor = new Color32(176, 48, 48, 255);
+                                    //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
                                     cb.normalColor = new Color32(137, 96, 96, 255);
                                     GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
                                     return;
@@ -1607,9 +1613,9 @@ public class RayIntersection : MonoBehaviour
                                     boundaryLineRenderers.Clear();
 
                                     GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-                                    ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
-                                    cb.normalColor = new Color32(176, 48, 48, 255);
-                                    GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+                                    ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
+                                    //cb.normalColor = new Color32(176, 48, 48, 255);
+                                    //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
                                     cb.normalColor = new Color32(137, 96, 96, 255);
                                     GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
                                     return;
@@ -1671,9 +1677,9 @@ public class RayIntersection : MonoBehaviour
                             boundaryLineRenderers.Clear();
 
                             GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-                            ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
-                            cb.normalColor = new Color32(176, 48, 48, 255);
-                            GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+                            ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
+                            //cb.normalColor = new Color32(176, 48, 48, 255);
+                            //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
                             cb.normalColor = new Color32(137, 96, 96, 255);
                             GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
                             return;
@@ -1732,6 +1738,7 @@ public class RayIntersection : MonoBehaviour
                 boundaryBFS = true;
                 boundaryCutMode = false;
             }
+            
         } // boundary cut mode
 
         // measure

@@ -2,7 +2,6 @@
 
 public class CHD : MonoBehaviour
 {
-    // 행동 제약?.
     // main
     public bool isCutMode = false;
     public bool isMeasureMode = false;
@@ -18,11 +17,16 @@ public class CHD : MonoBehaviour
     public bool isFirstPatch = true;
     public bool isPatchUpdate = false;
 
+
+    // double face test
+    public bool isDoubleFace = true;
+
     void Start()
     {
         MeshManager.Instance.Initialize();
         AdjacencyList.Instance.Initialize();
         PatchManager.Instance.Initialize();
+        IncisionManager.Instance.Initialize();
     }
 
     void Update()
@@ -33,7 +37,8 @@ public class CHD : MonoBehaviour
             {
                 if(isExtend)
                 {
-
+                    IncisionManager.Instance.ExecuteDividing();
+                    isExtend = false;
                 }
                 else if(Input.GetMouseButtonDown(0))
                 {
@@ -42,6 +47,7 @@ public class CHD : MonoBehaviour
                 else if(Input.GetMouseButtonUp(0))
                 {
                     IncisionManager.Instance.SetEndVertices();
+                    IncisionManager.Instance.SetDividingList();
                     isExtend = true;
                 }
             }
@@ -88,6 +94,11 @@ public class CHD : MonoBehaviour
                 Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
                 PatchManager.Instance.AddVertex(vertexPosition);
             }
+        }
+        else if(isDoubleFace)
+        {
+            isDoubleFace = false;
+            MakeDoubleFaceMesh.Instance.MakeDoubleFace();
         }
     }
 

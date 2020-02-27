@@ -102,8 +102,8 @@ public class IntersectionManager : Singleton<IntersectionManager>
         int[] triangels = MeshManager.Instance.triangles;
         Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
 
-        Vector3 intersectionInnerPoint = Vector3.zero;
-        Vector3 intersectionOuterPoint = Vector3.zero;
+        //Vector3 intersectionInnerPoint = Vector3.zero;
+        //Vector3 intersectionOuterPoint = Vector3.zero;
         Vector3 intersectionTemp = Vector3.zero;
 
         for (int i = 0; i < triangels.Length; i += 3)
@@ -116,18 +116,18 @@ public class IntersectionManager : Singleton<IntersectionManager>
                     if (dst_min != 10000000)
                     {
                         innerTriangleIndex = outerTriangleIndex;
-                        intersectionInnerPoint = intersectionOuterPoint;
+                        innerIntersectionPosition = outerIntersectionPosition;
                         dst_2nd = dst_min;
                     }
                     dst_min = dst_temp;
                     outerTriangleIndex = i;
-                    intersectionOuterPoint = intersectionTemp;
+                    outerIntersectionPosition = intersectionTemp;
                     continue;
                 }
                 if (dst_2nd > dst_temp)
                 {
                     innerTriangleIndex = i;
-                    intersectionInnerPoint = intersectionTemp;
+                    innerIntersectionPosition = intersectionTemp;
                     dst_2nd = dst_temp;
                 }
             }
@@ -243,7 +243,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
             if (currentEdgeIndex != -1 && edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx2 && edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx1)
                 continue;
 
-            if (RayTriangleIntersection(screenMiddlePoint, incisionStartPoint + screenEndRay.direction * 5, incisionEndPoint + screenStartRay.direction * 5, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1], ref intersectionTemp))
+            if (RayTriangleIntersection(screenMiddlePoint, incisionStartPoint + screenStartRay.direction * 10, incisionEndPoint + screenEndRay.direction * 10, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1], ref intersectionTemp))
             {
                 Debug.Log("ray triangle intersection");
                 if (!(intersectionTemp.x < Mathf.Min(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)) && !(intersectionTemp.x > Mathf.Max(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)))
@@ -259,6 +259,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
                 edgeIdx = incisionTriangleIndex + i;
                 incisionTriangleIndex = edgeList[edgeIdx].tri2;
                 edgePoint = intersectionPoint;
+                break;
             }
         }
 

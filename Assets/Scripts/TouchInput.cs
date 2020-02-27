@@ -384,7 +384,7 @@ public class TouchInput : MonoBehaviour
     {
         float wheel = Input.GetAxis("Mouse ScrollWheel");
         // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
-        transform.localScale += Vector3.one * (wheel * (0.2f + zoomBar.value/2));
+        transform.localScale += Vector3.one * (wheel * 0.8f);
         if (transform.localScale.x <= 0.2f)
             transform.localScale = Vector3.one *0.2f;
         if (Input.GetMouseButton(1))
@@ -393,8 +393,8 @@ public class TouchInput : MonoBehaviour
             float x = Input.GetAxis("Mouse X");
             float y = Input.GetAxis("Mouse Y");
             float sensitivityValue = rotateBar.value/10;
-            transform.RotateAround(Vector3.up, (-x * (0.03f + sensitivityValue))); 
-            transform.RotateAround(Vector3.right, (-y * (0.03f + sensitivityValue)));
+            transform.RotateAround(Vector3.up, (-x * 0.1f)); 
+            transform.RotateAround(Vector3.right, (-y * 0.1f));
         }
         else if(Input.GetMouseButton(2))
         {
@@ -404,8 +404,8 @@ public class TouchInput : MonoBehaviour
             float yPos = Input.GetAxis("Mouse Y");
 
             float sensitivityValue = moveBar.value;
-            pivot.transform.position += Vector3.left * (xPos * ( 1f + sensitivityValue));
-            pivot.transform.position += Vector3.up * (yPos*(1f + sensitivityValue));
+            pivot.transform.position += Vector3.left * (xPos * 2f);
+            pivot.transform.position += Vector3.up * (yPos*2f);
 
         }
 

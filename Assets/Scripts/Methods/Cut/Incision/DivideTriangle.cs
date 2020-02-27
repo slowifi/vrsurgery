@@ -54,19 +54,12 @@ public class DivideTriangle : MonoBehaviour
         if (!isInner)
         {
             // outer 딱 가운데 점들만 모으고 나서 BFS할 때 쓰일 vtx는 따로 찾는걸로.
-            //IncisionManager.Instance.leftSide.Add(vertices.Length + 1);
-            //IncisionManager.Instance.rightSide.Add(vertices.Length + 2);
-            
             IncisionManager.Instance.leftSide.Add(AdjacencyList.Instance.edgeList[edgeIdx].vtx1);
             IncisionManager.Instance.rightSide.Add(AdjacencyList.Instance.edgeList[edgeIdx].vtx2);
-
         }
         else
         {
             // inner
-            //IncisionManager.Instance.rightSide.Add(vertices.Length + 1);
-            //IncisionManager.Instance.leftSide.Add(vertices.Length + 2);
-
             IncisionManager.Instance.rightSide.Add(AdjacencyList.Instance.edgeList[edgeIdx].vtx1);
             IncisionManager.Instance.leftSide.Add(AdjacencyList.Instance.edgeList[edgeIdx].vtx2);
         }
@@ -96,202 +89,215 @@ public class DivideTriangle : MonoBehaviour
         newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
     }
 
-    public void DivideTrianglesEnd(Vector3 _newCenter, int _triangleIdx, int _edgeIdx, int side, int _isInner, int check)
+    public void DivideTrianglesEnd(Vector3 centerPosition, int triangleIdx, ref int triangleCount, int edgeIdx)
     {
         int[] triangles = MeshManager.Instance.mesh.triangles;
-        int[] newTriangles = new int[triangles.Length + 9];
-        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
-        Vector3[] newVertices = new Vector3[vertices.Length + 1];
+        int newTriangleLength = triangles.Length + IncisionManager.Instance.newTriangles.Count;
+        int newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
 
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Transform objTransform = ObjManager.Instance.objTransform;
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
 
-        for (int i = 0; i < triangles.Length; i++)
-            newTriangles[i] = triangles[i];
-
-        for (int i = 0; i < vertices.Length; i++)
-            newVertices[i] = vertices[i];
-
-        newVertices[vertices.Length] = objTransform.InverseTransformPoint(_newCenter);
-
-        int newEdgeIdx = -1, newVtxIdx = -1;
-
+        int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)
         {
-            if (triangles[_triangleIdx + i] != edgeList[_edgeIdx].vtx2 && triangles[_triangleIdx + i] != edgeList[_edgeIdx].vtx1)
-                newVtxIdx = triangles[_triangleIdx + i];
-            if (edgeList[_triangleIdx + i].vtx1 == edgeList[_edgeIdx].vtx2 && edgeList[_triangleIdx + i].vtx2 == edgeList[_edgeIdx].vtx1)
-                newEdgeIdx = _triangleIdx + i;
+            if (edgeList[edgeIdx].vtx1 == edgeList[triangleIdx + i].vtx2)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx1;
+                break;
+            }
+            else if (edgeList[edgeIdx].vtx2 == edgeList[triangleIdx + i].vtx1)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx2;
+                break;
+            }
         }
 
-        int _leftVtxIdx = vertices.Length - (2 + check);
-        int _rightVtxIdx = vertices.Length - (1 + check);
-        if (_isInner == 0)
-        {
-            // outer
-            // boundaryOuterEndVtx = vertices.Length;
-            IncisionManager.Instance.leftSide.Add(edgeList[newEdgeIdx].vtx2);
-            IncisionManager.Instance.rightSide.Add(edgeList[newEdgeIdx].vtx1);
-        }
-        else
-        {
-            // inner
-            // boundaryInnerEndVtx = vertices.Length;
-            IncisionManager.Instance.rightSide.Add(edgeList[newEdgeIdx].vtx2);
-            IncisionManager.Instance.leftSide.Add(edgeList[newEdgeIdx].vtx1);
-        }
+        Dictionary<int, Vector3> newVertices = IncisionManager.Instance.newVertices;
+        Dictionary<int, int> newTriangles = IncisionManager.Instance.newTriangles;
+        
+        //newVertices[vertices.Length] = objTransform.InverseTransformPoint(newCenter);
 
-        // left side
-        newTriangles[_triangleIdx] = vertices.Length;
-        newTriangles[_triangleIdx + 1] = _leftVtxIdx;
-        newTriangles[_triangleIdx + 2] = edgeList[newEdgeIdx].vtx2;
+        //// left side
+        //newTriangles[triangleIdx] = vertices.Length;
+        //newTriangles[triangleIdx + 1] = _leftVtxIdx;
+        //newTriangles[triangleIdx + 2] = edgeList[newEdgeIdx].vtx2;
 
-        int _triLen = triangles.Length;
+        //int _triLen = triangles.Length;
 
-        newTriangles[_triLen++] = vertices.Length;
-        newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx2;
-        newTriangles[_triLen++] = newVtxIdx;
+        //newTriangles[_triLen++] = vertices.Length;
+        //newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx2;
+        //newTriangles[_triLen++] = newVtxIdx;
 
-        newTriangles[_triLen++] = vertices.Length;
-        newTriangles[_triLen++] = newVtxIdx;
-        newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx1;
+        //newTriangles[_triLen++] = vertices.Length;
+        //newTriangles[_triLen++] = newVtxIdx;
+        //newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx1;
 
-        // right side
-        newTriangles[_triLen++] = vertices.Length;
-        newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx1;
-        newTriangles[_triLen] = _rightVtxIdx;
+        //// right side
+        //newTriangles[_triLen++] = vertices.Length;
+        //newTriangles[_triLen++] = edgeList[newEdgeIdx].vtx1;
+        //newTriangles[_triLen] = _rightVtxIdx;
 
-        MeshManager.Instance.mesh.vertices = newVertices;
-        MeshManager.Instance.mesh.triangles = newTriangles;
+        //left
+        newTriangles.Add(triangleIdx, newVertexLength);
+        newTriangles.Add(triangleIdx+1, newVertexLength-2);
+        newTriangles.Add(triangleIdx+2, edgeList[edgeIdx].vtx2);
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx2);
+        newTriangles.Add(triangleCount++, notEdgeVertex);
+
+        //right
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, notEdgeVertex);
+        newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx1);
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx1);
+        newTriangles.Add(triangleCount++, newVertexLength-1);
+
+        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(centerPosition));
     }
 
-    public void DivideTrianglesClockWise(Vector3 _new, int _triangleIdx, int _intersectEdgeIdx, int _leftVtxIdx, int _rightVtxIdx, int _isInner)
+    public void DivideTrianglesClockWise(Vector3 newEdgeVertexPosition, int triangleIdx, ref int triangleCount, int intersectEdgeIdx, bool isInner)
     {
         int[] triangles = MeshManager.Instance.mesh.triangles;
-        int[] newTriangles = new int[triangles.Length + 6];
-        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
-        Vector3[] newVertices = new Vector3[vertices.Length + 2];
-        int nextLength = -2;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        int newTriangleLength = triangles.Length + IncisionManager.Instance.newTriangles.Count;
+        int newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
+
         Transform objTransform = ObjManager.Instance.objTransform;
-        if (_intersectEdgeIdx - _triangleIdx != 2)
-            nextLength = 1;
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
 
-        for (int i = 0; i < triangles.Length; i++)
-            newTriangles[i] = triangles[i];
-
-        for (int i = 0; i < vertices.Length; i++)
-            newVertices[i] = vertices[i];
-
-        if (_isInner == 0)
+        int notEdgeVertex = -1;
+        for (int i = 0; i < 3; i++)
         {
-            IncisionManager.Instance.leftSide.Add(vertices.Length);
-            IncisionManager.Instance.rightSide.Add(vertices.Length + 1);
+            if (edgeList[intersectEdgeIdx].vtx1 == edgeList[triangleIdx + i].vtx2)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx1;
+                break;
+            }
+            else if (edgeList[intersectEdgeIdx].vtx2 == edgeList[triangleIdx + i].vtx1)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx2;
+                break;
+            }
+        }
 
-            IncisionManager.Instance.leftSide.Add(edgeList[_intersectEdgeIdx].vtx1);
-            IncisionManager.Instance.rightSide.Add(edgeList[_intersectEdgeIdx].vtx2);
-            IncisionManager.Instance.rightSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx2);
-
+        if (!isInner)
+        {
+            IncisionManager.Instance.leftSide.Add(newVertexLength);
+            IncisionManager.Instance.rightSide.Add(newVertexLength + 1);
         }
         else
         {
-            IncisionManager.Instance.rightSide.Add(vertices.Length);
-            IncisionManager.Instance.leftSide.Add(vertices.Length + 1);
-
-            IncisionManager.Instance.rightSide.Add(edgeList[_intersectEdgeIdx].vtx1);
-            IncisionManager.Instance.leftSide.Add(edgeList[_intersectEdgeIdx].vtx2);
-            IncisionManager.Instance.leftSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx2);
-
+            IncisionManager.Instance.rightSide.Add(newVertexLength);
+            IncisionManager.Instance.leftSide.Add(newVertexLength + 1);
         }
-        // left
-        newVertices[vertices.Length] = objTransform.InverseTransformPoint(_new);
 
-        // right
-        newVertices[vertices.Length + 1] = objTransform.InverseTransformPoint(_new);
+        Dictionary<int, Vector3> newVertices = IncisionManager.Instance.newVertices;
+        Dictionary<int, int> newTriangles = IncisionManager.Instance.newTriangles;
 
+        //newTriangles[triangleIdx] = leftVtxIdx;
+        //newTriangles[triangleIdx + 1] = edgeList[intersectEdgeIdx].vtx1;
+        //newTriangles[triangleIdx + 2] = vertices.Length;
+        //int _triLen = triangles.Length;
 
-        // triangle 만드는 과정을 제대로 해야됨
-        // 이 triangle은 지금 left side
-        // intersectEdgeIdx는 지금 old edge임.
-        newTriangles[_triangleIdx] = _leftVtxIdx;
-        newTriangles[_triangleIdx + 1] = edgeList[_intersectEdgeIdx].vtx1;
-        newTriangles[_triangleIdx + 2] = vertices.Length;
-        int _triLen = triangles.Length;
+        //// 이 triangles는 right side
+        //newTriangles[_triLen++] = rightVtxIdx;
+        //newTriangles[_triLen++] = vertices.Length + 1;
+        //newTriangles[_triLen++] = edgeList[intersectEdgeIdx].vtx2;
+        //newTriangles[_triLen++] = rightVtxIdx;
+        //newTriangles[_triLen++] = edgeList[intersectEdgeIdx + nextLength].vtx1;
+        //newTriangles[_triLen++] = edgeList[intersectEdgeIdx + nextLength].vtx2;
 
-        // 이 triangles는 right side
-        newTriangles[_triLen++] = _rightVtxIdx;
-        newTriangles[_triLen++] = vertices.Length + 1;
-        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx].vtx2;
-        newTriangles[_triLen++] = _rightVtxIdx;
-        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx1;
-        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx2;
+        //left
+        newTriangles.Add(triangleIdx, newVertexLength-2);
+        newTriangles.Add(triangleIdx + 1, edgeList[intersectEdgeIdx].vtx1);
+        newTriangles.Add(triangleIdx + 2, newVertexLength);
 
-        MeshManager.Instance.mesh.vertices = newVertices;
-        MeshManager.Instance.mesh.triangles = newTriangles;
+        //right
+        newTriangles.Add(triangleCount++, newVertexLength - 1);
+        newTriangles.Add(triangleCount++, newVertexLength+1);
+        newTriangles.Add(triangleCount++, edgeList[intersectEdgeIdx].vtx2);
+        newTriangles.Add(triangleCount++, newVertexLength - 1);
+        newTriangles.Add(triangleCount++, edgeList[intersectEdgeIdx].vtx2);
+        newTriangles.Add(triangleCount++, notEdgeVertex);
+
+        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
     }
 
-    public void DivideTrianglesCounterClockWise(Vector3 _new, int _triangleIdx, int _intersectEdgeIdx, int _leftVtxIdx, int _rightVtxIdx, int _isInner)
+    public void DivideTrianglesCounterClockWise(Vector3 newEdgeVertexPosition, int triangleIdx, ref int triangleCount, int intersectEdgeIdx, bool isInner)
     {
         int[] triangles = MeshManager.Instance.mesh.triangles;
-        int[] newTriangles = new int[triangles.Length + 6];
-        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
-        Vector3[] newVertices = new Vector3[vertices.Length + 2];
-        int nextLength = 2;
+        int newTriangleLength = triangles.Length + IncisionManager.Instance.newTriangles.Count;
+        int newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
+
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Transform objTransform = ObjManager.Instance.objTransform;
 
-        if (_intersectEdgeIdx - _triangleIdx != 0)
-            nextLength = -1;
-
-        for (int i = 0; i < triangles.Length; i++)
-            newTriangles[i] = triangles[i];
-
-        for (int i = 0; i < vertices.Length; i++)
-            newVertices[i] = vertices[i];
-
-        // left
-        newVertices[vertices.Length] = objTransform.InverseTransformPoint(_new);
-        if (_isInner == 0)
+        int notEdgeVertex = -1;
+        for (int i = 0; i < 3; i++)
         {
-            IncisionManager.Instance.leftSide.Add(vertices.Length);
-            IncisionManager.Instance.rightSide.Add(vertices.Length + 1);
+            if (edgeList[intersectEdgeIdx].vtx1 == edgeList[triangleIdx + i].vtx2)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx1;
+                break;
+            }
+            else if (edgeList[intersectEdgeIdx].vtx2 == edgeList[triangleIdx + i].vtx1)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx2;
+                break;
+            }
+        }
 
-            IncisionManager.Instance.rightSide.Add(edgeList[_intersectEdgeIdx].vtx2);
-            IncisionManager.Instance.leftSide.Add(edgeList[_intersectEdgeIdx].vtx1);
-            IncisionManager.Instance.leftSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx1);
-
+        if (!isInner)
+        {
+            IncisionManager.Instance.leftSide.Add(newVertexLength);
+            IncisionManager.Instance.rightSide.Add(newVertexLength + 1);
         }
         else
         {
-            IncisionManager.Instance.rightSide.Add(vertices.Length);
-            IncisionManager.Instance.leftSide.Add(vertices.Length + 1);
-
-            IncisionManager.Instance.leftSide.Add(edgeList[_intersectEdgeIdx].vtx2);
-            IncisionManager.Instance.rightSide.Add(edgeList[_intersectEdgeIdx].vtx1);
-            IncisionManager.Instance.rightSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx1);
-
+            IncisionManager.Instance.rightSide.Add(newVertexLength);
+            IncisionManager.Instance.leftSide.Add(newVertexLength + 1);
         }
-        // right
-        newVertices[vertices.Length + 1] = objTransform.InverseTransformPoint(_new);
+
+        Dictionary<int, Vector3> newVertices = IncisionManager.Instance.newVertices;
+        Dictionary<int, int> newTriangles = IncisionManager.Instance.newTriangles;
+
+        //right
+        newTriangles.Add(triangleIdx, newVertexLength-1);
+        newTriangles.Add(triangleIdx+1, newVertexLength+1);
+        newTriangles.Add(triangleIdx+2, edgeList[intersectEdgeIdx].vtx2);
+
+        //left
+        newTriangles.Add(triangleCount++, newVertexLength-2);
+        newTriangles.Add(triangleCount++, edgeList[intersectEdgeIdx].vtx1);
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, newVertexLength-2);
+        newTriangles.Add(triangleCount++, notEdgeVertex);
+        newTriangles.Add(triangleCount++, edgeList[intersectEdgeIdx].vtx1);
+        //// left
+        //newVertices[vertices.Length] = objTransform.InverseTransformPoint(newEdgeVertexPosition);
+        //// right
+        //newVertices[vertices.Length + 1] = objTransform.InverseTransformPoint(newEdgeVertexPosition);
 
 
-        // right side
-        newTriangles[_triangleIdx] = _rightVtxIdx;
-        newTriangles[_triangleIdx + 1] = vertices.Length + 1;
-        newTriangles[_triangleIdx + 2] = edgeList[_intersectEdgeIdx].vtx2;
+        //// right side
+        //newTriangles[_triangleIdx] = rightVtxIdx;
+        //newTriangles[_triangleIdx + 1] = vertices.Length + 1;
+        //newTriangles[_triangleIdx + 2] = edgeList[intersectEdgeIdx].vtx2;
 
-        int _triLen = triangles.Length;
+        //int _triLen = triangles.Length;
 
-        // left side
-        newTriangles[_triLen++] = _leftVtxIdx;
-        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx].vtx1;
-        newTriangles[_triLen++] = vertices.Length;
+        //// left side
+        //newTriangles[_triLen++] = leftVtxIdx;
+        //newTriangles[_triLen++] = edgeList[intersectEdgeIdx].vtx1;
+        //newTriangles[_triLen++] = vertices.Length;
 
-        newTriangles[_triLen++] = _leftVtxIdx;
-        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx1;
-        newTriangles[_triLen++] = edgeList[_intersectEdgeIdx + nextLength].vtx2;
+        //newTriangles[_triLen++] = leftVtxIdx;
+        //newTriangles[_triLen++] = edgeList[intersectEdgeIdx + nextLength].vtx1;
+        //newTriangles[_triLen++] = edgeList[intersectEdgeIdx + nextLength].vtx2;
 
-        MeshManager.Instance.mesh.vertices = newVertices;
-        MeshManager.Instance.mesh.triangles = newTriangles;
+        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
     }
 }

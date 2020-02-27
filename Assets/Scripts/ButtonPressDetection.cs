@@ -87,69 +87,65 @@ public class ButtonPressDetection : MonoBehaviour, IPointerDownHandler, IPointer
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        // find 쓰지말고 매니저 하나 둬서 그곳에서 관리하도록 해야겠다.
-        if (this.name == "Control button")
+        if (this.name == "Cutting button")
         {
-            ColorBlock cb = GameObject.Find("Control button_").GetComponent<Button>().colors;
-            cb.normalColor = new Color32(176, 48, 48, 255);
-            GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
-
-            cb.normalColor = new Color32(137, 96, 96, 255);
-            GameObject.Find("Patching button_").GetComponent<Button>().colors = cb;
-            GameObject.Find("Measure Distance button_").GetComponent<Button>().colors = cb;
-            GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
-            GameObject.Find("Incision button_").GetComponent<Button>().colors = cb;
-
-            GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-            GameObject.Find("Main Camera").gameObject.SendMessage("RendererOverlapping");
-            GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
-            // script on/off 
-            // GameObject.Find()
-        }
-        else if (this.name == "Cutting button")
-        {
-            
             ColorBlock cb = GameObject.Find("Cutting button_").GetComponent<Button>().colors;
-            cb.normalColor = new Color32(176, 48, 48, 255);
-            GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
+            if (cb.normalColor == new Color32(176, 48, 48, 255))
+            {
+                cb.normalColor = new Color32(137, 96, 96, 255);
+                GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
+                return;
+            }
+            else
+            {
+                cb.normalColor = new Color32(176, 48, 48, 255);
+                Debug.Log(cb.normalColor);
+                GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
+                Debug.Log(GameObject.Find("Cutting button_").GetComponent<Button>().colors.normalColor);
+                cb.normalColor = new Color32(137, 96, 96, 255);
+                // GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+                GameObject.Find("Measure Distance button_").GetComponent<Button>().colors = cb;
+                GameObject.Find("Patching button_").GetComponent<Button>().colors = cb;
+                GameObject.Find("Incision button_").GetComponent<Button>().colors = cb;
 
-            cb.normalColor = new Color32(137, 96, 96, 255);
-            GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
-            GameObject.Find("Measure Distance button_").GetComponent<Button>().colors = cb;
-            GameObject.Find("Patching button_").GetComponent<Button>().colors = cb;
-            GameObject.Find("Incision button_").GetComponent<Button>().colors = cb;
-
-            GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = false;
-            // GameObject.Find("Main Camera").GetComponent<RayIntersection>().enabled = true;
-            //GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
-            GameObject.Find("Main Camera").gameObject.SendMessage("CuttingOn");
-            GameObject.Find("Main Camera").gameObject.SendMessage("RendererOverlapping");
+                GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
+                // GameObject.Find("Main Camera").GetComponent<RayIntersection>().enabled = true;
+                //GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
+                GameObject.Find("Main Camera").gameObject.SendMessage("CuttingOn");
+                GameObject.Find("Main Camera").gameObject.SendMessage("RendererOverlapping");
+            }
         }
         else if (this.name == "Patching button")
         {
             ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
-            if(cb.normalColor == new Color32(176,48,48, 255))
+            Debug.Log(cb.normalColor);
+            if (cb.normalColor == new Color32(176,48,48, 255))
             {
                 GameObject.Find("Main Camera").gameObject.SendMessage("RendererOverlapping");
                 // GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
                 cb.normalColor = new Color32(137, 96, 96, 255);
+                Debug.Log(cb.normalColor);
                 GameObject.Find("Patching button_").GetComponent<Button>().colors = cb;
                 GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
                 return;
             }
-            cb.normalColor = new Color32(176, 48, 48, 255);
-            GameObject.Find("Patching button_").GetComponent<Button>().colors = cb;
+            else
+            {
+                
+                cb.normalColor = new Color32(176, 48, 48, 255);
+                GameObject.Find("Patching button_").GetComponent<Button>().colors = cb;
+                Debug.Log(cb.normalColor);
+                cb.normalColor = new Color32(137, 96, 96, 255);
+                //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+                GameObject.Find("Measure Distance button_").GetComponent<Button>().colors = cb;
+                GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
+                GameObject.Find("Incision button_").GetComponent<Button>().colors = cb;
 
-            cb.normalColor = new Color32(137, 96, 96, 255);
-            GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
-            GameObject.Find("Measure Distance button_").GetComponent<Button>().colors = cb;
-            GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
-            GameObject.Find("Incision button_").GetComponent<Button>().colors = cb;
-
-            GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = false;
-            // GameObject.Find("Main Camera").GetComponent<RayIntersection>().enabled = true;
-            // GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
-            GameObject.Find("Main Camera").gameObject.SendMessage("PatchingOn");
+                GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = false;
+                // GameObject.Find("Main Camera").GetComponent<RayIntersection>().enabled = true;
+                // GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
+                GameObject.Find("Main Camera").gameObject.SendMessage("PatchingOn");
+            }
         }
         else if (this.name == "Measure Distance button")
         {
@@ -158,7 +154,7 @@ public class ButtonPressDetection : MonoBehaviour, IPointerDownHandler, IPointer
             GameObject.Find("Measure Distance button_").GetComponent<Button>().colors = cb;
 
             cb.normalColor = new Color32(137, 96, 96, 255);
-            GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+            //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
             GameObject.Find("Patching button_").GetComponent<Button>().colors = cb;
             GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
             GameObject.Find("Incision button_").GetComponent<Button>().colors = cb;
@@ -175,11 +171,11 @@ public class ButtonPressDetection : MonoBehaviour, IPointerDownHandler, IPointer
             if (cb.normalColor == new Color32(176, 48, 48, 255))
             {
                 // GameObject.Find("Main Camera").gameObject.SendMessage("RendererOverlapping");
-                // GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
+                GameObject.Find("Main Camera").gameObject.SendMessage("Initializing");
                 cb.normalColor = new Color32(137, 96, 96, 255);
                 GameObject.Find("Incision button_").GetComponent<Button>().colors = cb;
                 GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-                GameObject.Find("Main Camera").gameObject.SendMessage("Incisioning");
+                // GameObject.Find("Main Camera").gameObject.SendMessage("Incisioning");
                 return;
             }
             cb.normalColor = new Color32(176, 48, 48, 255);
@@ -187,7 +183,7 @@ public class ButtonPressDetection : MonoBehaviour, IPointerDownHandler, IPointer
 
             cb.normalColor = new Color32(137, 96, 96, 255);
             GameObject.Find("Main Camera").gameObject.SendMessage("RendererOverlapping");
-            GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
+            //GameObject.Find("Control button_").GetComponent<Button>().colors = cb;
             GameObject.Find("Patching button_").GetComponent<Button>().colors = cb;
             GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
             GameObject.Find("Measure Distance button_").GetComponent<Button>().colors = cb;
