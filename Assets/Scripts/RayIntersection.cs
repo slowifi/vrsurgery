@@ -71,6 +71,13 @@ public class RayIntersection : MonoBehaviour
     private Color[] colors;
 
     // incision
+
+    private GameObject incisionOuterStartPointObject;
+    private GameObject incisionOuterEndPointObject;
+
+
+    private GameObject incisionLine;
+    private LineRenderer incisionLineRenderer;
     private bool rayincision;
     private bool incision;
 
@@ -312,6 +319,7 @@ public class RayIntersection : MonoBehaviour
         patching = true;
         reCalculate = false;
         measured_check = false;
+        rayincision = false;
         patchedCount = 0;
         patchNumber++;
         MeshRecalculate();
@@ -375,6 +383,15 @@ public class RayIntersection : MonoBehaviour
         firstRay = true;
         _onlyOnce = false;
         Destroy(GameObject.Find("Incision line"));
+
+
+
+        incisionOuterStartPointObject = new GameObject("StartPoint");
+        incisionOuterEndPointObject = new GameObject("EndPoint");
+        incisionOuterStartPointObject.transform.SetParent(obj.transform);
+        incisionOuterEndPointObject.transform.SetParent(obj.transform);
+        incisionLine = new GameObject("Incision line");
+        incisionLineRenderer = incisionLine.AddComponent<LineRenderer>();
         leftSide.Clear();
         rightSide.Clear();
         // ConnectedVerticesAndTriangles();
@@ -421,7 +438,12 @@ public class RayIntersection : MonoBehaviour
 
             Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
             Vector3[] vertices = mesh.vertices;
-            
+            MeshRecalculate();
+            // incisionOuterStartPoint, incisionOuterEndPoint 에 대해서 변환만 같이 시켜주면 업데이트는 문제 없을듯 추가로 meshrecalculate 하면됨.
+            // 위에 두 포인트 자체를 object로 만들어서 관리해도 괜찮을듯함. child로 소속시켜서
+            incisionOuterStartPoint = incisionOuterStartPointObject.transform.position;
+            incisionOuterEndPoint = incisionOuterEndPointObject.transform.position;
+
             Vector3 outerCenter = Vector3.Lerp(incisionOuterStartPoint, incisionOuterEndPoint, 0.5f);
             // Vector2 innerCenter = Vector3.Lerp(incisionInnerStartPoint, incisionInnerEndPoint, 0.5f);
 
@@ -431,6 +453,7 @@ public class RayIntersection : MonoBehaviour
             Vector2 rightVec = Vector2.Perpendicular(incisionOuterStartPoint - incisionOuterEndPoint);
 
             // 그때그때 계산하지말고 이건 한번만 계산해도 되는거
+            // 좌표들을 회전에 상관없이 고정된 좌표계는 local 좌표계인데
             foreach (int item in leftSide)
             {
                 double t = QuadraticEquation(test_world[item].x - outerCenter.x, test_world[item].y - outerCenter.y, leftVec.x, leftVec.y, radius);
@@ -472,7 +495,7 @@ public class RayIntersection : MonoBehaviour
             // incisionOuterStartPoint, incisionOuterEndPoint : start end point 위치
             if (outerIntersectionCount == 0 || innerIntersectionCount == 0)
             {
-                Debug.Log("error 띄워야됨. intersect 되지 않음. ");
+                ChatManager.Instance.GenerateMessage(" Incision : intersection 되지 않음.");
             }
             else if(outerIntersectionCount == 1 && innerIntersectionCount == 1)
             {
@@ -590,13 +613,16 @@ public class RayIntersection : MonoBehaviour
             }
 
             // 쪼개는것까지 한 프레임에 끝내고 BFS 돌리는건 다음 프레임부터 실행
+            incisionOuterStartPointObject.transform.position = incisionOuterStartPoint;
+            incisionOuterEndPointObject.transform.position = incisionOuterEndPoint;
             ConnectedVerticesAndTriangles();
             edgeList = new List<Edge>();
             GenerateEdgeList();
             //connectedVertices.Clear();
             //ConnectedVertices();
             // Initialize.Instance.Initializing();
-            MeshRecalculate();
+            GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
+            //MeshRecalculate();
             SetColor();
 
             extending = true;
@@ -606,7 +632,8 @@ public class RayIntersection : MonoBehaviour
         if (rayincision)
         {
             // button down일때랑 up일때랑만 start end point만 필요함.
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
+            
+            if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
             // if(Input.GetTouch(0).phase == TouchPhase.Began || Input.GetTouch(0).phase == TouchPhase.Moved || Input.GetTouch(0).phase == TouchPhase.Ended)
             {
                 Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
@@ -681,11 +708,7 @@ public class RayIntersection : MonoBehaviour
                         Debug.Log("start triangle idx : " + incisionOuterStartPointIdx);
                     }
                     else if (Input.GetMouseButtonUp(0) && !firstRay)
-                    // if(Input.GetTouch(0).phase == TouchPhase.Ended)
                     {
-                        // 여기서 끊어진 boundary 이어주기.
-                        // 중간중간에 해도 되지 않나
-                        // ConnectBoundary();
                         screenEndOrigin = cam.ScreenPointToRay(Input.mousePosition).origin;
                         screenEndDirection = cam.ScreenPointToRay(Input.mousePosition).direction;
                         incisionOuterEndPoint = incisionOuterPoint;
@@ -696,13 +719,14 @@ public class RayIntersection : MonoBehaviour
                         Debug.Log("incision end");
                         Debug.Log("end triangle idx : " + incisionOuterEndPointIdx );
                         // 여기서 incision false 값으로 바뀌고, triangle division 실행 
-                        var boundaryLine = new GameObject("Incision line");
-                        var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
-                        lineRenderer.material.color = Color.black;
-                        lineRenderer.SetPositions(new Vector3[] { incisionOuterStartPoint-screenStartDirection, incisionOuterEndPoint - screenEndDirection });
+                        // 이걸 전역으로 관리해야 그게 가능할거같은데;;
+                        
                         rayincision = false;
                         incision = true;
                     }
+                    
+                    incisionLineRenderer.material.color = Color.black;
+                    incisionLineRenderer.SetPositions(new Vector3[] { incisionOuterStartPoint - screenStartDirection, incisionOuterPoint - screenEndDirection });
                 }
             }
         }
@@ -1365,7 +1389,8 @@ public class RayIntersection : MonoBehaviour
                     ColorBlock cb = GameObject.Find("Patching button_").GetComponent<Button>().colors;
                     cb.normalColor = new Color32(137, 96, 96, 255);
                     GameObject.Find("Cutting button_").GetComponent<Button>().colors = cb;
-
+                    ChatManager.Instance.messageOn = true;
+                    ChatManager.Instance.GenerateMessage(" Ray가 심장을 벗어남.");
                     return;
                 }
                 else
@@ -1434,7 +1459,8 @@ public class RayIntersection : MonoBehaviour
                                 TriangleEdgeIntersectionInBoundary(ref nextTriangleIndex, ref currentEdgeIndex, boundaryOuterStartPoint, boundaryOuterLastPoint);
                                 if (currentEdgeIndex == -1 || nextTriangleIndex == -1)
                                 {
-                                    Debug.Log("에러를 띄워야 할텐데.");
+                                    ChatManager.Instance.messageOn = true;
+                                    ChatManager.Instance.GenerateMessage(" Edge의 다음 triangle이 존재하지 않음.");
                                     boundaryCutMode = false;
                                     ResetBoundaryCutValues();
                                     for (int i = 0; i < boundaryLineRenderers.Count; i++)
@@ -1484,7 +1510,8 @@ public class RayIntersection : MonoBehaviour
                                     TriangleEdgeIntersectionInBoundary(ref nextTriangleIndex, ref currentEdgeIndex, boundaryInnerStartPoint, boundaryInnerLastPoint);
                                     if (currentEdgeIndex == -1 || nextTriangleIndex == -1)
                                     {
-                                        Debug.Log("에러를 띄워야 할텐데.");
+                                        ChatManager.Instance.messageOn = true;
+                                        ChatManager.Instance.GenerateMessage(" Edge의 다음 triangle이 존재하지 않음.");
                                         boundaryCutMode = false;
                                         ResetBoundaryCutValues();
                                         for (int i = 0; i < boundaryLineRenderers.Count; i++)
@@ -1552,7 +1579,8 @@ public class RayIntersection : MonoBehaviour
                                 TriangleEdgeIntersectionInBoundary(ref nextTriangleIndex, ref currentEdgeIndex, boundaryOuterStartPoint, outerIntersectionPoint);
                                 if(currentEdgeIndex == -1 || nextTriangleIndex == -1)
                                 {
-                                    Debug.Log("에러를 띄워야 할텐데.");
+                                    ChatManager.Instance.messageOn = true;
+                                    ChatManager.Instance.GenerateMessage(" Edge의 다음 triangle이 존재하지 않음.");
                                     boundaryCutMode = false;
                                     ResetBoundaryCutValues();
                                     for (int i = 0; i < boundaryLineRenderers.Count; i++)
@@ -1605,7 +1633,8 @@ public class RayIntersection : MonoBehaviour
                                 TriangleEdgeIntersectionInBoundary(ref nextTriangleIndex, ref currentEdgeIndex, boundaryInnerStartPoint, innerIntersectionPoint);
                                 if (currentEdgeIndex == -1 || nextTriangleIndex == -1)
                                 {
-                                    Debug.Log("에러를 띄워야 할텐데.");
+                                    ChatManager.Instance.messageOn = true;
+                                    ChatManager.Instance.GenerateMessage(" Edge의 다음 triangle이 존재하지 않음.");
                                     boundaryCutMode = false;
                                     ResetBoundaryCutValues();
                                     for (int i = 0; i < boundaryLineRenderers.Count; i++)
@@ -2315,7 +2344,8 @@ public class RayIntersection : MonoBehaviour
             removeCount++;
             if (removeCount == 4000)
             {
-                Debug.Log("4천개임.");
+                ChatManager.Instance.messageOn = true;
+                ChatManager.Instance.GenerateMessage(" Ray가 Boundary를 벗어남.");
                 break;
             }
             foreach (int item in connectedVertices[temp.Dequeue()])
@@ -3275,7 +3305,7 @@ public class RayIntersection : MonoBehaviour
                 continue;
             // triangle : 1) s origin, e origin, incision start 2) e origin, incision start, incision end
             // intersectionTemp : test_world[edgeList[incisionPointIdx + i].vtx1], test_world[edgeList[incisionPointIdx + i].vtx2] - test_world[edgeList[incisionPointIdx + i].vtx1]
-            if (RayTriangleIntersection(screenMiddleOrigin, incisionEndPoint + screenEndDirection * 5, incisionStartPoint + screenStartDirection * 5, test_world[edgeList[incisionPointIdx + i].vtx1], test_world[edgeList[incisionPointIdx + i].vtx2] - test_world[edgeList[incisionPointIdx + i].vtx1]))
+            if (RayTriangleIntersection(screenMiddleOrigin, incisionEndPoint + screenEndDirection * 100, incisionStartPoint + screenStartDirection * 100, test_world[edgeList[incisionPointIdx + i].vtx1], test_world[edgeList[incisionPointIdx + i].vtx2] - test_world[edgeList[incisionPointIdx + i].vtx1]))
             {
                 Debug.Log("ray triangle intersection");
                 if (intersectionTemp.x < Mathf.Min(test_world[edgeList[incisionPointIdx + i].vtx1].x, test_world[edgeList[incisionPointIdx + i].vtx2].x) || intersectionTemp.x > Mathf.Max(test_world[edgeList[incisionPointIdx + i].vtx1].x, test_world[edgeList[incisionPointIdx + i].vtx2].x))
