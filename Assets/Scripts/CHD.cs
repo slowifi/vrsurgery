@@ -23,7 +23,8 @@ public class CHD : MonoBehaviour
 
     void Start()
     {
-        MeshManager.Instance.Initialize();
+        ObjManager.Instance.ObjUpdate();
+        // MeshManager.Instance.Initialize();
         AdjacencyList.Instance.Initialize();
         PatchManager.Instance.Initialize();
         IncisionManager.Instance.Initialize();
@@ -35,7 +36,13 @@ public class CHD : MonoBehaviour
         {
             if(isIncisionMode)
             {
-                if(isExtend)
+                if (isFirstPatch)
+                {
+                    AdjacencyList.Instance.ListUpdate();
+                    isFirstPatch = false;
+                }
+
+                if (isExtend)
                 {
                     IncisionManager.Instance.ExecuteDividing();
                     isExtend = false;
@@ -62,12 +69,13 @@ public class CHD : MonoBehaviour
         }
         else if(isMeasureMode)
         {
-            if(Input.GetMouseButtonDown(0))
+            
+            if (Input.GetMouseButtonDown(0))
             {
                 Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                //float dst = MeasureManager.Instance.MeasureDistance(vertexPosition);
-                //dst = dst / ObjManager.Instance.objTransform.lossyScale.z;
-                // UIManager.Instance.distance.text = dst + "mm";
+                float dst = MeasureManager.Instance.MeasureDistance(vertexPosition, ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                dst = dst / ObjManager.Instance.objTransform.lossyScale.z;
+                UIManager.Instance.distance.text = dst + "mm";
             }
         }
         else if(isPatchMode)

@@ -345,7 +345,7 @@ public class RayIntersection : MonoBehaviour
         // ObjManager.Instance.ObjUpdate();
         // ObjManager.Instance.Initializing();
         // AdjacencyList.Instance.Initialize();
-        AdjacencyList.Instance.MeshUpdate();
+        AdjacencyList.Instance.ListUpdate();
         GameObject.Destroy(GameObject.Find("Incision line"));
         Destroy(GameObject.Find("MeasureLine"));
     }
@@ -383,8 +383,6 @@ public class RayIntersection : MonoBehaviour
         firstRay = true;
         _onlyOnce = false;
         Destroy(GameObject.Find("Incision line"));
-
-
 
         incisionOuterStartPointObject = new GameObject("StartPoint");
         incisionOuterEndPointObject = new GameObject("EndPoint");
@@ -433,6 +431,7 @@ public class RayIntersection : MonoBehaviour
                 BFS_Circle(outerRightVtxIdx, incisionOuterStartPoint, incisionOuterEndPoint, false);
                 BFS_Circle(innerLeftVtxIdx, incisionOuterStartPoint, incisionOuterEndPoint, false);
                 BFS_Circle(innerRightVtxIdx, incisionOuterStartPoint, incisionOuterEndPoint, true);
+                GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
             }
             // inner부분도 리스트에 넣어줘야됨.
 
@@ -621,8 +620,7 @@ public class RayIntersection : MonoBehaviour
             //connectedVertices.Clear();
             //ConnectedVertices();
             // Initialize.Instance.Initializing();
-            GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
-            //MeshRecalculate();
+            MeshRecalculate();
             SetColor();
 
             extending = true;

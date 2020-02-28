@@ -12,7 +12,7 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
     public void MakeDoubleFace()
     {
         originalMesh = originalObject.GetComponent<MeshFilter>().mesh;
-        oppositeObject = new GameObject("Aorta_In", typeof(MeshFilter), typeof(MeshRenderer));
+        oppositeObject = new GameObject("Heart_In", typeof(MeshFilter), typeof(MeshRenderer));
         oppositeMesh = oppositeObject.GetComponent<MeshFilter>().mesh;
         
         int[] triangles = (int[])originalMesh.triangles.Clone();

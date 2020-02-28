@@ -25,7 +25,7 @@ public class AdjacencyList : Singleton<AdjacencyList>
         }
     }
 
-    public void MeshUpdate()
+    public void ListUpdate()
     {
         MeshManager.Instance.MeshUpdate();
         connectedVertices = new Dictionary<int, HashSet<int>>();
@@ -144,6 +144,6 @@ public class AdjacencyList : Singleton<AdjacencyList>
 
     protected override void InitializeChild()
     {
-        MeshUpdate();
+        ListUpdate();
     }
 }

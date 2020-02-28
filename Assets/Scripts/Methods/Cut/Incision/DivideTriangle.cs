@@ -72,7 +72,7 @@ public class DivideTriangle : MonoBehaviour
         newTriangles.Add(triangleIdx+2, newVertexLength + 1);
 
         newTriangles.Add(triangleCount++, newVertexLength);
-        newTriangles.Add(triangleCount++, newVertexLength+2);
+        newTriangles.Add(triangleCount++, newVertexLength + 2);
         newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx2);
 
         newTriangles.Add(triangleCount++, newVertexLength);
@@ -84,9 +84,12 @@ public class DivideTriangle : MonoBehaviour
         newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx1);
 
         // 버텍스 추가를 가장 나중에
-        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(centerPosition));
-        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
-        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        //newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(centerPosition));
+        //newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        //newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        newVertices.Add(newVertexLength++, centerPosition);
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
     }
 
     public void DivideTrianglesEnd(Vector3 centerPosition, int triangleIdx, ref int triangleCount, int edgeIdx)
@@ -115,7 +118,7 @@ public class DivideTriangle : MonoBehaviour
 
         Dictionary<int, Vector3> newVertices = IncisionManager.Instance.newVertices;
         Dictionary<int, int> newTriangles = IncisionManager.Instance.newTriangles;
-        
+
         //newVertices[vertices.Length] = objTransform.InverseTransformPoint(newCenter);
 
         //// left side
@@ -154,7 +157,8 @@ public class DivideTriangle : MonoBehaviour
         newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx1);
         newTriangles.Add(triangleCount++, newVertexLength-1);
 
-        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(centerPosition));
+        //newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(centerPosition));
+        newVertices.Add(newVertexLength++, centerPosition);
     }
 
     public void DivideTrianglesClockWise(Vector3 newEdgeVertexPosition, int triangleIdx, ref int triangleCount, int intersectEdgeIdx, bool isInner)
@@ -221,8 +225,10 @@ public class DivideTriangle : MonoBehaviour
         newTriangles.Add(triangleCount++, edgeList[intersectEdgeIdx].vtx2);
         newTriangles.Add(triangleCount++, notEdgeVertex);
 
-        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
-        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        //newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        //newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
     }
 
     public void DivideTrianglesCounterClockWise(Vector3 newEdgeVertexPosition, int triangleIdx, ref int triangleCount, int intersectEdgeIdx, bool isInner)
@@ -297,7 +303,9 @@ public class DivideTriangle : MonoBehaviour
         //newTriangles[_triLen++] = edgeList[intersectEdgeIdx + nextLength].vtx1;
         //newTriangles[_triLen++] = edgeList[intersectEdgeIdx + nextLength].vtx2;
 
-        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
-        newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        //newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        //newVertices.Add(newVertexLength++, objTransform.InverseTransformPoint(newEdgeVertexPosition));
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
     }
 }

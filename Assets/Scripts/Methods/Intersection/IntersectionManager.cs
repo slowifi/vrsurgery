@@ -3,6 +3,48 @@ using System.Collections.Generic;
 
 public class IntersectionManager : Singleton<IntersectionManager>
 {
+    public void GetIntersectedValues(Ray cameraRay, ref int triangleIndex)
+    {
+        float dst_min = 10000000;
+        int[] triangels = MeshManager.Instance.triangles;
+        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        Vector3 intersectionTemp = Vector3.zero;
+
+        for (int i = 0; i < triangels.Length; i += 3)
+        {
+            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            {
+                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
+                if (dst_min > dst_temp)
+                {
+                    dst_min = dst_temp;
+                    triangleIndex = i;
+                }
+            }
+        }
+    }
+
+    public void GetIntersectedValues(Ray cameraRay, ref Vector3 intersectionPoint)
+    {
+        float dst_min = 10000000;
+        int[] triangels = MeshManager.Instance.triangles;
+        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        Vector3 intersectionTemp = Vector3.zero;
+
+        for (int i = 0; i < triangels.Length; i += 3)
+        {
+            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            {
+                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
+                if (dst_min > dst_temp)
+                {
+                    dst_min = dst_temp;
+                    intersectionPoint = intersectionTemp;
+                }
+            }
+        }
+    }
+
     public void GetIntersectedValues(Ray cameraRay, ref int outerTriangleIndex, ref int innerTriangleIndex)
     {
         float dst_min = 10000000;
@@ -141,7 +183,6 @@ public class IntersectionManager : Singleton<IntersectionManager>
         {
             Debug.Log("triangle이랑 intersect 되지 않음.");
         }
-
     }
     
     public bool RayTriangleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, Ray ray, ref Vector3 intersectionTemp)
@@ -240,14 +281,17 @@ public class IntersectionManager : Singleton<IntersectionManager>
         {
             bool checkIntersection = true;
 
-            if (currentEdgeIndex != -1 && edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx2 && edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx1)
+            if (currentEdgeIndex != -1 && edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 && edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
                 continue;
 
             if (RayTriangleIntersection(screenMiddlePoint, incisionStartPoint + screenStartRay.direction * 10, incisionEndPoint + screenEndRay.direction * 10, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1], ref intersectionTemp))
             {
-                Debug.Log("ray triangle intersection");
+
                 if (!(intersectionTemp.x < Mathf.Min(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)) && !(intersectionTemp.x > Mathf.Max(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)))
+                {
                     intersectionPoint = intersectionTemp;
+                    Debug.Log("ray triangle intersection");
+                }
                 else
                     checkIntersection = false;
             }
@@ -273,6 +317,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
         else if (edgeList[currentEdgeIndex].vtx1 == edgeList[edgeIdx].vtx2)
         {
             // counter-clockwise
+            // 이게 왜 여기서 쓸 때 반대가 됐을까?
             return 1;
         }
         else if (edgeList[currentEdgeIndex].vtx2 == edgeList[edgeIdx].vtx1)
