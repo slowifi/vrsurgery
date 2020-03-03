@@ -52,6 +52,8 @@ public class CHD : MonoBehaviour
                 if (isExtend)
                 {
                     IncisionManager.Instance.ExecuteDividing();
+                    AdjacencyList.Instance.ListUpdate();
+                    IncisionManager.Instance.Extending();
                     isExtend = false;
                 }
                 else if(Input.GetMouseButtonDown(0))

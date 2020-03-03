@@ -18,6 +18,11 @@ public class IncisionManager : Singleton<IncisionManager>
     private Vector3 endOuterVertexPosition;
     private Vector3 endInnerVertexPosition;
 
+    public int firstOuterVertexIndex;
+    public int lastOuterVertexIndex;
+    public int firstInnerVertexIndex;
+    public int lastInnerVertexIndex;
+
     private int startOuterTriangleIndex;
     private int startInnerTriangleIndex;
     private int endOuterTriangleIndex;
@@ -98,7 +103,7 @@ public class IncisionManager : Singleton<IncisionManager>
 
             if (outerTriangleIndex == endOuterTriangleIndex)
             {
-                _dividingMethods.DivideTrianglesEnd(endOuterVertexPosition, endOuterTriangleIndex, ref outerTriangleCount, outerEdgeIdx);
+                _dividingMethods.DivideTrianglesEnd(endOuterVertexPosition, endOuterTriangleIndex, ref outerTriangleCount, outerEdgeIdx, false);
                 break;
             }
 
@@ -133,7 +138,7 @@ public class IncisionManager : Singleton<IncisionManager>
         }
 
         //inner
-        _dividingMethods.DivideTrianglesStart(startInnerVertexPosition, innerEdgePoint, startInnerTriangleIndex, innerNotEdgeVertex, innerEdgeIdx, ref innerTriangleCount, false);
+        _dividingMethods.DivideTrianglesStart(startInnerVertexPosition, innerEdgePoint, startInnerTriangleIndex, innerNotEdgeVertex, innerEdgeIdx, ref innerTriangleCount, true);
 
         while (true)
         {
@@ -143,16 +148,16 @@ public class IncisionManager : Singleton<IncisionManager>
 
             if (innerTriangleIndex == endInnerTriangleIndex)
             {
-                _dividingMethods.DivideTrianglesEnd(endInnerVertexPosition, endInnerTriangleIndex, ref innerTriangleCount, innerEdgeIdx);
+                _dividingMethods.DivideTrianglesEnd(endInnerVertexPosition, endInnerTriangleIndex, ref innerTriangleCount, innerEdgeIdx, true);
                 break;
             }
 
             innerSide = IntersectionManager.Instance.TriangleEdgeIntersection(ref innerEdgeIdx, ref innerEdgePoint, startInnerVertexPosition, endInnerVertexPosition, ref innerTriangleIndex, startScreenRay, endScreenRay);
 
             if (innerSide == 2)
-                _dividingMethods.DivideTrianglesClockWise(innerEdgePoint, edgeList[innerEdgeIdx].tri1, ref innerTriangleCount, innerEdgeIdx, false);
+                _dividingMethods.DivideTrianglesClockWise(innerEdgePoint, edgeList[innerEdgeIdx].tri1, ref innerTriangleCount, innerEdgeIdx, true);
             else if (innerSide == 1)
-                _dividingMethods.DivideTrianglesCounterClockWise(innerEdgePoint, edgeList[innerEdgeIdx].tri1, ref innerTriangleCount, innerEdgeIdx, false);
+                _dividingMethods.DivideTrianglesCounterClockWise(innerEdgePoint, edgeList[innerEdgeIdx].tri1, ref innerTriangleCount, innerEdgeIdx, true);
             else
             {
                 Debug.Log("error");
@@ -191,7 +196,41 @@ public class IncisionManager : Singleton<IncisionManager>
 
     public void Extending()
     {
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        // 이거 버텍스 정해주는게 좋긴함.
+        BFS.Instance.BFS_Circle(leftSide[0], startOuterVertexPosition, endOuterVertexPosition);
+        BFS.Instance.BFS_Circle(leftSide[leftSide.Count-1], startOuterVertexPosition, endOuterVertexPosition);
 
+
+        //foreach (var item in leftSide)
+        //{
+        //    GameObject v_test = new GameObject();
+        //    foreach (var item2 in AdjacencyList.Instance.connectedTriangles[item])
+        //    {
+        //        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //        v_test.transform.position = AdjacencyList.Instance.worldPositionVertices[triangles[item2]];
+        //        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //        v_test.transform.position = AdjacencyList.Instance.worldPositionVertices[triangles[item2 + 1]];
+        //        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //        v_test.transform.position = AdjacencyList.Instance.worldPositionVertices[triangles[item2 + 2]];
+        //    }
+
+        //}
+
+        //foreach (var item in rightSide)
+        //{
+        //    GameObject v_test = new GameObject();
+        //    foreach (var item2 in AdjacencyList.Instance.connectedTriangles[item])
+        //    {
+        //        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        //        v_test.transform.position = AdjacencyList.Instance.worldPositionVertices[triangles[item2]];
+        //        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        //        v_test.transform.position = AdjacencyList.Instance.worldPositionVertices[triangles[item2 + 1]];
+        //        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        //        v_test.transform.position = AdjacencyList.Instance.worldPositionVertices[triangles[item2 + 2]];
+        //    }
+
+        //}
 
 
 

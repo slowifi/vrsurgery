@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BFS : MonoBehaviour
+public class BFS : Singleton<BFS>
 {
-    private void BFS_Boundary()
+    public void BFS_Boundary()
     {
         // start point부터 end point까지 겹치는 point들 전부가 boundary list에 들어가야됨.
         // 일단 incision에서 사용한 기능부터 만들어 보고
@@ -44,8 +44,7 @@ public class BFS : MonoBehaviour
     }
     
 
-    
-    private void BFS_Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, bool _left)
+    public void BFS_Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint)//, bool _left)
     {
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
@@ -54,19 +53,26 @@ public class BFS : MonoBehaviour
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
         duplicateCheck.Add(vertex_num);
+        duplicateCheck.Add(IncisionManager.Instance.firstInnerVertexIndex);
+        duplicateCheck.Add(IncisionManager.Instance.firstOuterVertexIndex);
+        duplicateCheck.Add(IncisionManager.Instance.lastInnerVertexIndex);
+        duplicateCheck.Add(IncisionManager.Instance.lastOuterVertexIndex);
+        //시작점과 끝점을 하나씩 넣어주는게 좋음.
+        //duplicateCheck.Add()
 
-        if (_left)
-        {
-            IncisionManager.Instance.leftSide.Add(vertex_num);
-            foreach (int item in IncisionManager.Instance.leftSide)
-                duplicateCheck.Add(item);
-        }
-        else
-        {
-            IncisionManager.Instance.rightSide.Add(vertex_num);
-            foreach (int item in IncisionManager.Instance.rightSide)
-                duplicateCheck.Add(item);
-        }
+        //if (_left)
+        //{
+        //    IncisionManager.Instance.leftSide.Add(vertex_num);
+        //    foreach (int item in IncisionManager.Instance.leftSide)
+        //        duplicateCheck.Add(item);
+        //}
+        //else
+        //{
+        //    IncisionManager.Instance.rightSide.Add(vertex_num);
+        //    foreach (int item in IncisionManager.Instance.rightSide)
+        //        duplicateCheck.Add(item);
+        //}
+
         Debug.Log(vertex_num);
         temp.Enqueue(vertex_num);
         // outerVertices.Add(vertex_num);
@@ -96,35 +102,41 @@ public class BFS : MonoBehaviour
 
                 if (Vector2.Distance(center, worldVertices[item]) < dst)
                 {
-                    if (AlgorithmsManager.Instance.isLeft(startPoint, endPoint, worldVertices[item]))
-                    {
-                        if (_left)
-                        {
-                            duplicateCheck.Add(item);
-                            temp.Enqueue(item);
-                            IncisionManager.Instance.leftSide.Add(item);
+                    duplicateCheck.Add(item);
+                    temp.Enqueue(item);
+                    IncisionManager.Instance.leftSide.Add(item);
+                    GameObject v_test = new GameObject();
+                    v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    v_test.transform.position = worldVertices[item];
+                    //if (AlgorithmsManager.Instance.isLeft(startPoint, endPoint, worldVertices[item]))
+                    //{
+                    //    if (_left)
+                    //    {
+                    //        duplicateCheck.Add(item);
+                    //        temp.Enqueue(item);
+                    //        IncisionManager.Instance.leftSide.Add(item);
 
-                            GameObject v_test = new GameObject();
-                            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                            v_test.transform.position = worldVertices[item];
-                        }
-                        else
-                            continue;
-                    }
-                    else
-                    {
-                        if (!_left)
-                        {
-                            duplicateCheck.Add(item);
-                            temp.Enqueue(item);
-                            IncisionManager.Instance.rightSide.Add(item);
-                            GameObject v_test = new GameObject();
-                            v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                            v_test.transform.position = worldVertices[item];
-                        }
-                        else
-                            continue;
-                    }
+                    //        GameObject v_test = new GameObject();
+                    //        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    //        v_test.transform.position = worldVertices[item];
+                    //    }
+                    //    else
+                    //        continue;
+                    //}
+                    //else
+                    //{
+                    //    if (!_left)
+                    //    {
+                    //        duplicateCheck.Add(item);
+                    //        temp.Enqueue(item);
+                    //        IncisionManager.Instance.rightSide.Add(item);
+                    //        GameObject v_test = new GameObject();
+                    //        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    //        v_test.transform.position = worldVertices[item];
+                    //    }
+                    //    else
+                    //        continue;
+                    //}
                 }
             }
         }

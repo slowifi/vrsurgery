@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class DivideTriangle : MonoBehaviour
 {
-    public bool isBoundary = true;
+    public bool isBoundary = false;
 
     /// <summary>
     ///  지금 divide되는 triangle들은 버텍스가 두개씩 존재함.
@@ -166,14 +166,16 @@ public class DivideTriangle : MonoBehaviour
             if (!isInner)
             {
                 // outer 딱 가운데 점들만 모으고 나서 BFS할 때 쓰일 vtx는 따로 찾는걸로.
-                IncisionManager.Instance.leftSide.Add(AdjacencyList.Instance.edgeList[edgeIdx].vtx1);
-                IncisionManager.Instance.rightSide.Add(AdjacencyList.Instance.edgeList[edgeIdx].vtx2);
+                IncisionManager.Instance.firstOuterVertexIndex = newVertexLength;
+                IncisionManager.Instance.leftSide.Add(newVertexLength+1);
+                IncisionManager.Instance.rightSide.Add(newVertexLength+2);
             }
             else
             {
                 // inner
-                IncisionManager.Instance.rightSide.Add(AdjacencyList.Instance.edgeList[edgeIdx].vtx1);
-                IncisionManager.Instance.leftSide.Add(AdjacencyList.Instance.edgeList[edgeIdx].vtx2);
+                IncisionManager.Instance.firstInnerVertexIndex = newVertexLength;
+                IncisionManager.Instance.rightSide.Add(newVertexLength+1);
+                IncisionManager.Instance.leftSide.Add(newVertexLength+2);
             }
 
             Dictionary<int, Vector3> newVertices = IncisionManager.Instance.newVertices;
@@ -201,7 +203,7 @@ public class DivideTriangle : MonoBehaviour
         }
     }
 
-    public void DivideTrianglesEnd(Vector3 centerPosition, int triangleIdx, ref int triangleCount, int edgeIdx)
+    public void DivideTrianglesEnd(Vector3 centerPosition, int triangleIdx, ref int triangleCount, int edgeIdx, bool isInner)
     {
         int newTriangleLength;
         int newVertexLength;
@@ -260,7 +262,10 @@ public class DivideTriangle : MonoBehaviour
         {
             Dictionary<int, Vector3> newVertices = IncisionManager.Instance.newVertices;
             Dictionary<int, int> newTriangles = IncisionManager.Instance.newTriangles;
-
+            if(!isInner)
+                IncisionManager.Instance.lastOuterVertexIndex = newVertexLength;
+            else
+                IncisionManager.Instance.lastInnerVertexIndex = newVertexLength;
             //left
             newTriangles.Add(triangleIdx, newVertexLength);
             newTriangles.Add(triangleIdx + 1, newVertexLength - 2);

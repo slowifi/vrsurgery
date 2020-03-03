@@ -168,7 +168,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                 if (isEndToVtx)
                     _dividingMethods.DivideTrianglesEndToVtx(endVertexIndex, endTriangleIndex, ref triangleCount, edgeIdx);
                 else
-                    _dividingMethods.DivideTrianglesEnd(endVertexPosition, endTriangleIndex, ref triangleCount, edgeIdx);
+                    _dividingMethods.DivideTrianglesEnd(endVertexPosition, endTriangleIndex, ref triangleCount, edgeIdx, true);
                 break;
             }
 
