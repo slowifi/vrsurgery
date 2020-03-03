@@ -173,9 +173,6 @@ public class IncisionManager : Singleton<IncisionManager>
         Vector3[] vertices = new Vector3[mesh.vertexCount + newVertices.Count];
         int[] triangles = new int[trianglesCount];
 
-        Debug.Log(oldTriangles.Length);
-        Debug.Log(trianglesCount);
-
         for (int i = 0; i < oldVertices.Length; i++)
             vertices[i] = oldVertices[i];
         for (int i = 0; i < oldTriangles.Length; i++)
@@ -183,21 +180,10 @@ public class IncisionManager : Singleton<IncisionManager>
 
         // local 값이 지금 들어가있는 상태에서 
         foreach (var item in newVertices)
-        {
             vertices[item.Key] = ObjManager.Instance.objTransform.InverseTransformPoint(item.Value);
-        }
 
-        Debug.Log(newTriangles.Count);
-        int count = 12;
         foreach (var item in newTriangles)
-        {
-            
             triangles[item.Key] = item.Value;
-            Debug.Log(item.Value);
-            GameObject v_test = new GameObject();
-            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            v_test.transform.position = ObjManager.Instance.objTransform.TransformPoint(vertices[item.Value]);
-        }
 
         mesh.vertices = vertices;
         mesh.triangles = triangles;

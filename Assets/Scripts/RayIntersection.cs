@@ -6,6 +6,45 @@ using UnityEngine.UI;
 
 public class RayIntersection : MonoBehaviour
 {
+    public class Trans
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+        public Vector3 localScale;
+
+        public Trans(Vector3 newPosition, Quaternion newRotation, Vector3 newLocalScale)
+        {
+            position = newPosition;
+            rotation = newRotation;
+            localScale = newLocalScale;
+        }
+
+        public Trans()
+        {
+            position = Vector3.zero;
+            rotation = Quaternion.identity;
+            localScale = Vector3.one;
+        }
+
+        public Trans(Transform transform)
+        {
+            copyFrom(transform);
+        }
+
+        public void copyFrom(Transform transform)
+        {
+            position = transform.position;
+            rotation = transform.rotation;
+            localScale = transform.localScale;
+        }
+
+        public void copyTo(Transform transform)
+        {
+            transform.position = position;
+            transform.rotation = rotation;
+            transform.localScale = localScale;
+        }
+    }
     public class Edge
     {
         public int vtx1 { get; set; }
@@ -75,6 +114,8 @@ public class RayIntersection : MonoBehaviour
     private GameObject incisionOuterStartPointObject;
     private GameObject incisionOuterEndPointObject;
 
+    private List<float> leftsideWeight;
+    private List<float> rightsideWeight;
 
     private GameObject incisionLine;
     private LineRenderer incisionLineRenderer;
@@ -105,6 +146,12 @@ public class RayIntersection : MonoBehaviour
     private Vector3 incisionOuterStartPoint;
     private Vector3 incisionOuterEndPoint;
 
+    private int incisionOuterFirstVertexIndex;
+    private int incisionOuterLastVertexIndex;
+
+    private int incisionInnerFirstVertexIndex;
+    private int incisionInnerLastVertexIndex;
+
     private int incisionOuterStartPointIdx;
     private int incisionOuterEndPointIdx;
 
@@ -113,6 +160,8 @@ public class RayIntersection : MonoBehaviour
 
     private int incisionInnerStartPointIdx;
     private int incisionInnerEndPointIdx;
+
+    private Transform oldTransform;
 
     // boundary cut
     private int boundaryCount;
@@ -263,7 +312,8 @@ public class RayIntersection : MonoBehaviour
         extending = false;
         leftSide = new HashSet<int>();
         rightSide = new HashSet<int>();
-
+        leftsideWeight = new List<float>();
+        rightsideWeight = new List<float>();
         // boundary cut
         boundaryCut = false;
         firstBoundary = true;
@@ -384,12 +434,18 @@ public class RayIntersection : MonoBehaviour
         _onlyOnce = false;
         Destroy(GameObject.Find("Incision line"));
 
+        incisionOuterFirstVertexIndex = -1;
+        incisionOuterLastVertexIndex = -1;
+        incisionInnerFirstVertexIndex = -1;
+        incisionInnerLastVertexIndex = -1;
         incisionOuterStartPointObject = new GameObject("StartPoint");
         incisionOuterEndPointObject = new GameObject("EndPoint");
         incisionOuterStartPointObject.transform.SetParent(obj.transform);
         incisionOuterEndPointObject.transform.SetParent(obj.transform);
         incisionLine = new GameObject("Incision line");
         incisionLineRenderer = incisionLine.AddComponent<LineRenderer>();
+        leftsideWeight.Clear();
+        rightSide.Clear();
         leftSide.Clear();
         rightSide.Clear();
         // ConnectedVerticesAndTriangles();
@@ -426,18 +482,32 @@ public class RayIntersection : MonoBehaviour
 
             if (!_onlyOnce)
             {
-                _onlyOnce = true;
                 BFS_Circle(outerLeftVtxIdx, incisionOuterStartPoint, incisionOuterEndPoint, true);
                 BFS_Circle(outerRightVtxIdx, incisionOuterStartPoint, incisionOuterEndPoint, false);
                 BFS_Circle(innerLeftVtxIdx, incisionOuterStartPoint, incisionOuterEndPoint, false);
                 BFS_Circle(innerRightVtxIdx, incisionOuterStartPoint, incisionOuterEndPoint, true);
-                GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
+                //GameObject.Find("HumanHeart").GetComponent<TouchInput>().enabled = true;
+                //Trans temp = new Trans(obj.transform);
+                //oldTransform = new GameObject().transform;
+                //temp.copyTo(oldTransform);
             }
             // inner부분도 리스트에 넣어줘야됨.
 
+            //if (oldTransform.rotation.x != obj.transform.rotation.x)
+            //{
+            //    Debug.Log("transform이 다름.");
+            //    Trans temp = new Trans(obj.transform);
+            //    oldTransform = new GameObject().transform;
+            //    temp.copyTo(oldTransform);
+            //    MeshRecalculate();
+            //    return;
+            //}
+
+            // 지금 단계에서 회전하면서 incision을 못하는 이유는 값들이 x, y좌표값만을 가지고 원을 계산하여서 회전하면 축변환이 이뤄지는게 아니기때문에 값을 바꾸기가 힘들다.
+
             Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
             Vector3[] vertices = mesh.vertices;
-            MeshRecalculate();
+            // MeshRecalculate();
             // incisionOuterStartPoint, incisionOuterEndPoint 에 대해서 변환만 같이 시켜주면 업데이트는 문제 없을듯 추가로 meshrecalculate 하면됨.
             // 위에 두 포인트 자체를 object로 만들어서 관리해도 괜찮을듯함. child로 소속시켜서
             incisionOuterStartPoint = incisionOuterStartPointObject.transform.position;
@@ -447,25 +517,53 @@ public class RayIntersection : MonoBehaviour
             // Vector2 innerCenter = Vector3.Lerp(incisionInnerStartPoint, incisionInnerEndPoint, 0.5f);
 
             double radius = Vector2.Distance(incisionOuterStartPoint, incisionOuterEndPoint) / 2;
+            
 
-            Vector2 leftVec = Vector2.Perpendicular(incisionOuterEndPoint - incisionOuterStartPoint);
-            Vector2 rightVec = Vector2.Perpendicular(incisionOuterStartPoint - incisionOuterEndPoint);
-
+            //Vector2 leftVec = Vector2.Perpendicular(incisionOuterEndPoint - incisionOuterStartPoint);
+            //Vector2 rightVec = Vector2.Perpendicular(incisionOuterStartPoint - incisionOuterEndPoint);
+            
+            Vector3 rightVec = Vector3.Cross(incisionOuterEndPoint - incisionOuterStartPoint, mesh.normals[outerRightVtxIdx]);
+            Vector3 leftVec = Vector3.Cross(incisionOuterStartPoint - incisionOuterEndPoint, mesh.normals[outerLeftVtxIdx]);
+            Debug.Log(rightVec);
+            Debug.Log(leftVec);
             // 그때그때 계산하지말고 이건 한번만 계산해도 되는거
             // 좌표들을 회전에 상관없이 고정된 좌표계는 local 좌표계인데
+            //if (!_onlyOnce)
+            //{
+            //    _onlyOnce = true;
+            //    foreach (int item in leftSide)
+            //    {
+            //        // 각 t를 지금 한번만 계산해도 되는거라면 
+            //        // t는 weight에 가까움.
+            //        double t = QuadraticEquation(test_world[item].x - outerCenter.x, test_world[item].y - outerCenter.y, leftVec.x, leftVec.y, radius);
+            //        float temp = Convert.ToSingle(t);
+            //        leftsideWeight.Add(temp);
+            //        vertices[item] = obj.transform.InverseTransformPoint(new Vector3(m_Extend.value * temp * leftVec.x + test_world[item].x, m_Extend.value * temp * leftVec.y + test_world[item].y, test_world[item].z));
+            //    }
+
+            //    foreach (int item in rightSide)
+            //    {
+            //        double t = QuadraticEquation(test_world[item].x - outerCenter.x, test_world[item].y - outerCenter.y, rightVec.x, rightVec.y, radius);
+            //        float temp = Convert.ToSingle(t);
+            //        rightsideWeight.Add(temp);
+            //        vertices[item] = obj.transform.InverseTransformPoint(new Vector3(m_Extend.value * temp * rightVec.x + test_world[item].x, m_Extend.value * temp * rightVec.y + test_world[item].y, test_world[item].z));
+            //    }
+            //}
+
             foreach (int item in leftSide)
             {
                 double t = QuadraticEquation(test_world[item].x - outerCenter.x, test_world[item].y - outerCenter.y, leftVec.x, leftVec.y, radius);
                 float temp = Convert.ToSingle(t);
-                vertices[item] = obj.transform.InverseTransformPoint(new Vector3(m_Extend.value * temp * leftVec.x + test_world[item].x, m_Extend.value * temp * leftVec.y+ test_world[item].y, test_world[item].z));
+                vertices[item] = obj.transform.InverseTransformPoint(new Vector3(m_Extend.value * temp * leftVec.x + test_world[item].x, m_Extend.value * temp * leftVec.y + test_world[item].y, test_world[item].z));
             }
-              
+
             foreach (int item in rightSide)
             {
                 double t = QuadraticEquation(test_world[item].x - outerCenter.x, test_world[item].y - outerCenter.y, rightVec.x, rightVec.y, radius);
                 float temp = Convert.ToSingle(t);
-                vertices[item] = obj.transform.InverseTransformPoint(new Vector3(m_Extend.value * temp * rightVec.x+ test_world[item].x, m_Extend.value * temp * rightVec.y+ test_world[item].y, test_world[item].z));
+                vertices[item] = obj.transform.InverseTransformPoint(new Vector3(m_Extend.value * temp * rightVec.x + test_world[item].x, m_Extend.value * temp * rightVec.y + test_world[item].y, test_world[item].z));
             }
+
             mesh.vertices = vertices;
         }
 
@@ -2382,10 +2480,12 @@ public class RayIntersection : MonoBehaviour
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
         
         // vertex_num
+        // 어차피 왼쪽 오른쪽이 잘려 있는 상태이니까 왼쪽인지 굳이 체크할 필요 없이 끝점만 이어준다면 상관없지 않을까?
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
         duplicateCheck.Add(vertex_num);
 
+        //여기에 지금 점을 넣어야됨.시작과 끝점의 index를 넣어야함.
         if (_left)
         {
             leftSide.Add(vertex_num);
@@ -2428,34 +2528,38 @@ public class RayIntersection : MonoBehaviour
 
                 if (Vector2.Distance(center, test_world[item]) < dst)
                 {
+                    
+                    //duplicateCheck.Add(item);
+                    //temp.Enqueue(item);
+                    //rightSide.Add(item);
+
+
+
+
                     if (isLeft(startPoint, endPoint, test_world[item]))
                     {
-                        if(_left)
+                        if (_left)
                         {
                             duplicateCheck.Add(item);
                             temp.Enqueue(item);
                             leftSide.Add(item);
-                            /*
+                            
                             GameObject v_test = new GameObject();
                             v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                             v_test.transform.position = test_world[item];
-                            */
+                            
                         }
                         else
                             continue;
                     }
-                    else 
+                    else
                     {
                         if (!_left)
                         {
-                            duplicateCheck.Add(item);
-                            temp.Enqueue(item);
-                            rightSide.Add(item);
-                            /*
                             GameObject v_test = new GameObject();
                             v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
                             v_test.transform.position = test_world[item];
-                            */
+                            
                         }
                         else
                             continue;
@@ -3100,6 +3204,7 @@ public class RayIntersection : MonoBehaviour
         {
             // outer
             boundaryOuterEndVtx = vertices.Length;
+            //incisionOuterLastVertexIndex = vertices.Length;
             leftSide.Add(edgeList[newEdgeIdx].vtx2);
             rightSide.Add(edgeList[newEdgeIdx].vtx1);
         }
@@ -3107,6 +3212,7 @@ public class RayIntersection : MonoBehaviour
         {
             // inner
             boundaryInnerEndVtx = vertices.Length;
+            //incisionInnerLastVertexIndex = vertices.Length;
             rightSide.Add(edgeList[newEdgeIdx].vtx2);
             leftSide.Add(edgeList[newEdgeIdx].vtx1);
         }
@@ -3223,21 +3329,21 @@ public class RayIntersection : MonoBehaviour
         {
             leftSide.Add(vertices.Length);
             rightSide.Add(vertices.Length + 1);
-            
+
             rightSide.Add(edgeList[_intersectEdgeIdx].vtx2);
             leftSide.Add(edgeList[_intersectEdgeIdx].vtx1);
             leftSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx1);
-            
+
         }
         else
         {
             rightSide.Add(vertices.Length);
             leftSide.Add(vertices.Length + 1);
-            
+
             leftSide.Add(edgeList[_intersectEdgeIdx].vtx2);
             rightSide.Add(edgeList[_intersectEdgeIdx].vtx1);
             rightSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx1);
-            
+
         }
         // right
         newVertices[vertices.Length+1] = obj.transform.InverseTransformPoint(_new);
@@ -3519,8 +3625,8 @@ public class RayIntersection : MonoBehaviour
         {
             if (d == 0)
                 return (-b) / (2.0 * a);
-            else
-                Debug.Log("허근");
+            //else
+            //    Debug.Log("허근");
         }
         return 0;
     }

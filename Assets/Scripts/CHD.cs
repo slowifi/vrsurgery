@@ -11,8 +11,13 @@ public class CHD : MonoBehaviour
     public bool isExtend = false;
 
     public bool isEraseMode = false;
+
     public bool isBoundaryCutMode = false;
-    
+    public int boundaryCount;
+    public Vector3 firstMousePosition;
+    public Vector3 oldMousePosition;
+
+
     // test
     public bool isFirstPatch = true;
     public bool isPatchUpdate = false;
@@ -28,6 +33,8 @@ public class CHD : MonoBehaviour
         AdjacencyList.Instance.Initialize();
         PatchManager.Instance.Initialize();
         IncisionManager.Instance.Initialize();
+        BoundaryCutManager.Instance.Initialize();
+        boundaryCount = 0;
     }
 
     void Update()
@@ -64,7 +71,68 @@ public class CHD : MonoBehaviour
             }
             else if(isBoundaryCutMode)
             {
-
+                if (isFirstPatch)
+                {
+                    AdjacencyList.Instance.ListUpdate();
+                    isFirstPatch = false;
+                    //boundaryCount = 0;
+                }
+                
+                //조건짜는게 까다로움.
+                if (Input.GetMouseButtonDown(0))
+                {
+                    ChatManager.Instance.GenerateMessage("첫 진입");
+                    BoundaryCutManager.Instance.SetStartVertices();
+                    oldMousePosition = Input.mousePosition;
+                    firstMousePosition = oldMousePosition;
+                    boundaryCount++;
+                }
+                else if(Input.GetMouseButton(0))
+                {
+                    if (boundaryCount > 3 && Vector3.Distance(Input.mousePosition, firstMousePosition) < 3.0f)
+                    {
+                        ChatManager.Instance.GenerateMessage("마지막 처음과 가까워짐.");
+                        BoundaryCutManager.Instance.ResetIndex();
+                        BoundaryCutManager.Instance.SetEndVtxToStartVtx();
+                        BoundaryCutManager.Instance.SetDividingList();
+                        BoundaryCutManager.Instance.ExecuteDividing();
+                        isBoundaryCutMode = false;
+                    }
+                    else if (Vector3.Distance(Input.mousePosition, oldMousePosition) < 50.0f)
+                        return;
+                    else if (boundaryCount == 1)
+                    {
+                        ChatManager.Instance.GenerateMessage("첫 진입 후 생성");
+                        // BoundaryCutManager.Instance.ResetIndex();
+                        BoundaryCutManager.Instance.SetEndVertices();
+                        BoundaryCutManager.Instance.SetDividingList();
+                        BoundaryCutManager.Instance.ExecuteDividing();
+                        AdjacencyList.Instance.ListUpdate();
+                        oldMousePosition = Input.mousePosition;
+                        boundaryCount++;
+                        isFirstPatch = true;
+                    }
+                    else
+                    {
+                        ChatManager.Instance.GenerateMessage("중간과정");
+                        BoundaryCutManager.Instance.ResetIndex();
+                        BoundaryCutManager.Instance.SetEndVertices();
+                        BoundaryCutManager.Instance.SetDividingList();
+                        BoundaryCutManager.Instance.ExecuteDividing();
+                        AdjacencyList.Instance.ListUpdate();
+                        oldMousePosition = Input.mousePosition;
+                        boundaryCount++;
+                    }
+                }
+                else if(Input.GetMouseButtonUp(0))
+                {
+                    ChatManager.Instance.GenerateMessage("마지막 마우스 버튼 업");
+                    BoundaryCutManager.Instance.ResetIndex();
+                    BoundaryCutManager.Instance.SetEndVtxToStartVtx();
+                    BoundaryCutManager.Instance.SetDividingList();
+                    BoundaryCutManager.Instance.ExecuteDividing();
+                    isBoundaryCutMode = false;
+                }
             }
         }
         else if(isMeasureMode)
@@ -84,6 +152,7 @@ public class CHD : MonoBehaviour
             if (isFirstPatch)
             {
                 isFirstPatch = false;
+                AdjacencyList.Instance.ListUpdate();
                 PatchManager.Instance.Generate();
                 return;
             }

@@ -45,6 +45,28 @@ public class IntersectionManager : Singleton<IntersectionManager>
         }
     }
 
+    public void GetIntersectedValues(Ray cameraRay, ref Vector3 intersectionPoint, ref int triangleIndex)
+    {
+        float dst_min = 10000000;
+        int[] triangels = MeshManager.Instance.triangles;
+        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        Vector3 intersectionTemp = Vector3.zero;
+
+        for (int i = 0; i < triangels.Length; i += 3)
+        {
+            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            {
+                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
+                if (dst_min > dst_temp)
+                {
+                    dst_min = dst_temp;
+                    intersectionPoint = intersectionTemp;
+                    triangleIndex = i;
+                }
+            }
+        }
+    }
+
     public void GetIntersectedValues(Ray cameraRay, ref int outerTriangleIndex, ref int innerTriangleIndex)
     {
         float dst_min = 10000000;
