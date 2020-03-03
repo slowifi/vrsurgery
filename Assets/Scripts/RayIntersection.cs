@@ -146,11 +146,6 @@ public class RayIntersection : MonoBehaviour
     private Vector3 incisionOuterStartPoint;
     private Vector3 incisionOuterEndPoint;
 
-    private int incisionOuterFirstVertexIndex;
-    private int incisionOuterLastVertexIndex;
-
-    private int incisionInnerFirstVertexIndex;
-    private int incisionInnerLastVertexIndex;
 
     private int incisionOuterStartPointIdx;
     private int incisionOuterEndPointIdx;
@@ -434,10 +429,6 @@ public class RayIntersection : MonoBehaviour
         _onlyOnce = false;
         Destroy(GameObject.Find("Incision line"));
 
-        incisionOuterFirstVertexIndex = -1;
-        incisionOuterLastVertexIndex = -1;
-        incisionInnerFirstVertexIndex = -1;
-        incisionInnerLastVertexIndex = -1;
         incisionOuterStartPointObject = new GameObject("StartPoint");
         incisionOuterEndPointObject = new GameObject("EndPoint");
         incisionOuterStartPointObject.transform.SetParent(obj.transform);
@@ -504,7 +495,6 @@ public class RayIntersection : MonoBehaviour
             //}
 
             // 지금 단계에서 회전하면서 incision을 못하는 이유는 값들이 x, y좌표값만을 가지고 원을 계산하여서 회전하면 축변환이 이뤄지는게 아니기때문에 값을 바꾸기가 힘들다.
-
             Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
             Vector3[] vertices = mesh.vertices;
             // MeshRecalculate();
@@ -514,41 +504,14 @@ public class RayIntersection : MonoBehaviour
             incisionOuterEndPoint = incisionOuterEndPointObject.transform.position;
 
             Vector3 outerCenter = Vector3.Lerp(incisionOuterStartPoint, incisionOuterEndPoint, 0.5f);
-            // Vector2 innerCenter = Vector3.Lerp(incisionInnerStartPoint, incisionInnerEndPoint, 0.5f);
 
             double radius = Vector2.Distance(incisionOuterStartPoint, incisionOuterEndPoint) / 2;
-            
 
-            //Vector2 leftVec = Vector2.Perpendicular(incisionOuterEndPoint - incisionOuterStartPoint);
-            //Vector2 rightVec = Vector2.Perpendicular(incisionOuterStartPoint - incisionOuterEndPoint);
-            
-            Vector3 rightVec = Vector3.Cross(incisionOuterEndPoint - incisionOuterStartPoint, mesh.normals[outerRightVtxIdx]);
-            Vector3 leftVec = Vector3.Cross(incisionOuterStartPoint - incisionOuterEndPoint, mesh.normals[outerLeftVtxIdx]);
-            Debug.Log(rightVec);
-            Debug.Log(leftVec);
-            // 그때그때 계산하지말고 이건 한번만 계산해도 되는거
-            // 좌표들을 회전에 상관없이 고정된 좌표계는 local 좌표계인데
-            //if (!_onlyOnce)
-            //{
-            //    _onlyOnce = true;
-            //    foreach (int item in leftSide)
-            //    {
-            //        // 각 t를 지금 한번만 계산해도 되는거라면 
-            //        // t는 weight에 가까움.
-            //        double t = QuadraticEquation(test_world[item].x - outerCenter.x, test_world[item].y - outerCenter.y, leftVec.x, leftVec.y, radius);
-            //        float temp = Convert.ToSingle(t);
-            //        leftsideWeight.Add(temp);
-            //        vertices[item] = obj.transform.InverseTransformPoint(new Vector3(m_Extend.value * temp * leftVec.x + test_world[item].x, m_Extend.value * temp * leftVec.y + test_world[item].y, test_world[item].z));
-            //    }
+            Vector2 leftVec = Vector2.Perpendicular(incisionOuterEndPoint - incisionOuterStartPoint);
+            Vector2 rightVec = Vector2.Perpendicular(incisionOuterStartPoint - incisionOuterEndPoint);
 
-            //    foreach (int item in rightSide)
-            //    {
-            //        double t = QuadraticEquation(test_world[item].x - outerCenter.x, test_world[item].y - outerCenter.y, rightVec.x, rightVec.y, radius);
-            //        float temp = Convert.ToSingle(t);
-            //        rightsideWeight.Add(temp);
-            //        vertices[item] = obj.transform.InverseTransformPoint(new Vector3(m_Extend.value * temp * rightVec.x + test_world[item].x, m_Extend.value * temp * rightVec.y + test_world[item].y, test_world[item].z));
-            //    }
-            //}
+            //Vector3 rightVec = Vector3.Cross(incisionOuterEndPoint - incisionOuterStartPoint, mesh.normals[outerRightVtxIdx]);
+            //Vector3 leftVec = Vector3.Cross(incisionOuterStartPoint - incisionOuterEndPoint, mesh.normals[outerLeftVtxIdx]);
 
             foreach (int item in leftSide)
             {
@@ -715,9 +678,6 @@ public class RayIntersection : MonoBehaviour
             ConnectedVerticesAndTriangles();
             edgeList = new List<Edge>();
             GenerateEdgeList();
-            //connectedVertices.Clear();
-            //ConnectedVertices();
-            // Initialize.Instance.Initializing();
             MeshRecalculate();
             SetColor();
 
@@ -2528,14 +2488,6 @@ public class RayIntersection : MonoBehaviour
 
                 if (Vector2.Distance(center, test_world[item]) < dst)
                 {
-                    
-                    //duplicateCheck.Add(item);
-                    //temp.Enqueue(item);
-                    //rightSide.Add(item);
-
-
-
-
                     if (isLeft(startPoint, endPoint, test_world[item]))
                     {
                         if (_left)
@@ -2543,11 +2495,6 @@ public class RayIntersection : MonoBehaviour
                             duplicateCheck.Add(item);
                             temp.Enqueue(item);
                             leftSide.Add(item);
-                            
-                            GameObject v_test = new GameObject();
-                            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                            v_test.transform.position = test_world[item];
-                            
                         }
                         else
                             continue;
@@ -2556,10 +2503,9 @@ public class RayIntersection : MonoBehaviour
                     {
                         if (!_left)
                         {
-                            GameObject v_test = new GameObject();
-                            v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                            v_test.transform.position = test_world[item];
-                            
+                            duplicateCheck.Add(item);
+                            temp.Enqueue(item);
+                            leftSide.Add(item);
                         }
                         else
                             continue;
@@ -3088,8 +3034,8 @@ public class RayIntersection : MonoBehaviour
                 leftSide.Add(vertices.Length + 1);
                 rightSide.Add(vertices.Length + 2);
 
-                leftSide.Add(edgeList[_edgeIdx].vtx1);
-                rightSide.Add(edgeList[_edgeIdx].vtx2);
+                //leftSide.Add(edgeList[_edgeIdx].vtx1);
+                //rightSide.Add(edgeList[_edgeIdx].vtx2);
             }
         }
         else
@@ -3104,8 +3050,8 @@ public class RayIntersection : MonoBehaviour
                 rightSide.Add(vertices.Length + 1);
                 leftSide.Add(vertices.Length + 2);
 
-                rightSide.Add(edgeList[_edgeIdx].vtx1);
-                leftSide.Add(edgeList[_edgeIdx].vtx2);
+                //rightSide.Add(edgeList[_edgeIdx].vtx1);
+                //leftSide.Add(edgeList[_edgeIdx].vtx2);
             }
                 
         }
@@ -3205,16 +3151,16 @@ public class RayIntersection : MonoBehaviour
             // outer
             boundaryOuterEndVtx = vertices.Length;
             //incisionOuterLastVertexIndex = vertices.Length;
-            leftSide.Add(edgeList[newEdgeIdx].vtx2);
-            rightSide.Add(edgeList[newEdgeIdx].vtx1);
+            //leftSide.Add(edgeList[newEdgeIdx].vtx2);
+            //rightSide.Add(edgeList[newEdgeIdx].vtx1);
         }
         else
         {
             // inner
             boundaryInnerEndVtx = vertices.Length;
-            //incisionInnerLastVertexIndex = vertices.Length;
-            rightSide.Add(edgeList[newEdgeIdx].vtx2);
-            leftSide.Add(edgeList[newEdgeIdx].vtx1);
+            ////incisionInnerLastVertexIndex = vertices.Length;
+            //rightSide.Add(edgeList[newEdgeIdx].vtx2);
+            //leftSide.Add(edgeList[newEdgeIdx].vtx1);
         }
 
         // left side
@@ -3266,9 +3212,9 @@ public class RayIntersection : MonoBehaviour
             leftSide.Add(vertices.Length);
             rightSide.Add(vertices.Length + 1);
 
-            leftSide.Add(edgeList[_intersectEdgeIdx].vtx1);
-            rightSide.Add(edgeList[_intersectEdgeIdx].vtx2);
-            rightSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx2);
+            //leftSide.Add(edgeList[_intersectEdgeIdx].vtx1);
+            //rightSide.Add(edgeList[_intersectEdgeIdx].vtx2);
+            //rightSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx2);
 
         }
         else
@@ -3276,9 +3222,9 @@ public class RayIntersection : MonoBehaviour
             rightSide.Add(vertices.Length);
             leftSide.Add(vertices.Length + 1);
 
-            rightSide.Add(edgeList[_intersectEdgeIdx].vtx1);
-            leftSide.Add(edgeList[_intersectEdgeIdx].vtx2);
-            leftSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx2);
+            //rightSide.Add(edgeList[_intersectEdgeIdx].vtx1);
+            //leftSide.Add(edgeList[_intersectEdgeIdx].vtx2);
+            //leftSide.Add(edgeList[_intersectEdgeIdx + nextLength].vtx2);
 
         }
         
