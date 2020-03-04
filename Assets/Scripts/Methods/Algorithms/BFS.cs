@@ -44,7 +44,7 @@ public class BFS : Singleton<BFS>
     }
     
 
-    public void BFS_Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint)//, bool _left)
+    public void BFS_Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, bool isLeft)
     {
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
@@ -53,9 +53,9 @@ public class BFS : Singleton<BFS>
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
         duplicateCheck.Add(vertex_num);
-        duplicateCheck.Add(IncisionManager.Instance.firstInnerVertexIndex);
+        //duplicateCheck.Add(IncisionManager.Instance.firstInnerVertexIndex);
         duplicateCheck.Add(IncisionManager.Instance.firstOuterVertexIndex);
-        duplicateCheck.Add(IncisionManager.Instance.lastInnerVertexIndex);
+        //duplicateCheck.Add(IncisionManager.Instance.lastInnerVertexIndex);
         duplicateCheck.Add(IncisionManager.Instance.lastOuterVertexIndex);
         //시작점과 끝점을 하나씩 넣어주는게 좋음.
         //duplicateCheck.Add()
@@ -73,7 +73,6 @@ public class BFS : Singleton<BFS>
         //        duplicateCheck.Add(item);
         //}
 
-        Debug.Log(vertex_num);
         temp.Enqueue(vertex_num);
         // outerVertices.Add(vertex_num);
         GameObject v_t = new GameObject();
@@ -84,7 +83,6 @@ public class BFS : Singleton<BFS>
         {
             foreach (int item in AdjacencyList.Instance.connectedVertices[temp.Dequeue()])
             {
-                Debug.Log(item);
                 bool temp_check = false;
                 // vtx에서 다른거로 어떻게 넘어갈까 흠..
                 foreach (int check in duplicateCheck)
@@ -104,10 +102,10 @@ public class BFS : Singleton<BFS>
                 {
                     duplicateCheck.Add(item);
                     temp.Enqueue(item);
-                    IncisionManager.Instance.leftSide.Add(item);
-                    GameObject v_test = new GameObject();
-                    v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    v_test.transform.position = worldVertices[item];
+                    if(isLeft)
+                        IncisionManager.Instance.leftSide.Add(item);
+                    else
+                        IncisionManager.Instance.rightSide.Add(item);
                     //if (AlgorithmsManager.Instance.isLeft(startPoint, endPoint, worldVertices[item]))
                     //{
                     //    if (_left)

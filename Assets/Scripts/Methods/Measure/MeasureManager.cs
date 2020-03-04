@@ -45,7 +45,7 @@ public class MeasureManager : Singleton<MeasureManager>
     public Vector3 vertexPosition(Ray cameraRay)
     {
         float dst_min = 1000000;
-        int[] triangles = MeshManager.Instance.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         Vector3[] worldPositionVertices = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
         Vector3 intersectionPoint = Vector3.zero;

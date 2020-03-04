@@ -208,6 +208,7 @@ public class TouchInput : MonoBehaviour
         setByMode();
 
         // Estimating local bounds of a model set and setting a pivot point against the model
+        /*
         humanHeart = GameObject.Find("HumanHeart");
         if (humanHeart == null)
             Debug.Log("Null Model");
@@ -233,9 +234,9 @@ public class TouchInput : MonoBehaviour
 
         for (int i = 0; i < 3; i++)
             mButtonStatus[i] = 0;
-
+            */
         // StartCoroutine(Breathing());
-        ResetPivot();
+        //ResetPivot();
     }
     // Scaling
     Vector3 updateCoM(Mesh mesh)
@@ -287,7 +288,7 @@ public class TouchInput : MonoBehaviour
             _currentScale += (humanHeart.transform.localScale.x - x)+0.4f;
         }
 
-        updatePlaneModel();
+        //updatePlaneModel();
     }
 
     public void ProjectParts(ButtonPressDetection.buttonData mItem)
@@ -404,8 +405,8 @@ public class TouchInput : MonoBehaviour
             float yPos = Input.GetAxis("Mouse Y");
 
             float sensitivityValue = moveBar.value;
-            pivot.transform.position += Vector3.left * (xPos * 2f);
-            pivot.transform.position += Vector3.up * (yPos*2f);
+            transform.position += Vector3.left * (xPos * 2f);
+            transform.position += Vector3.up * (yPos*2f);
 
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class DivideTriangle : MonoBehaviour
 {
-    public bool isBoundary = false;
+    public bool isBoundary = true;
 
     /// <summary>
     ///  지금 divide되는 triangle들은 버텍스가 두개씩 존재함.
@@ -64,9 +64,9 @@ public class DivideTriangle : MonoBehaviour
 
     public void DivideTrianglesStartFromVtx(int startVtxIndex, Vector3 newEdgeVertexPosition, int triangleIdx, int edgeIdx, ref int triangleCount)
     {
-        int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
-        int newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
-
+        int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
+        int newVertexLength = MeshManager.Instance.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
+        Debug.Log("start from vtx");
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
 
@@ -141,7 +141,7 @@ public class DivideTriangle : MonoBehaviour
             Dictionary<int, Vector3> newVertices = BoundaryCutManager.Instance.newVertices;
             Dictionary<int, int> newTriangles = BoundaryCutManager.Instance.newTriangles;
             BoundaryCutManager.Instance.startVertexIndex = newVertexLength;
-
+            BoundaryCutManager.Instance.firstVertexIndex = newVertexLength;
             newTriangles.Add(triangleIdx, newVertexLength);
             newTriangles.Add(triangleIdx + 1, edgeList[edgeIdx].vtx1);
             newTriangles.Add(triangleIdx + 2, newVertexLength + 1);
@@ -207,6 +207,7 @@ public class DivideTriangle : MonoBehaviour
     {
         int newTriangleLength;
         int newVertexLength;
+        // 지금 이부분에 문제가 있는데 뭐가 문젠지 모르겠다 어떻게 뚫리게된거지?
         if (isBoundary)
         {
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
@@ -239,11 +240,18 @@ public class DivideTriangle : MonoBehaviour
         {
             Dictionary<int, Vector3> newVertices = BoundaryCutManager.Instance.newVertices;
             Dictionary<int, int> newTriangles = BoundaryCutManager.Instance.newTriangles;
-
-            newTriangles.Add(triangleIdx, newVertexLength);
-            newTriangles.Add(triangleIdx + 1, newVertexLength - 1);
-            newTriangles.Add(triangleIdx + 2, edgeList[edgeIdx].vtx2);
-
+            if (newTriangles.ContainsKey(triangleIdx))
+            {
+                newTriangles[triangleIdx] = newVertexLength;
+                newTriangles[triangleIdx + 1] = newVertexLength - 1;
+                newTriangles[triangleIdx + 2]  = edgeList[edgeIdx].vtx2;
+            }
+            else
+            {
+                newTriangles.Add(triangleIdx, newVertexLength);
+                newTriangles.Add(triangleIdx + 1, newVertexLength - 1);
+                newTriangles.Add(triangleIdx + 2, edgeList[edgeIdx].vtx2);
+            }
             newTriangles.Add(triangleCount++, newVertexLength);
             newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx2);
             newTriangles.Add(triangleCount++, notEdgeVertex);
@@ -300,7 +308,6 @@ public class DivideTriangle : MonoBehaviour
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
             newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
         }
-        
 
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
@@ -322,7 +329,7 @@ public class DivideTriangle : MonoBehaviour
 
         if(isBoundary)
         {
-
+            Debug.Log("DivideTrianglesClockWise");
             Dictionary<int, Vector3> newVertices = BoundaryCutManager.Instance.newVertices;
             Dictionary<int, int> newTriangles = BoundaryCutManager.Instance.newTriangles;
             if (newTriangles.ContainsKey(triangleIdx))
@@ -387,6 +394,7 @@ public class DivideTriangle : MonoBehaviour
         int newVertexLength;
         if (isBoundary)
         {
+            Debug.Log("DivideTrianglesCounterClockWise");
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
             newVertexLength = MeshManager.Instance.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
         }
