@@ -383,6 +383,7 @@ public class TouchInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+#if UNITY_STANDALONE_WIN
         float wheel = Input.GetAxis("Mouse ScrollWheel");
         // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
         transform.localScale += Vector3.one * (wheel * 0.8f);
@@ -409,7 +410,7 @@ public class TouchInput : MonoBehaviour
             transform.position += Vector3.up * (yPos*2f);
 
         }
-
+#endif
 
 
 

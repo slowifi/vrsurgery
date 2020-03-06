@@ -21,6 +21,7 @@ public class CHD : MonoBehaviour
     // test
     public bool isFirstPatch = true;
     public bool isPatchUpdate = false;
+    public bool isTestMode = true;
 
     public bool isDoubleFace = true;
 
@@ -205,6 +206,10 @@ public class CHD : MonoBehaviour
                 Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
                 PatchManager.Instance.AddVertex(vertexPosition);
             }
+        }
+        else if(isTestMode)
+        {
+
         }
     }
 

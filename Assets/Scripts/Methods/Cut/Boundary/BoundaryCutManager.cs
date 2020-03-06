@@ -81,7 +81,8 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         int triangleIndex = startTriangleIndex;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Vector3[] worldVertices = AdjacencyList.Instance.worldPositionVertices;
-
+        
+        // 100줄따리에서 문제점을 못찾다니 말이나 되는소린가 진짜
         // start
         // 여기서 이제 edge index랑 찾기를 해야됨.
         if (isStartFromVtx)
@@ -89,7 +90,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             Vector3 intersectionTemp = Vector3.zero;
             var connectedTriangles = AdjacencyList.Instance.connectedTriangles;
             Vector3 screenMiddlePoint = Vector3.Lerp(startScreenRay.origin, endScreenRay.origin, 0.5f);
-            Debug.Log(connectedTriangles[startVertexIndex].Count);
+            
             foreach (var item in connectedTriangles[startVertexIndex])
             {
                 //item : triangle index
@@ -292,6 +293,12 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         int triangleIndex = startTriangleIndex;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Vector3[] worldVertices = AdjacencyList.Instance.worldPositionVertices;
+
+
+        // 도대체 문제점이 뭘까 알 수가 없네.
+        
+
+
 
         // start
         // 여기서 이제 edge index랑 찾기를 해야됨.
