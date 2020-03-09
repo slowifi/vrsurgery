@@ -97,9 +97,9 @@ public class CHD : MonoBehaviour
                         BoundaryCutManager.Instance.SetStartVertices(ray, startVertexPosition, startTriangleIndex);
                         oldPosition = startVertexPosition;
                         firstPosition = oldPosition;
-                        //GameObject v_test = new GameObject();
-                        //v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        //v_test.transform.position = startVertexPosition;
+                        GameObject v_test = new GameObject();
+                        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        v_test.transform.position = startVertexPosition;
                         boundaryCount++;
                     }
                     else
@@ -112,9 +112,10 @@ public class CHD : MonoBehaviour
                     Vector3 currentPosition = Vector3.zero;
                     if(IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition))
                     {
-                        if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 3.0f)
+                        if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 4.0f)
                         {
-                            AdjacencyList.Instance.ListUpdate();
+                            AdjacencyList.Instance.ListUpdateOnlyTriangles();
+                            //AdjacencyList.Instance.ListUpdate();
                             //ChatManager.Instance.GenerateMessage("마지막 처음과 가까워짐.");
                             BoundaryCutManager.Instance.ResetIndex();
                             BoundaryCutManager.Instance.SetEndVtxToStartVtx();
@@ -129,13 +130,14 @@ public class CHD : MonoBehaviour
                             //ChatManager.Instance.GenerateMessage("첫 진입 후 생성");
                             //BoundaryCutManager.Instance.ResetIndex(); 
 
-                            //GameObject v_test = new GameObject();
-                            //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                            //v_test.transform.position = currentPosition;
+                            GameObject v_test = new GameObject();
+                            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                            v_test.transform.position = currentPosition;
                             BoundaryCutManager.Instance.SetEndVertices();
                             BoundaryCutManager.Instance.SetDividingList();
                             BoundaryCutManager.Instance.ExecuteDividing();
-                            AdjacencyList.Instance.ListUpdate();
+                            //AdjacencyList.Instance.ListUpdate();
+                            AdjacencyList.Instance.ListUpdateOnlyTriangles();
                             oldPosition = currentPosition;
                             boundaryCount++;
                             isFirstPatch = true;
@@ -161,7 +163,8 @@ public class CHD : MonoBehaviour
                             BoundaryCutManager.Instance.SetEndVertices();
                             BoundaryCutManager.Instance.SetDividingList();
                             BoundaryCutManager.Instance.ExecuteDividing();
-                            AdjacencyList.Instance.ListUpdate();
+                            //AdjacencyList.Instance.ListUpdate();
+                            AdjacencyList.Instance.ListUpdateOnlyTriangles();
                             oldPosition = currentPosition;
                             boundaryCount++;
                         }

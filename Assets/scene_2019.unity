@@ -4105,6 +4105,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: PartialModel
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: e3f3356a038b7d54ea0a20b7298f724a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -5975033157549033438, guid: e3f3356a038b7d54ea0a20b7298f724a,
         type: 3}
       propertyPath: m_LocalPosition.y

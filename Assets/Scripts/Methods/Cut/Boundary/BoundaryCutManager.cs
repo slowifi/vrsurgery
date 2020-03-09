@@ -76,7 +76,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
     {
         int side = 0;
         int edgeIdx = -1;
-
+        //AdjacencyList.Instance.connectedTriangles[1].Remove();
         Vector3 edgePoint = Vector3.zero;
         int triangleIndex = startTriangleIndex;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
@@ -135,22 +135,6 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                         checkIntersection2 = false;
                     //edgeIdx = item + 2;
                 }
-
-                //if (checkIntersection = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item].vtx1], worldVertices[edgeList[item].vtx2] - worldVertices[edgeList[item].vtx1], ref intersectionTemp))
-                //{
-                //    count++;
-                //    edgeIdx = item;
-                //}
-                //if (checkIntersection1 = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item + 1].vtx1], worldVertices[edgeList[item + 1].vtx2] - worldVertices[edgeList[item + 1].vtx1], ref intersectionTemp))
-                //{
-                //    count++;
-                //    edgeIdx = item + 1;
-                //}
-                //if (checkIntersection2 = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item + 2].vtx1], worldVertices[edgeList[item + 2].vtx2] - worldVertices[edgeList[item + 2].vtx1], ref intersectionTemp))
-                //{
-                //    count++;
-                //    edgeIdx = item + 2;
-                //}
 
                 if (checkIntersection || checkIntersection1 || checkIntersection2)
                 {
