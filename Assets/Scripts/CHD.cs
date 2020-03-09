@@ -97,6 +97,9 @@ public class CHD : MonoBehaviour
                         BoundaryCutManager.Instance.SetStartVertices(ray, startVertexPosition, startTriangleIndex);
                         oldPosition = startVertexPosition;
                         firstPosition = oldPosition;
+                        GameObject v_test = new GameObject();
+                        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        v_test.transform.position = startVertexPosition;
                         boundaryCount++;
                     }
                     else
@@ -119,7 +122,7 @@ public class CHD : MonoBehaviour
                             BoundaryCutManager.Instance.ExecuteDividing();
                             isBoundaryCutMode = false;
                         }
-                        else if (Vector3.Distance(currentPosition, oldPosition) < 5.0f)
+                        else if (Vector3.Distance(currentPosition, oldPosition) < 8.0f)
                             return;
                         else if (boundaryCount == 1)
                         {

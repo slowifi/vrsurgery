@@ -81,20 +81,25 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         int triangleIndex = startTriangleIndex;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Vector3[] worldVertices = AdjacencyList.Instance.worldPositionVertices;
-        
+
         // 100줄따리에서 문제점을 못찾다니 말이나 되는소린가 진짜
         // start
         // 여기서 이제 edge index랑 찾기를 해야됨.
+
         if (isStartFromVtx)
         {
             Vector3 intersectionTemp = Vector3.zero;
             var connectedTriangles = AdjacencyList.Instance.connectedTriangles;
             Vector3 screenMiddlePoint = Vector3.Lerp(startScreenRay.origin, endScreenRay.origin, 0.5f);
-            
+            // 찾을때 어떻게 찾는지 보고 그 다음 거의 다 왔음.
             foreach (var item in connectedTriangles[startVertexIndex])
             {
                 //item : triangle index
                 bool checkIntersection = false;
+                //bool checkIntersection1 = false;
+                //bool checkIntersection2 = false;
+                int count = 0;
+                //여기서 그럼 두개이상 겹치는게 있는지 판단을 해볼까 ?
                 if (edgeList[item].vtx1 != startVertexIndex && edgeList[item].vtx2 != startVertexIndex)
                 {
                     checkIntersection = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item].vtx1], worldVertices[edgeList[item].vtx2] - worldVertices[edgeList[item].vtx1], ref intersectionTemp);
@@ -111,10 +116,45 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                     edgeIdx = item + 2;
                 }
 
-                if(checkIntersection)
+                //if (checkIntersection = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item].vtx1], worldVertices[edgeList[item].vtx2] - worldVertices[edgeList[item].vtx1], ref intersectionTemp))
+                //{
+                //    count++;
+                //    edgeIdx = item;
+                //}
+                //if (checkIntersection = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item + 1].vtx1], worldVertices[edgeList[item + 1].vtx2] - worldVertices[edgeList[item + 1].vtx1], ref intersectionTemp))
+                //{
+                //    count++;
+                //    edgeIdx = item + 1;
+                //}
+                //if (checkIntersection = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item + 2].vtx1], worldVertices[edgeList[item + 2].vtx2] - worldVertices[edgeList[item + 2].vtx1], ref intersectionTemp))
+                //{
+                //    count++;
+                //    edgeIdx = item + 2;
+                //}
+
+                if (checkIntersection)
                 {
+                    if (count >= 2)
+                    {
+                        Debug.Log("몇개나 겹치는지 보자");
+                        Debug.Log(count);
+                        Debug.Break();
+                    }
                     edgePoint = intersectionTemp;
                     triangleIndex = item;
+
+                    //GameObject v_test = new GameObject();
+                    //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    //v_test.transform.position = intersectionTemp;
+
+                    //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    //v_test.transform.position = MeshManager.Instance.mesh.vertices[MeshManager.Instance.mesh.triangles[item]];
+
+                    //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    //v_test.transform.position = MeshManager.Instance.mesh.vertices[MeshManager.Instance.mesh.triangles[item+1]];
+
+                    //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    //v_test.transform.position = MeshManager.Instance.mesh.vertices[MeshManager.Instance.mesh.triangles[item+2]];
                     break;
                 }
             }
@@ -181,7 +221,11 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                 break;
             }
 
+            // 여기서 처음 start from vtx로 들어옴에서 
+
             side = IntersectionManager.Instance.TriangleEdgeIntersection(ref edgeIdx, ref edgePoint, startVertexPosition, endVertexPosition, ref triangleIndex, startScreenRay, endScreenRay);
+            // 여기서 계속 side를 정하지 못해서 에러가 생기는데 문제네 문제
+
             if (side == 0 || side == -1)
                 Debug.Break();
             if (side == 2)

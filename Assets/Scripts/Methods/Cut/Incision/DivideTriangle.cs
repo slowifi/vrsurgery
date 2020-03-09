@@ -65,8 +65,8 @@ public class DivideTriangle : MonoBehaviour
     public void DivideTrianglesStartFromVtx(int startVtxIndex, Vector3 newEdgeVertexPosition, int triangleIdx, int edgeIdx, ref int triangleCount)
     {
         int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
-        int newVertexLength = MeshManager.Instance.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
-        Debug.Log("start from vtx");
+        int newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
+        
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
 
@@ -94,7 +94,7 @@ public class DivideTriangle : MonoBehaviour
     public void DivideTrianglesEndToVtx(int endVtxIndex, int triangleIdx, ref int triangleCount, int edgeIdx)
     {
         int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
-        int newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
+        int newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
 
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
@@ -126,12 +126,12 @@ public class DivideTriangle : MonoBehaviour
         if (isBoundary)
         {
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
-            newVertexLength = MeshManager.Instance.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
+            newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
         }
         else
         {
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
-            newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
+            newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
         }
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
@@ -211,12 +211,12 @@ public class DivideTriangle : MonoBehaviour
         if (isBoundary)
         {
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
-            newVertexLength = MeshManager.Instance.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
+            newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
         }
         else
         {
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
-            newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
+            newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
         }
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
@@ -301,12 +301,12 @@ public class DivideTriangle : MonoBehaviour
         if (isBoundary)
         {
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
-            newVertexLength = MeshManager.Instance.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
+            newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
         }
         else
         {
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
-            newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
+            newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
         }
 
         Transform objTransform = ObjManager.Instance.objTransform;
@@ -396,12 +396,12 @@ public class DivideTriangle : MonoBehaviour
         {
             Debug.Log("DivideTrianglesCounterClockWise");
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
-            newVertexLength = MeshManager.Instance.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
+            newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
         }
         else
         {
             newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
-            newVertexLength = MeshManager.Instance.vertexCount + IncisionManager.Instance.newVertices.Count;
+            newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
         }
 
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
