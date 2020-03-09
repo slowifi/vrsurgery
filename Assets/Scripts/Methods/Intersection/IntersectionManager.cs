@@ -374,7 +374,8 @@ public class IntersectionManager : Singleton<IntersectionManager>
         Vector3 screenMiddlePoint = Vector3.Lerp(screenStartRay.origin, screenEndRay.origin, 0.5f);
 
         Vector3[] vertices = MeshManager.Instance.mesh.vertices;
-
+        // 여기를 다시 한 번 보자.
+        int intersectionCount = 0;
         for (int i = 0; i < 3; i++)
         {
             bool checkIntersection = true;
@@ -384,7 +385,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
 
             if (RayTriangleIntersection(screenMiddlePoint, incisionStartPoint + screenStartRay.direction * 10, incisionEndPoint + screenEndRay.direction * 10, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1], ref intersectionTemp))
             {
-                intersectionPoint = intersectionTemp;
+                //intersectionPoint = intersectionTemp;
                 if (!(intersectionTemp.x <= Mathf.Min(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)) && !(intersectionTemp.x >= Mathf.Max(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)))
                 {
                     intersectionPoint = intersectionTemp;
@@ -398,13 +399,14 @@ public class IntersectionManager : Singleton<IntersectionManager>
 
             if (checkIntersection)
             {
+                intersectionCount++;
                 edgeIdx = incisionTriangleIndex + i;
                 incisionTriangleIndex = edgeList[edgeIdx].tri2;
                 edgePoint = intersectionPoint;
                 break;
             }
         }
-
+        
         if (currentEdgeIndex == -1)
         {
             
@@ -427,6 +429,9 @@ public class IntersectionManager : Singleton<IntersectionManager>
             // clockwise
             return 2;
         }
+        Debug.Log(edgeIdx);
+        Debug.Log(currentEdgeIndex);
+        Debug.Log(intersectionCount);
         int[] triangles = MeshManager.Instance.mesh.triangles;
         GameObject v_test = new GameObject();
         v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);

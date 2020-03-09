@@ -122,12 +122,12 @@ public class CHD : MonoBehaviour
                             BoundaryCutManager.Instance.ExecuteDividing();
                             isBoundaryCutMode = false;
                         }
-                        else if (Vector3.Distance(currentPosition, oldPosition) < 8.0f)
+                        else if (Vector3.Distance(currentPosition, oldPosition) < 4.0f)
                             return;
                         else if (boundaryCount == 1)
                         {
                             //ChatManager.Instance.GenerateMessage("첫 진입 후 생성");
-                            //BoundaryCutManager.Instance.ResetIndex();
+                            //BoundaryCutManager.Instance.ResetIndex(); 
 
                             GameObject v_test = new GameObject();
                             v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -142,6 +142,15 @@ public class CHD : MonoBehaviour
                         }
                         else
                         {
+                            var boundaryLine = new GameObject("Boundary Line");
+                            var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
+                            Vector3 curPos = currentPosition;
+                            Vector3 oldPos = oldPosition;
+                            curPos.z += 1f;
+                            oldPos.z += 1f;
+                            lineRenderer.material.color = Color.black;
+                            lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
+
                             GameObject v_test = new GameObject();
                             v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                             v_test.transform.position = currentPosition;
