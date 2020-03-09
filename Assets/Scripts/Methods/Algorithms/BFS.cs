@@ -48,7 +48,7 @@ public class BFS : Singleton<BFS>
     {
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
-        Vector3[] worldVertices = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
         // vertex_num
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();

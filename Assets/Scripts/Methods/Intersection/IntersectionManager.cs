@@ -7,7 +7,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
     {
         float dst_min = 10000000;
         int[] triangels = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
         for (int i = 0; i < triangels.Length; i += 3)
@@ -28,7 +28,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
     {
         float dst_min = 10000000;
         int[] triangels = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
         for (int i = 0; i < triangels.Length; i += 3)
@@ -49,7 +49,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
     {
         float dst_min = 10000000;
         int[] triangels = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
         for (int i = 0; i < triangels.Length; i += 3)
@@ -73,7 +73,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
         float dst_2nd = 10000000;
 
         int[] triangels = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
         for (int i = 0; i < triangels.Length; i += 3)
@@ -118,7 +118,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
         float dst_2nd = 10000000;
 
         int[] triangels = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
 
         Vector3 intersectionTemp = Vector3.zero;
 
@@ -164,7 +164,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
         float dst_2nd = 10000000;
 
         int[] triangels = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
 
         //Vector3 intersectionInnerPoint = Vector3.zero;
         //Vector3 intersectionOuterPoint = Vector3.zero;
@@ -211,7 +211,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
     {
         float dst_min = 10000000;
         int[] triangels = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
         for (int i = 0; i < triangels.Length; i += 3)
@@ -234,7 +234,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
     {
         float dst_min = 10000000;
         int[] triangels = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
         for (int i = 0; i < triangels.Length; i += 3)
@@ -260,7 +260,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
     {
         float dst_min = 10000000;
         int[] triangels = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
         for (int i = 0; i < triangels.Length; i += 3)
@@ -364,7 +364,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
     {
         // return side number : 1, 2, 0 / 1 : couter-clockwise, 2 : clockwise, 0 : 첫 시작, -1 : error 반환
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
-        Vector3[] worldVertices = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
 
         int currentEdgeIndex = edgeIdx;
 

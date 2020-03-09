@@ -7,7 +7,7 @@ public class AdjacencyList : Singleton<AdjacencyList>
     public Dictionary<int, HashSet<int>> connectedVertices;
     public Dictionary<int, HashSet<int>> connectedTriangles;
     public List<Edge> edgeList;
-    public Vector3[] worldPositionVertices;
+    public List<Vector3> worldPositionVertices;
 
     public class Edge
     {
@@ -42,9 +42,9 @@ public class AdjacencyList : Singleton<AdjacencyList>
 
     private void LocalToWorldPosition()
     {
-        worldPositionVertices = MeshManager.Instance.mesh.vertices;
+        worldPositionVertices = new List<Vector3>(MeshManager.Instance.mesh.vertices);
         Transform objTransform = ObjManager.Instance.objTransform;
-        for (int i = 0; i < worldPositionVertices.Length; i++)
+        for (int i = 0; i < worldPositionVertices.Count; i++)
         {
             worldPositionVertices[i] = objTransform.TransformPoint(worldPositionVertices[i]);
         }

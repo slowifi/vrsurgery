@@ -203,7 +203,7 @@ public class IncisionManager : Singleton<IncisionManager>
         AdjacencyList.Instance.ListUpdate();
         int[] triangles = MeshManager.Instance.mesh.triangles;
         Vector3[] vertices = MeshManager.Instance.mesh.vertices;
-        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         // 이거 버텍스 정해주는게 좋긴함.
         // bfs 돌리는 순서를 안쪽부터 해주는게 좋음. leftside의 array가 bfs돌리면서 차기 때문.
         BFS.Instance.BFS_Circle(leftSide[leftSide.Count - 1], startOuterVertexPosition, endOuterVertexPosition, true);

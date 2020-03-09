@@ -80,7 +80,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         Vector3 edgePoint = Vector3.zero;
         int triangleIndex = startTriangleIndex;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
-        Vector3[] worldVertices = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
 
         // 100줄따리에서 문제점을 못찾다니 말이나 되는소린가 진짜
         // start
@@ -370,7 +370,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         Vector3 edgePoint = Vector3.zero;
         int triangleIndex = startTriangleIndex;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
-        Vector3[] worldVertices = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
 
 
         // 도대체 문제점이 뭘까 알 수가 없네.

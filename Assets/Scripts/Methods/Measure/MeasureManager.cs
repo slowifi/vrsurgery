@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+
 public class MeasureManager : Singleton<MeasureManager>
 {
     public float distanceStartToEnd = 0f;
@@ -46,7 +48,7 @@ public class MeasureManager : Singleton<MeasureManager>
     {
         float dst_min = 1000000;
         int[] triangles = MeshManager.Instance.mesh.triangles;
-        Vector3[] worldPositionVertices = AdjacencyList.Instance.worldPositionVertices;
+        List<Vector3> worldPositionVertices = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
         Vector3 intersectionPoint = Vector3.zero;
         // Debug.Log(worldPositionVertices.Length);

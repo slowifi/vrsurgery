@@ -97,9 +97,9 @@ public class CHD : MonoBehaviour
                         BoundaryCutManager.Instance.SetStartVertices(ray, startVertexPosition, startTriangleIndex);
                         oldPosition = startVertexPosition;
                         firstPosition = oldPosition;
-                        GameObject v_test = new GameObject();
-                        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        v_test.transform.position = startVertexPosition;
+                        //GameObject v_test = new GameObject();
+                        //v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        //v_test.transform.position = startVertexPosition;
                         boundaryCount++;
                     }
                     else
@@ -129,9 +129,9 @@ public class CHD : MonoBehaviour
                             //ChatManager.Instance.GenerateMessage("첫 진입 후 생성");
                             //BoundaryCutManager.Instance.ResetIndex(); 
 
-                            GameObject v_test = new GameObject();
-                            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                            v_test.transform.position = currentPosition;
+                            //GameObject v_test = new GameObject();
+                            //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                            //v_test.transform.position = currentPosition;
                             BoundaryCutManager.Instance.SetEndVertices();
                             BoundaryCutManager.Instance.SetDividingList();
                             BoundaryCutManager.Instance.ExecuteDividing();
@@ -151,10 +151,10 @@ public class CHD : MonoBehaviour
                             lineRenderer.material.color = Color.black;
                             lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
 
-                            GameObject v_test = new GameObject();
-                            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                            v_test.transform.position = currentPosition;
-                            AdjacencyList.Instance.ListUpdate();
+                            //GameObject v_test = new GameObject();
+                            //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                            //v_test.transform.position = currentPosition;
+                            //AdjacencyList.Instance.ListUpdate();
 
                             //ChatManager.Instance.GenerateMessage("중간과정");
                             BoundaryCutManager.Instance.ResetIndex();
