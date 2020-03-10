@@ -49,6 +49,7 @@ public class BFS : Singleton<BFS>
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
+        int currentIndex = IncisionManager.Instance.currentIndex;
         // vertex_num
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
@@ -103,9 +104,9 @@ public class BFS : Singleton<BFS>
                     duplicateCheck.Add(item);
                     temp.Enqueue(item);
                     if(isLeft)
-                        IncisionManager.Instance.leftSide.Add(item);
+                        IncisionManager.Instance.leftSide[currentIndex].Add(item);
                     else
-                        IncisionManager.Instance.rightSide.Add(item);
+                        IncisionManager.Instance.rightSide[currentIndex].Add(item);
                     //if (AlgorithmsManager.Instance.isLeft(startPoint, endPoint, worldVertices[item]))
                     //{
                     //    if (_left)

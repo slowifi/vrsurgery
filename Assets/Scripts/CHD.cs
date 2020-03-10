@@ -51,8 +51,8 @@ public class CHD : MonoBehaviour
 
                 if (isExtend)
                 {
-                    // 거의 다 된상태 만약 멀리있는 메쉬가 잡아진다면?
-                    IncisionManager.Instance.Extending();
+                    // 여기에 손가락 움직임에 따른 value의 변화량이 측정되면 그거 가지고 받아서 여기에 넣으면 됨.
+                    IncisionManager.Instance.Extending(0);
                     MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
                     isExtend = false;
                 }
@@ -66,7 +66,11 @@ public class CHD : MonoBehaviour
                     IncisionManager.Instance.SetEndVerticesDF();
                     IncisionManager.Instance.SetDividingListDF();
                     IncisionManager.Instance.ExecuteDividing();
+                    //MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+                    AdjacencyList.Instance.ListUpdate();
+                    IncisionManager.Instance.GenerateIncisionList();
                     MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+                    IncisionManager.Instance.currentIndex++;
                     isExtend = true;
                 }
             }

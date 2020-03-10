@@ -28,6 +28,33 @@ public class UIManager : Singleton<UIManager>
     public Button resetButton;
     public Button resetPositionScaleButton;
 
-    
     // 각각에 대한 event handle 부분 설정 필요.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

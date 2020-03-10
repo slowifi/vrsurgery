@@ -213,7 +213,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                 }
             }
 
-            _dividingMethods.DivideTrianglesStart(startVertexPosition, edgePoint, startTriangleIndex, notEdgeVertex, edgeIdx, ref triangleCount, false);
+            _dividingMethods.DivideTrianglesStartBoundary(startVertexPosition, edgePoint, startTriangleIndex, notEdgeVertex, edgeIdx, ref triangleCount, false);
         }
         int asdf = 0;
         while (true)
@@ -235,7 +235,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                 if (isEndToVtx)
                     _dividingMethods.DivideTrianglesEndToVtx(endVertexIndex, endTriangleIndex, ref triangleCount, edgeIdx);
                 else
-                    _dividingMethods.DivideTrianglesEnd(endVertexPosition, endTriangleIndex, ref triangleCount, edgeIdx, true);
+                    _dividingMethods.DivideTrianglesEndBoundary(endVertexPosition, endTriangleIndex, ref triangleCount, edgeIdx, true);
                 break;
             }
 
@@ -247,9 +247,9 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             if (side == 0 || side == -1)
                 Debug.Break();
             if (side == 2)
-                _dividingMethods.DivideTrianglesClockWise(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
+                _dividingMethods.DivideTrianglesClockWiseBoundary(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
             else if (side == 1)
-                _dividingMethods.DivideTrianglesCounterClockWise(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
+                _dividingMethods.DivideTrianglesCounterClockWiseBoundary(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
             else
             {
                 Debug.Break();
@@ -435,7 +435,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                     break;
                 }
             }
-            _dividingMethods.DivideTrianglesStart(startVertexPosition, edgePoint, startTriangleIndex, notEdgeVertex, edgeIdx, ref triangleCount, false);
+            _dividingMethods.DivideTrianglesStartBoundary(startVertexPosition, edgePoint, startTriangleIndex, notEdgeVertex, edgeIdx, ref triangleCount, false);
         }
 
         while (true)
@@ -450,16 +450,16 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                 if (isEndToVtx)
                     _dividingMethods.DivideTrianglesEndToVtx(endVertexIndex, endTriangleIndex, ref triangleCount, edgeIdx);
                 else
-                    _dividingMethods.DivideTrianglesEnd(endVertexPosition, endTriangleIndex, ref triangleCount, edgeIdx, true);
+                    _dividingMethods.DivideTrianglesEndBoundary(endVertexPosition, endTriangleIndex, ref triangleCount, edgeIdx, true);
                 break;
             }
 
             side = IntersectionManager.Instance.TriangleEdgeIntersection(ref edgeIdx, ref edgePoint, startVertexPosition, endVertexPosition, ref triangleIndex, startScreenRay, endScreenRay);
 
             if (side == 2)
-                _dividingMethods.DivideTrianglesClockWise(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
+                _dividingMethods.DivideTrianglesClockWiseBoundary(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
             else if (side == 1)
-                _dividingMethods.DivideTrianglesCounterClockWise(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
+                _dividingMethods.DivideTrianglesCounterClockWiseBoundary(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
             else
             {
                 ChatManager.Instance.GenerateMessage("Edge와 라인이 intersect 되지 않았습니다.");
