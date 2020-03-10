@@ -80,6 +80,8 @@ public class CHD : MonoBehaviour
             }
             else if(isBoundaryCutMode)
             {
+                // 무한 루프 관련해서 조정이 필요함.
+
                 if (isFirstPatch)
                 {
                     AdjacencyList.Instance.ListUpdate();

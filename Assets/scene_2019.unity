@@ -327,12 +327,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd34c52c098bbf459fb36249f4f8917, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftSide: 
-  rightSide: 
   firstOuterVertexIndex: 0
   lastOuterVertexIndex: 0
   firstInnerVertexIndex: 0
   lastInnerVertexIndex: 0
+  currentIndex: 0
 --- !u!1001 &71756834
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1156,6 +1155,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 963194227}
   objTransform: {fileID: 1150503976}
+  pivotTransform: {fileID: 732360980}
   startMeasurePoint: {fileID: 700696333}
   endMeasurePoint: {fileID: 1035688306}
 --- !u!1 &312368821
@@ -2664,7 +2664,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 732360979}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c75b896c976258649a8d9737bb6ab567, type: 3}
   m_Name: 
