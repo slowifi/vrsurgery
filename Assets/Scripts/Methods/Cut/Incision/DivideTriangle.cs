@@ -70,6 +70,7 @@ public class DivideTriangle : MonoBehaviour
         
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength);
 
         Dictionary<int, Vector3> newVertices = BoundaryCutManager.Instance.newVertices;
         Dictionary<int, int> newTriangles = BoundaryCutManager.Instance.newTriangles;
@@ -133,7 +134,8 @@ public class DivideTriangle : MonoBehaviour
         Dictionary<int, int> newTriangles = BoundaryCutManager.Instance.newTriangles;
         BoundaryCutManager.Instance.startVertexIndex = newVertexLength;
         BoundaryCutManager.Instance.firstVertexIndex = newVertexLength;
-
+        BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength);
+        BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength+1);
         newTriangles.Add(triangleIdx, newVertexLength);
         newTriangles.Add(triangleIdx + 1, edgeList[edgeIdx].vtx1);
         newTriangles.Add(triangleIdx + 2, newVertexLength + 1);
@@ -165,7 +167,7 @@ public class DivideTriangle : MonoBehaviour
 
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
-
+        BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength);
         int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)
         {
@@ -218,7 +220,7 @@ public class DivideTriangle : MonoBehaviour
         
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
-
+        BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength);
         int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)
         {
@@ -268,7 +270,7 @@ public class DivideTriangle : MonoBehaviour
 
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         Transform objTransform = ObjManager.Instance.objTransform;
-
+        BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength);
         int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)
         {

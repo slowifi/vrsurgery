@@ -44,7 +44,7 @@ public class AdjacencyList : Singleton<AdjacencyList>
     {
         MeshManager.Instance.MeshUpdate();
         connectedTriangles = new Dictionary<int, HashSet<int>>();
-        edgeList = new List<Edge>();
+        //edgeList = new List<Edge>();
 
         int vertexCount = MeshManager.Instance.mesh.vertexCount;
         int[] triangles = MeshManager.Instance.mesh.triangles;
@@ -52,6 +52,11 @@ public class AdjacencyList : Singleton<AdjacencyList>
         LocalToWorldPosition();
         ConnectedTrianglesAndEdges(vertexCount, triangles);
         //GenerateEdgeList(vertexCount, triangles);
+    }
+
+    public void WorldPositionUpdate()
+    {
+        LocalToWorldPosition();
     }
 
     private void LocalToWorldPosition()
@@ -139,7 +144,6 @@ public class AdjacencyList : Singleton<AdjacencyList>
             }
         }
     }
-
 
     private void ConnectedVerticesAndTriangles(int verticesLength, int[] triangles)
     {

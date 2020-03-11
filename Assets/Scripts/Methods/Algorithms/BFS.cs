@@ -1,25 +1,40 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class BFS : Singleton<BFS>
 {
-    public void BFS_Boundary()
+    public void BFS_Boundary(int vertex, List<int> boundaryList)
     {
         // start point부터 end point까지 겹치는 point들 전부가 boundary list에 들어가야됨.
         // 일단 incision에서 사용한 기능부터 만들어 보고
         // 여기는 그냥 BFS만 구현 하면됨.
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
-        // temp.Enqueue(vertex_num);
-        /*
-        foreach (int item in collection)
+        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
+        temp.Enqueue(vertex);
+        duplicateCheck.Add(vertex);
+        Dictionary<int, HashSet<int>> connectedVertices = AdjacencyList.Instance.connectedVertices;
+        Dictionary<int, HashSet<int>> connectedTriangles = AdjacencyList.Instance.connectedTriangles;
+        HashSet<int> removeTrianglesSet = new HashSet<int>();
+        foreach (int item in boundaryList)
         {
             duplicateCheck.Add(item);
+
+            GameObject v_test = new GameObject();
+            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            v_test.transform.position = worldVertices[item];
         }
-        
+        foreach (int item2 in connectedTriangles[vertex])
+            removeTrianglesSet.Add(item2);
+        int asdf = 0;
         while (temp.Count != 0)
         {
+            asdf++;
+            if (asdf == 500)
+                break;
+
             foreach (int item in connectedVertices[temp.Dequeue()])
             {
                 Debug.Log(item);
@@ -34,13 +49,39 @@ public class BFS : Singleton<BFS>
                 }
                 if (temp_check)
                     continue;
-
+                foreach (int item2 in connectedTriangles[item])
+                    removeTrianglesSet.Add(item2);
                 duplicateCheck.Add(item);
                 temp.Enqueue(item);
             }
         }
+
+        List<int> removeTrianglesList = removeTrianglesSet.ToList();
+        removeTrianglesList.Sort();
+        // triangles를 지울 수 있는 걸 만들어야됨.
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        int[] newTriangles = new int[triangles.Length - removeTrianglesList.Count * 3];
+        int removeCount = 0, newTriangleCount = 0;
+        for (int i = 0; i < triangles.Length; i+=3)
+        {
+            if(removeTrianglesList[removeCount] == i)
+            {
+                removeCount++;
+                if (removeCount == removeTrianglesList.Count)
+                    removeCount = 0;
+            }
+            else
+            {
+                newTriangles[newTriangleCount++] = triangles[i];
+                newTriangles[newTriangleCount++] = triangles[i+1];
+                newTriangles[newTriangleCount++] = triangles[i+2];
+            }
+        }
+
+        MeshManager.Instance.mesh.triangles = newTriangles;
+
         return;
-        */
+        
     }
     
 

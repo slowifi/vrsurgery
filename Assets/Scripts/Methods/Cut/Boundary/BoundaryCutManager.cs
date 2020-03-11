@@ -8,6 +8,11 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
     public Dictionary<int, Vector3> newVertices;
     public Dictionary<int, int> newTriangles;
 
+    public List<int> removeBoundaryVertices;
+
+    public List<Ray> rays;
+    public List<Vector3> intersectedPosition;
+
     public int firstVertexIndex;
     public int startVertexIndex;
     public int endVertexIndex;
@@ -21,7 +26,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
     private Vector3 endVertexPosition;
 
     private int firstTriangleIndex;
-    private int startTriangleIndex;
+    public int startTriangleIndex;
     private int endTriangleIndex;
 
     public bool isStartFromVtx;
@@ -41,6 +46,15 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
     }
 
     public void SetEndVtxToStartVtx()
+    {
+        endVertexPosition = firstVertexPosition;
+        endTriangleIndex = firstTriangleIndex;
+        endVertexIndex = firstVertexIndex;
+        endScreenRay = firstScreenRay;
+        isEndToVtx = true;
+    }
+
+    public void SetEndVtxToStartVtxModified()
     {
         endVertexPosition = firstVertexPosition;
         endTriangleIndex = firstTriangleIndex;
@@ -72,17 +86,24 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         isEndToVtx = false;
     }
 
+    public void SetEndVertices(Ray endRay)
+    {
+        // 여기에 라인렌더러 넣는걸
+        // 두번 중복되어있음...
+        endScreenRay = endRay;
+        IntersectionManager.Instance.GetIntersectedValues(endScreenRay, ref endVertexPosition, ref endTriangleIndex);
+        isEndToVtx = false;
+    }
+
     public void SetDividingList()
     {
         int side = 0;
         int edgeIdx = -1;
-        //AdjacencyList.Instance.connectedTriangles[1].Remove();
         Vector3 edgePoint = Vector3.zero;
         int triangleIndex = startTriangleIndex;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
 
-        // 100줄따리에서 문제점을 못찾다니 말이나 되는소린가 진짜
         // start
         // 여기서 이제 edge index랑 찾기를 해야됨.
         int intersectionCount = 0;
@@ -215,6 +236,63 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
             _dividingMethods.DivideTrianglesStartBoundary(startVertexPosition, edgePoint, startTriangleIndex, notEdgeVertex, edgeIdx, ref triangleCount, false);
         }
+
+        if (isEndToVtx)
+        {
+            //endTriangleIndex의 계산이 필요함.
+            Vector3 intersectionTemp = Vector3.zero;
+            var connectedTriangles = AdjacencyList.Instance.connectedTriangles;
+            Vector3 screenMiddlePoint = Vector3.Lerp(startScreenRay.origin, endScreenRay.origin, 0.5f);
+            foreach (var item in connectedTriangles[endVertexIndex])
+            {
+                //item : triangle index
+                bool checkIntersection = false;
+                bool checkIntersection1 = false;
+                bool checkIntersection2 = false;
+                int count = 0;
+                //여기서 그럼 두개이상 겹치는게 있는지 판단을 해볼까 ?
+                if (edgeList[item].vtx1 != endVertexIndex && edgeList[item].vtx2 != endVertexIndex)
+                {
+                    checkIntersection = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item].vtx1], worldVertices[edgeList[item].vtx2] - worldVertices[edgeList[item].vtx1], ref intersectionTemp);
+                    if (!(intersectionTemp.x <= Mathf.Min(worldVertices[edgeList[item].vtx1].x, worldVertices[edgeList[item].vtx2].x)) && !(intersectionTemp.x >= Mathf.Max(worldVertices[edgeList[item].vtx1].x, worldVertices[edgeList[item].vtx2].x)))
+                    {
+                        Debug.Log("ray triangle intersection");
+                    }
+                    else
+                        checkIntersection = false;
+                    //edgeIdx = item;
+                }
+                else if (edgeList[item + 1].vtx1 != endVertexIndex && edgeList[item + 1].vtx2 != endVertexIndex)
+                {
+                    checkIntersection1 = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item + 1].vtx1], worldVertices[edgeList[item + 1].vtx2] - worldVertices[edgeList[item + 1].vtx1], ref intersectionTemp);
+                    if (!(intersectionTemp.x <= Mathf.Min(worldVertices[edgeList[item + 1].vtx1].x, worldVertices[edgeList[item + 1].vtx2].x)) && !(intersectionTemp.x >= Mathf.Max(worldVertices[edgeList[item + 1].vtx1].x, worldVertices[edgeList[item + 1].vtx2].x)))
+                    {
+                        Debug.Log("ray triangle intersection");
+                    }
+                    else
+                        checkIntersection1 = false;
+                    //edgeIdx = item + 1;
+                }
+                else if (edgeList[item + 2].vtx1 != endVertexIndex && edgeList[item + 2].vtx2 != endVertexIndex)
+                {
+                    checkIntersection2 = IntersectionManager.Instance.RayTriangleIntersection(screenMiddlePoint, startVertexPosition + startScreenRay.direction * 10, endVertexPosition + endScreenRay.direction * 10, worldVertices[edgeList[item + 2].vtx1], worldVertices[edgeList[item + 2].vtx2] - worldVertices[edgeList[item + 2].vtx1], ref intersectionTemp);
+                    if (!(intersectionTemp.x <= Mathf.Min(worldVertices[edgeList[item + 2].vtx1].x, worldVertices[edgeList[item + 2].vtx2].x)) && !(intersectionTemp.x >= Mathf.Max(worldVertices[edgeList[item + 2].vtx1].x, worldVertices[edgeList[item + 2].vtx2].x)))
+                    {
+                        Debug.Log("ray triangle intersection");
+                    }
+                    else
+                        checkIntersection2 = false;
+                    //edgeIdx = item + 2;
+                }
+
+                if (checkIntersection || checkIntersection1 || checkIntersection2)
+                {
+                    intersectionCount++;
+                    endTriangleIndex = item;
+                    break;
+                }
+            }
+        }
         int asdf = 0;
         while (true)
         {
@@ -308,6 +386,33 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         newTriangles.Clear();
     }
 
+    public void PostProcess()
+    {
+        SetStartVertices(rays[0], intersectedPosition[0], startTriangleIndex);
+        for (int i = 1; i < rays.Count; i++)
+        {
+            if (i == 1)
+            {
+                SetEndVertices(rays[i]);
+                SetDividingList();
+                ExecuteDividing();
+                AdjacencyList.Instance.ListUpdate();
+            }
+            else
+            {
+                ResetIndex();
+                SetEndVertices(rays[i]);
+                SetDividingList();
+                ExecuteDividing();
+                AdjacencyList.Instance.ListUpdate();
+            }
+        }
+        ResetIndex();
+        SetEndVtxToStartVtx();
+        SetDividingList();
+        ExecuteDividing();
+
+    }
 
     public void ResetIndexDF()
     {
@@ -509,10 +614,11 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
         isStartFromVtx = false;
         isEndToVtx = false;
-
+        
         startScreenRay = new Ray();
         endScreenRay = new Ray();
 
+        removeBoundaryVertices.Clear();
         newVertices.Clear();
         newTriangles.Clear();
     }
@@ -531,6 +637,10 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
         startScreenRay = new Ray();
         endScreenRay = new Ray();
+        rays = new List<Ray>();
+        intersectedPosition = new List<Vector3>();
+
+        removeBoundaryVertices = new List<int>();
 
         newVertices = new Dictionary<int, Vector3>();
         newTriangles = new Dictionary<int, int>();

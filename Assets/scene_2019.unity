@@ -930,6 +930,7 @@ MonoBehaviour:
   isFirstPatch: 1
   isPatchUpdate: 0
   isTestMode: 0
+  isLastBoundaryCut: 0
   isDoubleFace: 0
 --- !u!1001 &231094222
 PrefabInstance:
@@ -2989,7 +2990,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 849121953}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, Unity.ugui, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &849121953
@@ -5760,10 +5772,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b91b7fae7b1805459351fc2d08b08d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  removeBoundaryVertices: 
+  intersectedPosition: []
   firstVertexIndex: 0
   startVertexIndex: 0
   endVertexIndex: 0
   firstVertexPosition: {x: 0, y: 0, z: 0}
+  startTriangleIndex: 0
   isStartFromVtx: 0
   isEndToVtx: 0
 --- !u!1 &1628191703

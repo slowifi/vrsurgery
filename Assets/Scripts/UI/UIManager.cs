@@ -58,6 +58,8 @@ public class UIManager : Singleton<UIManager>
             ObjManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
             ObjManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
         }
+        // 특정 움직임이 있었을 때만 업데이트 하도록 해야됨.
+        // AdjacencyList.Instance.WorldPositionUpdate();
 #endif
 
         // android용은 수정 해야됨.

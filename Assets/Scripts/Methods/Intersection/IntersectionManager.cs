@@ -3,16 +3,38 @@ using System.Collections.Generic;
 
 public class IntersectionManager : Singleton<IntersectionManager>
 {
+    public int GetIntersectedValues(Ray cameraRay)
+    {
+        float dst_min = 10000000;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        Vector3 intersectionTemp = Vector3.zero;
+        int vertexIndex = -1;
+        for (int i = 0; i < triangles.Length; i += 3)
+        {
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
+            {
+                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
+                if (dst_min > dst_temp)
+                {
+                    dst_min = dst_temp;
+                    vertexIndex = triangles[i];
+                }
+            }
+        }
+        return vertexIndex;
+    }
+
     public void GetIntersectedValues(Ray cameraRay, ref int triangleIndex)
     {
         float dst_min = 10000000;
-        int[] triangels = MeshManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
-        for (int i = 0; i < triangels.Length; i += 3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
@@ -27,13 +49,13 @@ public class IntersectionManager : Singleton<IntersectionManager>
     public void GetIntersectedValues(Ray cameraRay, ref Vector3 intersectionPoint)
     {
         float dst_min = 10000000;
-        int[] triangels = MeshManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
-        for (int i = 0; i < triangels.Length; i += 3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
@@ -48,13 +70,13 @@ public class IntersectionManager : Singleton<IntersectionManager>
     public void GetIntersectedValues(Ray cameraRay, ref Vector3 intersectionPoint, ref int triangleIndex)
     {
         float dst_min = 10000000;
-        int[] triangels = MeshManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
-        for (int i = 0; i < triangels.Length; i += 3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
@@ -72,13 +94,13 @@ public class IntersectionManager : Singleton<IntersectionManager>
         float dst_min = 10000000;
         float dst_2nd = 10000000;
 
-        int[] triangels = MeshManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
-        for (int i = 0; i < triangels.Length; i += 3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
@@ -117,14 +139,14 @@ public class IntersectionManager : Singleton<IntersectionManager>
         float dst_min = 10000000;
         float dst_2nd = 10000000;
 
-        int[] triangels = MeshManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
 
         Vector3 intersectionTemp = Vector3.zero;
 
-        for (int i = 0; i < triangels.Length; i += 3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
@@ -163,16 +185,16 @@ public class IntersectionManager : Singleton<IntersectionManager>
         float dst_min = 10000000;
         float dst_2nd = 10000000;
 
-        int[] triangels = MeshManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
 
         //Vector3 intersectionInnerPoint = Vector3.zero;
         //Vector3 intersectionOuterPoint = Vector3.zero;
         Vector3 intersectionTemp = Vector3.zero;
 
-        for (int i = 0; i < triangels.Length; i += 3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
@@ -210,13 +232,13 @@ public class IntersectionManager : Singleton<IntersectionManager>
     public bool RayObjectIntersection(Ray cameraRay)
     {
         float dst_min = 10000000;
-        int[] triangels = MeshManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
-        for (int i = 0; i < triangels.Length; i += 3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
@@ -233,13 +255,13 @@ public class IntersectionManager : Singleton<IntersectionManager>
     public bool RayObjectIntersection(Ray cameraRay, ref Vector3 intersectionPoint)
     {
         float dst_min = 10000000;
-        int[] triangels = MeshManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
-        for (int i = 0; i < triangels.Length; i += 3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
@@ -259,13 +281,13 @@ public class IntersectionManager : Singleton<IntersectionManager>
     public bool RayObjectIntersection(Ray cameraRay, ref Vector3 intersectionPoint, ref int triangleIndex)
     {
         float dst_min = 10000000;
-        int[] triangels = MeshManager.Instance.mesh.triangles;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
-        for (int i = 0; i < triangels.Length; i += 3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangels[i]], worldPosition[triangels[i + 1]], worldPosition[triangels[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
@@ -429,34 +451,34 @@ public class IntersectionManager : Singleton<IntersectionManager>
             // clockwise
             return 2;
         }
-        Debug.Log(edgeIdx);
-        Debug.Log(currentEdgeIndex);
-        Debug.Log(intersectionCount);
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        GameObject v_test = new GameObject();
-        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        v_test.transform.position = incisionStartPoint;
+        //Debug.Log(edgeIdx);
+        //Debug.Log(currentEdgeIndex);
+        //Debug.Log(intersectionCount);
+        //int[] triangles = MeshManager.Instance.mesh.triangles;
+        //GameObject v_test = new GameObject();
+        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //v_test.transform.position = incisionStartPoint;
 
-        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        v_test.transform.position = incisionEndPoint;
+        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //v_test.transform.position = incisionEndPoint;
 
-        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        v_test.transform.position = worldVertices[edgeList[edgeIdx].vtx1];
+        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //v_test.transform.position = worldVertices[edgeList[edgeIdx].vtx1];
 
-        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        v_test.transform.position = worldVertices[edgeList[edgeIdx].vtx2];
+        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //v_test.transform.position = worldVertices[edgeList[edgeIdx].vtx2];
 
 
-        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        v_test.transform.position = worldVertices[triangles[incisionTriangleIndex]];
+        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //v_test.transform.position = worldVertices[triangles[incisionTriangleIndex]];
 
-        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        v_test.transform.position = worldVertices[triangles[incisionTriangleIndex+1]];
+        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //v_test.transform.position = worldVertices[triangles[incisionTriangleIndex+1]];
 
-        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        v_test.transform.position = worldVertices[triangles[incisionTriangleIndex+2]];
+        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //v_test.transform.position = worldVertices[triangles[incisionTriangleIndex+2]];
 
-        Debug.Break();
+        //Debug.Break();
         return -1;
     }
 }
