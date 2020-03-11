@@ -388,6 +388,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
     public void PostProcess()
     {
+        // 여기에 문제가 있을 가능성이 농후
         SetStartVertices(rays[0], intersectedPosition[0], startTriangleIndex);
         for (int i = 1; i < rays.Count; i++)
         {

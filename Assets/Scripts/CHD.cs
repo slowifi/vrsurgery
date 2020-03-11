@@ -81,7 +81,6 @@ public class CHD : MonoBehaviour
             }
             else if(isBoundaryCutMode)
             {
-                // 무한 루프 관련해서 조정이 필요함.
 
                 if (isFirstPatch)
                 {
@@ -90,7 +89,7 @@ public class CHD : MonoBehaviour
                     boundaryCount = 0;
                 }
 
-                if(isLastBoundaryCut)
+                if (isLastBoundaryCut)
                 {
                     if (Input.GetMouseButtonDown(0))
                     {
@@ -130,19 +129,18 @@ public class CHD : MonoBehaviour
                     //ChatManager.Instance.GenerateMessage("첫 진입");
                     oldPosition = Vector3.zero;
                     Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-                    
+
                     Vector3 startVertexPosition = Vector3.zero;
                     int startTriangleIndex = -1;
                     if (IntersectionManager.Instance.RayObjectIntersection(ray, ref startVertexPosition, ref startTriangleIndex))
                     {
-                        BoundaryCutManager.Instance.rays.Add(ray);
+                        //BoundaryCutManager.Instance.rays.Add(ray);
                         //BoundaryCutManager.Instance.intersectedPosition.Add(startVertexPosition);
-                        BoundaryCutManager.Instance.intersectedPosition.Add(startVertexPosition);
-                        BoundaryCutManager.Instance.startTriangleIndex = startTriangleIndex;
-                        
+                        //BoundaryCutManager.Instance.startTriangleIndex = startTriangleIndex;
+
                         //// 이부분이 추후 작업에 들어가야됨.
-                        //BoundaryCutManager.Instance.SetStartVertices(ray, startVertexPosition, startTriangleIndex);
-                        //firstPosition = oldPosition;
+                        BoundaryCutManager.Instance.SetStartVertices(ray, startVertexPosition, startTriangleIndex);
+                        firstPosition = oldPosition;
 
                         GameObject v_test = new GameObject();
                         v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -156,38 +154,37 @@ public class CHD : MonoBehaviour
                         ChatManager.Instance.GenerateMessage("intersect 되지 않음.");
                     }
                 }
-                else if(Input.GetMouseButton(0))
+                else if (Input.GetMouseButton(0))
                 {
                     Vector3 currentPosition = Vector3.zero;
-                    if(IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition))
+                    if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition))
                     {
                         if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 2.5f)
                         {
-
                             //추후작업
-                            //BoundaryCutManager.Instance.ResetIndex();
-                            //BoundaryCutManager.Instance.SetEndVtxToStartVtx();
-                            //BoundaryCutManager.Instance.SetDividingList();
-                            //BoundaryCutManager.Instance.ExecuteDividing();
-                            BoundaryCutManager.Instance.PostProcess();
+                            BoundaryCutManager.Instance.ResetIndex();
+                            BoundaryCutManager.Instance.SetEndVtxToStartVtx();
+                            BoundaryCutManager.Instance.SetDividingList();
+                            BoundaryCutManager.Instance.ExecuteDividing();
+                            //BoundaryCutManager.Instance.PostProcess();
                             isLastBoundaryCut = true;
                         }
                         else if (Vector3.Distance(currentPosition, oldPosition) < 2.5f)
                             return;
                         else if (boundaryCount == 1)
                         {
-                            BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                            BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
+                            //BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                            //BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
 
                             GameObject v_test = new GameObject();
                             v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                             v_test.transform.position = currentPosition;
 
-                            ////추후 작업
-                            //BoundaryCutManager.Instance.SetEndVertices();
-                            //BoundaryCutManager.Instance.SetDividingList();
-                            //BoundaryCutManager.Instance.ExecuteDividing();
-                            //AdjacencyList.Instance.ListUpdate();
+                            //추후 작업
+                            BoundaryCutManager.Instance.SetEndVertices();
+                            BoundaryCutManager.Instance.SetDividingList();
+                            BoundaryCutManager.Instance.ExecuteDividing();
+                            AdjacencyList.Instance.ListUpdate();
 
                             oldPosition = currentPosition;
                             boundaryCount++;
@@ -204,38 +201,38 @@ public class CHD : MonoBehaviour
                             lineRenderer.material.color = Color.black;
                             lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
 
-                            BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                            BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
+                            //BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                            //BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
 
                             GameObject v_test = new GameObject();
                             v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                             v_test.transform.position = currentPosition;
                             //AdjacencyList.Instance.ListUpdate();
 
-                            ////추후 작업
-                            //BoundaryCutManager.Instance.ResetIndex();
-                            //BoundaryCutManager.Instance.SetEndVertices();
-                            //BoundaryCutManager.Instance.SetDividingList();
-                            //BoundaryCutManager.Instance.ExecuteDividing();
-                            //AdjacencyList.Instance.ListUpdate();
+                            //추후 작업
+                            BoundaryCutManager.Instance.ResetIndex();
+                            BoundaryCutManager.Instance.SetEndVertices();
+                            BoundaryCutManager.Instance.SetDividingList();
+                            BoundaryCutManager.Instance.ExecuteDividing();
+                            AdjacencyList.Instance.ListUpdate();
 
                             oldPosition = currentPosition;
                             boundaryCount++;
                         }
                     }
                 }
-                else if(Input.GetMouseButtonUp(0))
+                else if (Input.GetMouseButtonUp(0))
                 {
                     if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
                     {
-                        ////추후 작업
-                        //AdjacencyList.Instance.ListUpdate();
-                        //ChatManager.Instance.GenerateMessage("마지막 마우스 버튼 업");
-                        //BoundaryCutManager.Instance.ResetIndex();
-                        //BoundaryCutManager.Instance.SetEndVtxToStartVtx();
-                        //BoundaryCutManager.Instance.SetDividingList();
-                        //BoundaryCutManager.Instance.ExecuteDividing();
-                        BoundaryCutManager.Instance.PostProcess();
+                        //추후 작업
+                        AdjacencyList.Instance.ListUpdate();
+                        ChatManager.Instance.GenerateMessage("마지막 마우스 버튼 업");
+                        BoundaryCutManager.Instance.ResetIndex();
+                        BoundaryCutManager.Instance.SetEndVtxToStartVtx();
+                        BoundaryCutManager.Instance.SetDividingList();
+                        BoundaryCutManager.Instance.ExecuteDividing();
+                        //BoundaryCutManager.Instance.PostProcess();
                         isLastBoundaryCut = true;
                     }
                 }
