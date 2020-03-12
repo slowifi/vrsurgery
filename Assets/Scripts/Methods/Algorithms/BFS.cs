@@ -22,9 +22,9 @@ public class BFS : Singleton<BFS>
         {
             duplicateCheck.Add(item);
 
-            GameObject v_test = new GameObject();
-            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            v_test.transform.position = worldVertices[item];
+            //GameObject v_test = new GameObject();
+            //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //v_test.transform.position = worldVertices[item];
         }
         foreach (int item2 in connectedTriangles[vertex])
             removeTrianglesSet.Add(item2);
@@ -37,7 +37,7 @@ public class BFS : Singleton<BFS>
 
             foreach (int item in connectedVertices[temp.Dequeue()])
             {
-                Debug.Log(item);
+                //Debug.Log(item);
                 bool temp_check = false;
                 foreach (int check in duplicateCheck)
                 {

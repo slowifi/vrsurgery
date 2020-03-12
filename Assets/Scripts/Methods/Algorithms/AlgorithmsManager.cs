@@ -33,4 +33,14 @@ public class AlgorithmsManager : Singleton<AlgorithmsManager>
         }
         return 0;
     }
+
+    public Vector3 GetPlaneNormal(Vector3 vertexPoint1, Vector3 vertexPoint2, Vector3 vertexPoint3)
+    {
+        Vector3 crossVec1 = vertexPoint2 - vertexPoint1;
+        Vector3 crossVec2 = vertexPoint3 - vertexPoint1;
+        Vector3 planeNormal = Vector3.Cross(crossVec1, crossVec2);
+        return planeNormal;
+    }
+
+
 }

@@ -405,6 +405,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
             if (currentEdgeIndex != -1 && edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 && edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
                 continue;
 
+            // 이거 자체를 바꿔야하나?
             if (RayTriangleIntersection(screenMiddlePoint, incisionStartPoint + screenStartRay.direction * 10, incisionEndPoint + screenEndRay.direction * 10, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1], ref intersectionTemp))
             {
                 //intersectionPoint = intersectionTemp;
@@ -428,10 +429,10 @@ public class IntersectionManager : Singleton<IntersectionManager>
                 break;
             }
         }
-        
+
         if (currentEdgeIndex == -1)
         {
-            
+
             if (edgeIdx != -1)
                 return 0;
             else
@@ -480,5 +481,250 @@ public class IntersectionManager : Singleton<IntersectionManager>
 
         //Debug.Break();
         return -1;
+    }
+
+
+    public int PlaneEdgeIntersection(ref int edgeIdx, ref Vector3 edgePoint, Vector3 incisionStartPoint, Vector3 incisionEndPoint, ref int incisionTriangleIndex, Ray screenStartRay, Ray screenEndRay)
+    {
+        // return side number : 1, 2, 0 / 1 : couter-clockwise, 2 : clockwise, 0 : 첫 시작, -1 : error 반환
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
+
+        int currentEdgeIndex = edgeIdx;
+
+        Vector3 intersectionPoint = Vector3.zero;
+        Vector3 intersectionTemp = Vector3.zero;
+
+        // 이 밑에 두개 값들은 고정된 값이므로 여기서 계산하지말고 밖에서 한번만 계산해서 넘겨주는식으로.
+        Vector3 screenMiddlePoint = Vector3.Lerp(screenStartRay.origin, screenEndRay.origin, 0.5f);
+        Vector3 planeNormal = AlgorithmsManager.Instance.GetPlaneNormal(screenMiddlePoint, incisionStartPoint, incisionEndPoint);
+
+        // 여기를 다시 한 번 보자.
+        int intersectionCount = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            bool checkIntersection = true;
+
+            if (currentEdgeIndex != -1 && edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 && edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
+                continue;
+
+            //처음에 방향 설정 관련
+            if (LinePlaneIntersection(ref intersectionTemp, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2]- worldVertices[edgeList[incisionTriangleIndex + i].vtx1], planeNormal, incisionStartPoint))
+            {
+                //첫 시작에서 두개가 잡혀야됨. 버텍스에서 시작할 때가 문제인데 아닌 버텍스인경우 엣지를 아예 검사하지 말아야됨.
+                Debug.Log("line plane intersection");
+                intersectionPoint = intersectionTemp;
+            }
+            else
+                checkIntersection = false;
+
+            if (checkIntersection)
+            {
+                intersectionCount++;
+                edgeIdx = incisionTriangleIndex + i;
+                incisionTriangleIndex = edgeList[edgeIdx].tri2;
+                edgePoint = intersectionPoint;
+                break;
+            }
+        }
+
+        if (currentEdgeIndex == -1)
+        {
+
+            if (edgeIdx != -1)
+                return 0;
+            else
+            {
+                Debug.Break();
+                return -1;
+            }
+        }
+        else if (edgeList[currentEdgeIndex].vtx1 == edgeList[edgeIdx].vtx2)
+        {
+            // counter-clockwise
+            // 이게 왜 여기서 쓸 때 반대가 됐을까?
+            return 1;
+        }
+        else if (edgeList[currentEdgeIndex].vtx2 == edgeList[edgeIdx].vtx1)
+        {
+            // clockwise
+            return 2;
+        }
+        return -1;
+    }
+
+    public int PlaneEdgeIntersectionStart(ref int edgeIdx, ref Vector3 edgePoint, Vector3 incisionStartPoint, Vector3 incisionEndPoint, ref int incisionTriangleIndex, Ray screenStartRay, Ray screenEndRay)
+    {
+        // 여기서 근데 3개가 겹쳐야 정상인거 같은데?
+        // return side number : 1, 2, 0 / 1 : couter-clockwise, 2 : clockwise, 0 : 첫 시작, -1 : error 반환
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
+
+        int currentEdgeIndex = edgeIdx;
+
+        Vector3 intersectionPoint = Vector3.zero;
+        Vector3 intersectionTemp = Vector3.zero;
+
+        // 이 밑에 두개 값들은 고정된 값이므로 여기서 계산하지말고 밖에서 한번만 계산해서 넘겨주는식으로.
+        Vector3 screenMiddlePoint = Vector3.Lerp(screenStartRay.origin, screenEndRay.origin, 0.5f);
+        Vector3 planeNormal = AlgorithmsManager.Instance.GetPlaneNormal(screenMiddlePoint, incisionStartPoint, incisionEndPoint);
+
+        // 여기를 다시 한 번 보자.
+        int intersectionCount = 0;
+        float distance = 1000000;
+        for (int i = 0; i < 3; i++)
+        {
+            bool checkIntersection = true;
+
+            if (currentEdgeIndex != -1 && edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 && edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
+                continue;
+
+            //처음에 방향 설정 관련
+            if (LinePlaneIntersectionModified(ref intersectionTemp, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1], planeNormal, incisionStartPoint))
+            {
+                //첫 시작에서 두개가 잡혀야됨. 버텍스에서 시작할 때가 문제인데 아닌 버텍스인경우 엣지를 아예 검사하지 말아야됨.
+                Debug.Log("line plane intersection");
+                intersectionPoint = intersectionTemp;
+            }
+            else
+                checkIntersection = false;
+
+            if (checkIntersection)
+            {
+                float curDistance = Vector3.Distance(intersectionPoint, incisionEndPoint);
+                if(curDistance<distance)
+                {
+                    distance = curDistance;
+                    edgeIdx = incisionTriangleIndex + i;
+                    incisionTriangleIndex = edgeList[edgeIdx].tri2;
+                    edgePoint = intersectionPoint;
+                }
+            }
+        }
+
+        if (currentEdgeIndex == -1)
+        {
+
+            if (edgeIdx != -1)
+                return 0;
+            else
+            {
+                Debug.Break();
+                return -1;
+            }
+        }
+        else if (edgeList[currentEdgeIndex].vtx1 == edgeList[edgeIdx].vtx2)
+        {
+            // counter-clockwise
+            // 이게 왜 여기서 쓸 때 반대가 됐을까?
+            return 1;
+        }
+        else if (edgeList[currentEdgeIndex].vtx2 == edgeList[edgeIdx].vtx1)
+        {
+            // clockwise
+            return 2;
+        }
+        return -1;
+    }
+
+    public bool LinePlaneIntersection(ref Vector3 intersectionPoint, Vector3 linePoint, Vector3 lineVec, Vector3 planeNormal, Vector3 planePoint)
+    {
+        float length;
+        float dotNumerator;
+        float dotDenominator;
+        Vector3 vector;
+
+        //calculate the distance between the linePoint and the line-plane intersection point
+        dotNumerator = Vector3.Dot((planePoint - linePoint), planeNormal);
+        dotDenominator = Vector3.Dot(lineVec, planeNormal);
+
+        //line and plane are not parallel
+        if (dotDenominator != 0.0f)
+        {
+            length = dotNumerator / dotDenominator;
+
+            //create a vector from the linePoint to the intersection point
+
+            vector = Vector3.Normalize(lineVec) * length;
+
+            //get the coordinates of the line-plane intersection point
+            intersectionPoint = linePoint + vector;
+
+            // 이 경우는 점에 딱 맞는 경우는 없다고 가정한다.
+            if (linePoint.x == (linePoint + lineVec).x)
+            {
+                if (intersectionPoint.y < linePoint.y)
+                {
+                    if (intersectionPoint.y > (linePoint + lineVec).y)
+                        return true;
+                    else
+                        return false;
+                }
+                else if (intersectionPoint.y > linePoint.y)
+                {
+                    if (intersectionPoint.y < (linePoint + lineVec).y)
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                if (intersectionPoint.x < linePoint.x)
+                {
+                    if (intersectionPoint.x > (linePoint + lineVec).x)
+                        return true;
+                    else
+                        return false;
+                }
+                else if (intersectionPoint.x > linePoint.x)
+                {
+                    if (intersectionPoint.x < (linePoint + lineVec).x)
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                    return false;
+            }
+        }
+
+        //output not valid
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool LinePlaneIntersectionModified(ref Vector3 intersectionPoint, Vector3 linePoint, Vector3 lineVec, Vector3 planeNormal, Vector3 planePoint)
+    {
+        float denom = Vector3.Dot(planeNormal, lineVec);
+        if (Mathf.Abs(denom) > 0.0001f) // your favorite epsilon
+        {
+            float t = Vector3.Dot( (planePoint - linePoint), planeNormal) / denom;
+            if (t >= 0)
+            {
+                intersectionPoint = linePoint + t * lineVec;
+                if(intersectionPoint.x < linePoint.x)
+                {
+                    if (intersectionPoint.x > (linePoint + lineVec).x)
+                        return true;
+                    else
+                        return false;
+                }
+                else if(intersectionPoint.x > linePoint.x)
+                {
+                    if (intersectionPoint.x < (linePoint + lineVec).x)
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                    return false; // you might want to allow an epsilon here too
+            }
+        }
+        return false;
     }
 }

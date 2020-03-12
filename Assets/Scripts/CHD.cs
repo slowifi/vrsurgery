@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class CHD : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class CHD : MonoBehaviour
     public Vector3 firstPosition;
     public Vector3 oldPosition;
 
+    // line renderer
+    public List<GameObject> lineRenderers;
+
 
     // test
     public bool isFirstPatch = true;
@@ -24,22 +28,64 @@ public class CHD : MonoBehaviour
     public bool isTestMode = true;
     public bool isLastBoundaryCut = false;
 
-    public bool isDoubleFace = true;
+
+    public void CutMode()
+    {
+        isCutMode = true;
+        isBoundaryCutMode = true;
+        isMeasureMode = false;
+        isPatchMode = false;
+        isIncisionMode = false;
+        isExtend = false;
+    }
+
+    public void PatchMode()
+    {
+
+    }
+
+    public void MeasureMode()
+    {
+
+    }
+
+    public void IncisionMode()
+    {
+
+    }
+
+    public void Exit()
+    {
+
+    }
+
+
+
+
+
 
     void Start()
     {
         ObjManager.Instance.ObjUpdate();
-        // MeshManager.Instance.Initialize();
+        MeshManager.Instance.Initialize();
         AdjacencyList.Instance.Initialize();
         PatchManager.Instance.Initialize();
         IncisionManager.Instance.Initialize();
         BoundaryCutManager.Instance.Initialize();
         MakeDoubleFaceMesh.Instance.Initialize();
+        lineRenderers = new List<GameObject>();
         boundaryCount = 0;
     }
 
     void Update()
     {
+        if(Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
+        {
+            AdjacencyList.Instance.WorldPositionUpdate();
+            if (!IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
+                return;
+        }
+        
         if(isCutMode)
         {
             if(isIncisionMode)
@@ -81,50 +127,46 @@ public class CHD : MonoBehaviour
             }
             else if(isBoundaryCutMode)
             {
+                // 조건을 잘 짜야됨.
 
                 if (isFirstPatch)
                 {
+                    MeshManager.Instance.SaveCurrentMesh();
                     AdjacencyList.Instance.ListUpdate();
                     isFirstPatch = false;
                     boundaryCount = 0;
+                    return;
                 }
 
                 if (isLastBoundaryCut)
                 {
                     if (Input.GetMouseButtonDown(0))
                     {
+                        for (int i = 0; i < lineRenderers.Count; i++)
+                            Destroy(lineRenderers[i]);
+                        lineRenderers.Clear();
                         AdjacencyList.Instance.ListUpdate();
+
                         int vertexIndex = IntersectionManager.Instance.GetIntersectedValues(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
                         if (vertexIndex == -1)
                             return;
                         else
                             BFS.Instance.BFS_Boundary(vertexIndex, BoundaryCutManager.Instance.removeBoundaryVertices);
                         MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+                        MeshManager.Instance.SaveCurrentMesh();
+                        //MeshManager.Instance.LoadOldMesh();
+                        BoundaryCutManager.Instance.BoundaryCutUpdate();
                         isLastBoundaryCut = false;
                         isBoundaryCutMode = false;
-                        return;
+                        isFirstPatch = true;
                     }
+                    return;
                 }
 
-                // 일단 모든 정보들 다 받아놓고, 그 다음에 하나씩 진행하도록 대신 다음 triangle index를 찾는문제에서 그때그때 검색을 해줘야함. 그 포지션에 무슨 트라이앵글이 존재하는지에 대해 ray의 벡터도 저장을 해서 다시 한번 쏴주는게 답일듯. 생성된 네개의 트라이앵글 중에 하나가 그거니깐
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                //조건짜는게 까다로움.
+                
                 if (Input.GetMouseButtonDown(0))
                 {
+                    AdjacencyList.Instance.ListUpdate();
                     boundaryCount = 0;
                     //ChatManager.Instance.GenerateMessage("첫 진입");
                     oldPosition = Vector3.zero;
@@ -134,19 +176,19 @@ public class CHD : MonoBehaviour
                     int startTriangleIndex = -1;
                     if (IntersectionManager.Instance.RayObjectIntersection(ray, ref startVertexPosition, ref startTriangleIndex))
                     {
-                        //BoundaryCutManager.Instance.rays.Add(ray);
-                        //BoundaryCutManager.Instance.intersectedPosition.Add(startVertexPosition);
-                        //BoundaryCutManager.Instance.startTriangleIndex = startTriangleIndex;
+                        BoundaryCutManager.Instance.rays.Add(ray);
+                        BoundaryCutManager.Instance.intersectedPosition.Add(startVertexPosition);
+                        BoundaryCutManager.Instance.startTriangleIndex = startTriangleIndex;
 
                         //// 이부분이 추후 작업에 들어가야됨.
-                        BoundaryCutManager.Instance.SetStartVertices(ray, startVertexPosition, startTriangleIndex);
-                        firstPosition = oldPosition;
+                        //BoundaryCutManager.Instance.SetStartVertices(ray, startVertexPosition, startTriangleIndex);
 
-                        GameObject v_test = new GameObject();
-                        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        v_test.transform.position = startVertexPosition;
+                        //GameObject v_test = new GameObject();
+                        //v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        //v_test.transform.position = startVertexPosition;
 
                         oldPosition = startVertexPosition;
+                        firstPosition = oldPosition;
                         boundaryCount++;
                     }
                     else
@@ -159,41 +201,33 @@ public class CHD : MonoBehaviour
                     Vector3 currentPosition = Vector3.zero;
                     if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition))
                     {
-                        if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 2.5f)
+                        if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 3f*ObjManager.Instance.pivotTransform.lossyScale.z)
                         {
                             //추후작업
-                            BoundaryCutManager.Instance.ResetIndex();
-                            BoundaryCutManager.Instance.SetEndVtxToStartVtx();
-                            BoundaryCutManager.Instance.SetDividingList();
-                            BoundaryCutManager.Instance.ExecuteDividing();
-                            //BoundaryCutManager.Instance.PostProcess();
+                            //BoundaryCutManager.Instance.ResetIndex();
+                            //BoundaryCutManager.Instance.SetEndVtxToStartVtx();
+                            //BoundaryCutManager.Instance.SetDividingList();
+                            //BoundaryCutManager.Instance.ExecuteDividing();
+                            lineRenderers.Add(new GameObject("Boundary Line", typeof(LineRenderer)));
+                            var lineRenderer = lineRenderers[boundaryCount - 1].GetComponent<LineRenderer>();
+                            Vector3 curPos = firstPosition;
+                            Vector3 oldPos = oldPosition;
+                            curPos.z += 1f;
+                            oldPos.z += 1f;
+                            lineRenderer.material.color = Color.black;
+                            lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
+
+                            BoundaryCutManager.Instance.PostProcess();
                             isLastBoundaryCut = true;
                         }
-                        else if (Vector3.Distance(currentPosition, oldPosition) < 2.5f)
+                        else if (Vector3.Distance(currentPosition, oldPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
                             return;
                         else if (boundaryCount == 1)
                         {
-                            //BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                            //BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
-
-                            GameObject v_test = new GameObject();
-                            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                            v_test.transform.position = currentPosition;
-
-                            //추후 작업
-                            BoundaryCutManager.Instance.SetEndVertices();
-                            BoundaryCutManager.Instance.SetDividingList();
-                            BoundaryCutManager.Instance.ExecuteDividing();
-                            AdjacencyList.Instance.ListUpdate();
-
-                            oldPosition = currentPosition;
-                            boundaryCount++;
-                            //isFirstPatch = true;
-                        }
-                        else
-                        {
-                            var boundaryLine = new GameObject("Boundary Line");
-                            var lineRenderer = boundaryLine.AddComponent<LineRenderer>();
+                            BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                            BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
+                            lineRenderers.Add(new GameObject("Boundary Line", typeof(LineRenderer)));
+                            var lineRenderer = lineRenderers[0].GetComponent<LineRenderer>();
                             Vector3 curPos = currentPosition;
                             Vector3 oldPos = oldPosition;
                             curPos.z += 1f;
@@ -201,20 +235,23 @@ public class CHD : MonoBehaviour
                             lineRenderer.material.color = Color.black;
                             lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
 
-                            //BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                            //BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
+                            oldPosition = currentPosition;
+                            boundaryCount++;
+                        }
+                        else
+                        {
+                            // 생성했던거를 그려지면 바로 지워지는 식으로 하면 되려나?
+                            lineRenderers.Add(new GameObject("Boundary Line", typeof(LineRenderer)));
+                            var lineRenderer = lineRenderers[boundaryCount - 1].GetComponent<LineRenderer>();
+                            Vector3 curPos = currentPosition;
+                            Vector3 oldPos = oldPosition;
+                            curPos.z += 1f;
+                            oldPos.z += 1f;
+                            lineRenderer.material.color = Color.black;
+                            lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
 
-                            GameObject v_test = new GameObject();
-                            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                            v_test.transform.position = currentPosition;
-                            //AdjacencyList.Instance.ListUpdate();
-
-                            //추후 작업
-                            BoundaryCutManager.Instance.ResetIndex();
-                            BoundaryCutManager.Instance.SetEndVertices();
-                            BoundaryCutManager.Instance.SetDividingList();
-                            BoundaryCutManager.Instance.ExecuteDividing();
-                            AdjacencyList.Instance.ListUpdate();
+                            BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                            BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
 
                             oldPosition = currentPosition;
                             boundaryCount++;
@@ -225,14 +262,16 @@ public class CHD : MonoBehaviour
                 {
                     if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
                     {
-                        //추후 작업
-                        AdjacencyList.Instance.ListUpdate();
-                        ChatManager.Instance.GenerateMessage("마지막 마우스 버튼 업");
-                        BoundaryCutManager.Instance.ResetIndex();
-                        BoundaryCutManager.Instance.SetEndVtxToStartVtx();
-                        BoundaryCutManager.Instance.SetDividingList();
-                        BoundaryCutManager.Instance.ExecuteDividing();
-                        //BoundaryCutManager.Instance.PostProcess();
+                        lineRenderers.Add(new GameObject("Boundary Line", typeof(LineRenderer)));
+                        var lineRenderer = lineRenderers[boundaryCount - 1].GetComponent<LineRenderer>();
+                        Vector3 curPos = firstPosition;
+                        Vector3 oldPos = oldPosition;
+                        curPos.z += 1f;
+                        oldPos.z += 1f;
+                        lineRenderer.material.color = Color.black;
+                        lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
+
+                        BoundaryCutManager.Instance.PostProcess();
                         isLastBoundaryCut = true;
                     }
                 }
