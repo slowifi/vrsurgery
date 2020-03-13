@@ -8,8 +8,12 @@ public class CHD : MonoBehaviour
     public bool isMeasureMode = false;
     public bool isPatchMode = false;
 
+
+
     public bool isIncisionMode = false;
     public bool isExtend = false;
+    private float oldExtendValue;
+
 
     public bool isEraseMode = false;
 
@@ -20,7 +24,6 @@ public class CHD : MonoBehaviour
 
     // line renderer
     public List<GameObject> lineRenderers;
-
 
     // test
     public bool isFirstPatch = true;
@@ -41,22 +44,42 @@ public class CHD : MonoBehaviour
 
     public void PatchMode()
     {
-
+        isCutMode = false;
+        isBoundaryCutMode = false;
+        isMeasureMode = false;
+        isPatchMode = true;
+        isIncisionMode = false;
+        isExtend = false;
     }
 
     public void MeasureMode()
     {
-
+        isCutMode = false;
+        isBoundaryCutMode = false;
+        isMeasureMode = true;
+        isPatchMode = false;
+        isIncisionMode = false;
+        isExtend = false;
     }
 
     public void IncisionMode()
     {
-
+        isCutMode = true;
+        isBoundaryCutMode = false;
+        isMeasureMode = false;
+        isPatchMode = false;
+        isIncisionMode = true;
+        isExtend = false;
     }
 
     public void Exit()
     {
-
+        isCutMode = false;
+        isBoundaryCutMode = false;
+        isMeasureMode = false;
+        isPatchMode = false;
+        isIncisionMode = false;
+        isExtend = false;
     }
 
 
@@ -75,11 +98,12 @@ public class CHD : MonoBehaviour
         MakeDoubleFaceMesh.Instance.Initialize();
         lineRenderers = new List<GameObject>();
         boundaryCount = 0;
+        oldExtendValue = 0;
     }
 
     void Update()
     {
-        if(Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
+        if(Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
         {
             AdjacencyList.Instance.WorldPositionUpdate();
             if (!IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
@@ -99,9 +123,15 @@ public class CHD : MonoBehaviour
                 if (isExtend)
                 {
                     // 여기에 손가락 움직임에 따른 value의 변화량이 측정되면 그거 가지고 받아서 여기에 넣으면 됨.
-                    IncisionManager.Instance.Extending(0);
-                    MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
-                    isExtend = false;
+                    // 숫자 안에는 incision index 넣어주면됨.
+                    if (oldExtendValue != UIManager.Instance.extendBar.value)
+                    {
+                        IncisionManager.Instance.Extending(0, UIManager.Instance.extendBar.value, oldExtendValue);
+                        oldExtendValue = UIManager.Instance.extendBar.value;
+                        MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+                    }
+                    else
+                        return;
                 }
                 else if(Input.GetMouseButtonDown(0))
                 {

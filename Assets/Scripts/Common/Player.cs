@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-
-
+    // 행동제어를 아예 player쪽에서 하기.
 
 
 

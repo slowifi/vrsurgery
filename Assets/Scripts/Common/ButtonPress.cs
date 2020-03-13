@@ -14,6 +14,7 @@ public class ButtonPress : MonoBehaviour
     public Button measureButton;
     public Button incisionButton;
 
+    // event 처리로 바꾸는게 맞음... 기존의 방법대로 가는게 나으려나
     public void Cutting()
     {
         // selected Color32(176, 48, 48, 255);
