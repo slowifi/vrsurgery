@@ -14,20 +14,25 @@ public class Player : MonoBehaviour
     void Update()
     {
 #if UNITY_STANDALONE_WIN
+
         float wheel = Input.GetAxis("Mouse ScrollWheel");
-        // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
-        ObjManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
+        if (wheel!=0)
+        {
+            // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
+            ObjManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
 
-        if (transform.localScale.x <= 0.2f)
-            transform.localScale = Vector3.one * 0.2f;
-
-        if (Input.GetMouseButton(1))
+            if (transform.localScale.x <= 0.2f)
+                transform.localScale = Vector3.one * 0.2f;
+            AdjacencyList.Instance.WorldPositionUpdate();
+        }
+        else if (Input.GetMouseButton(1))
         {
             // 여기에 UI 추가.
             float x = Input.GetAxis("Mouse X");
             float y = Input.GetAxis("Mouse Y");
             ObjManager.Instance.pivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
             ObjManager.Instance.pivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
+            AdjacencyList.Instance.WorldPositionUpdate();
         }
         else if (Input.GetMouseButton(2))
         {
@@ -38,6 +43,7 @@ public class Player : MonoBehaviour
 
             ObjManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
             ObjManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
+            AdjacencyList.Instance.WorldPositionUpdate();
         }
         // 특정 움직임이 있었을 때만 업데이트 하도록 해야됨.
         // AdjacencyList.Instance.WorldPositionUpdate();
