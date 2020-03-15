@@ -12,14 +12,8 @@ public class IncisionManager : Singleton<IncisionManager>
     public List<List<int>> leftSide;
     public List<List<int>> rightSide;
 
-    public List<List<Vector3>> fixedLeftSideWorldPos;
-    public List<List<Vector3>> fixedRightSideWorldPos;
-
     public List<List<float>> leftSideWeight;
     public List<List<float>> rightSideWeight;
-
-    private List<Vector3> leftVector;
-    private List<Vector3> rightVector;
 
     private List<int> startPointIndices;
     private List<int> endPointIndices;
@@ -28,22 +22,22 @@ public class IncisionManager : Singleton<IncisionManager>
     private Ray endScreenRay;
 
     private Vector3 startOuterVertexPosition;
-    private Vector3 startInnerVertexPosition;
+    //private Vector3 startInnerVertexPosition;
     private Vector3 endOuterVertexPosition;
-    private Vector3 endInnerVertexPosition;
+    //private Vector3 endInnerVertexPosition;
 
     public int firstOuterVertexIndex;
     public int lastOuterVertexIndex;
-    public int firstInnerVertexIndex;
-    public int lastInnerVertexIndex;
+    //public int firstInnerVertexIndex;
+    //public int lastInnerVertexIndex;
 
     private int startOuterTriangleIndex;
-    private int startInnerTriangleIndex;
+    //private int startInnerTriangleIndex;
     private int endOuterTriangleIndex;
-    private int endInnerTriangleIndex;
+    //private int endInnerTriangleIndex;
 
-    private GameObject leftVectorObject;
-    private GameObject rightVectorObject;
+    private List<GameObject> leftVectorObject;
+    private List<GameObject> rightVectorObject;
 
 
     public int currentIndex;
@@ -82,14 +76,12 @@ public class IncisionManager : Singleton<IncisionManager>
 
     public void GenerateIncisionList()
     {
+        AdjacencyList.Instance.WorldPositionUpdate();
         Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
 
         leftSideWeight.Add(new List<float>());
         rightSideWeight.Add(new List<float>());
-
-        fixedLeftSideWorldPos.Add(new List<Vector3>());
-        fixedRightSideWorldPos.Add(new List<Vector3>());
 
         BFS.Instance.BFS_Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, true);
         BFS.Instance.BFS_Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, false);
@@ -97,23 +89,24 @@ public class IncisionManager : Singleton<IncisionManager>
         startPointIndices.Add(newTriangles.Values.First());
         endPointIndices.Add(vertices.Length - 1);
 
-
+        
         //object처리에 대해 구상 해봐야됨.
-        leftVectorObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        leftVectorObject.transform.position = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[vertices.Length - 1];
-        leftVectorObject.transform.SetParent(ObjManager.Instance.pivotTransform);
-
-        rightVectorObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        rightVectorObject.transform.position = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[vertices.Length - 1];
-        rightVectorObject.transform.SetParent(ObjManager.Instance.pivotTransform);
-
+        Vector3 normalVector = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[newTriangles.Values.First()];
 
         Transform objTransform = ObjManager.Instance.pivotTransform;
-        Vector3 leftVector = Vector3.Cross(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]], objTransform.TransformPoint(leftVectorObject.transform.position) - worldPosition[startPointIndices[currentIndex]]);
-        Vector3 rightVector = Vector3.Cross(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]], objTransform.TransformPoint(leftVectorObject.transform.position) - worldPosition[startPointIndices[currentIndex]]);
         
-        leftVectorObject.transform.position = objTransform.InverseTransformPoint(leftVector + worldPosition[startPointIndices[currentIndex]]);
-        rightVectorObject.transform.position = objTransform.InverseTransformPoint(rightVector + worldPosition[startPointIndices[currentIndex]]);
+        Vector2 rightVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
+        Vector2 leftVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
+
+        leftVectorObject.Add(GameObject.CreatePrimitive(PrimitiveType.Cube));
+        rightVectorObject.Add(GameObject.CreatePrimitive(PrimitiveType.Cube));
+
+        
+        leftVectorObject[currentIndex].transform.position = new Vector3(leftVector.x + worldPosition[startPointIndices[currentIndex]].x, leftVector.y + worldPosition[startPointIndices[currentIndex]].y, worldPosition[startPointIndices[currentIndex]].z);
+        rightVectorObject[currentIndex].transform.position = new Vector3(rightVector.x + worldPosition[startPointIndices[currentIndex]].x, rightVector.y + worldPosition[startPointIndices[currentIndex]].y, worldPosition[startPointIndices[currentIndex]].z);
+
+        leftVectorObject[currentIndex].transform.SetParent(ObjManager.Instance.pivotTransform);
+        rightVectorObject[currentIndex].transform.SetParent(ObjManager.Instance.pivotTransform);
 
         Vector3 center = Vector3.Lerp(worldPosition[startPointIndices[currentIndex]], worldPosition[endPointIndices[currentIndex]], 0.5f);
         double radius = Vector2.Distance(center, worldPosition[endPointIndices[currentIndex]]);
@@ -134,20 +127,19 @@ public class IncisionManager : Singleton<IncisionManager>
 
     public void Extending(int incisionIndex, float currentExtendValue, float oldExtendValue)
     {
-
         AdjacencyList.Instance.WorldPositionUpdate();
 
         int[] triangles = MeshManager.Instance.mesh.triangles;
         Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         
-        //local한 위치를 가지고 있으면 이게 원활한데 그게 또 아니니까 기존의 값을 가지고 한다는게 어렵네;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         
         Transform objTransform = ObjManager.Instance.objTransform;
         Transform pivotTransform = ObjManager.Instance.pivotTransform;
-        Vector3 leftVector = leftVectorObject.transform.position - worldPosition[startPointIndices[incisionIndex]];
-        Vector3 rightVector = rightVectorObject.transform.position - worldPosition[startPointIndices[incisionIndex]];
 
+        Vector3 leftVector = leftVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
+        Vector3 rightVector = rightVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
+        Debug.Log(incisionIndex);
         int count = 0;
         foreach (int item in leftSide[incisionIndex])
         {
@@ -252,14 +244,14 @@ public class IncisionManager : Singleton<IncisionManager>
     public void IncisionUpdate()
     {
         startOuterVertexPosition = Vector3.zero;
-        startInnerVertexPosition = Vector3.zero;
+        
         endOuterVertexPosition = Vector3.zero;
-        endInnerVertexPosition = Vector3.zero;
+        
 
         startOuterTriangleIndex = -1;
-        startInnerTriangleIndex = -1;
+        
         endOuterTriangleIndex = -1;
-        endInnerTriangleIndex = -1;
+        
         trianglesCount = 0;
 
         startScreenRay = new Ray();
@@ -273,14 +265,14 @@ public class IncisionManager : Singleton<IncisionManager>
     protected override void InitializeChild()
     {
         startOuterVertexPosition = Vector3.zero;
-        startInnerVertexPosition = Vector3.zero;
+        //startInnerVertexPosition = Vector3.zero;
         endOuterVertexPosition = Vector3.zero;
-        endInnerVertexPosition = Vector3.zero;
+        //endInnerVertexPosition = Vector3.zero;
 
         startOuterTriangleIndex = -1;
-        startInnerTriangleIndex = -1;
+        //startInnerTriangleIndex = -1;
         endOuterTriangleIndex = -1;
-        endInnerTriangleIndex = -1;
+        //endInnerTriangleIndex = -1;
         trianglesCount = 0;
         currentIndex = 0;
 
@@ -293,8 +285,8 @@ public class IncisionManager : Singleton<IncisionManager>
         leftSide = new List<List<int>>();
         rightSide = new List<List<int>>();
 
-        fixedLeftSideWorldPos = new List<List<Vector3>>();
-        fixedRightSideWorldPos = new List<List<Vector3>>();
+        leftVectorObject = new List<GameObject>();
+        rightVectorObject = new List<GameObject>();
 
         leftSideWeight = new List<List<float>>();
         rightSideWeight = new List<List<float>>();

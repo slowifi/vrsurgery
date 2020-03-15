@@ -8,12 +8,10 @@ public class CHD : MonoBehaviour
     public bool isMeasureMode = false;
     public bool isPatchMode = false;
 
-
-
     public bool isIncisionMode = false;
     public bool isExtend = false;
     private float oldExtendValue;
-
+    private int incisionCount;
 
     public bool isEraseMode = false;
 
@@ -70,6 +68,9 @@ public class CHD : MonoBehaviour
         isPatchMode = false;
         isIncisionMode = true;
         isExtend = false;
+        incisionCount++;
+        oldExtendValue = 0;
+        UIManager.Instance.extendBar.value = 0;
     }
 
     public void Exit()
@@ -99,6 +100,7 @@ public class CHD : MonoBehaviour
         lineRenderers = new List<GameObject>();
         boundaryCount = 0;
         oldExtendValue = 0;
+        incisionCount = -1;
     }
 
     void Update()
@@ -114,19 +116,12 @@ public class CHD : MonoBehaviour
         {
             if(isIncisionMode)
             {
-                if (isFirstPatch)
-                {
-                    
-                    isFirstPatch = false;
-                }
-
                 if (isExtend)
                 {
-                    // 여기에 손가락 움직임에 따른 value의 변화량이 측정되면 그거 가지고 받아서 여기에 넣으면 됨.
-                    // 숫자 안에는 incision index 넣어주면됨.
+                    //추후 incision된 파트들 indexing 해서 관리를 해줘야됨 + undo를 위한 작업도 미리미리 해놓는게 좋음.
                     if (oldExtendValue != UIManager.Instance.extendBar.value)
                     {
-                        IncisionManager.Instance.Extending(0, UIManager.Instance.extendBar.value, oldExtendValue);
+                        IncisionManager.Instance.Extending(incisionCount, UIManager.Instance.extendBar.value, oldExtendValue);
                         oldExtendValue = UIManager.Instance.extendBar.value;
                         MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
                     }
@@ -135,6 +130,7 @@ public class CHD : MonoBehaviour
                 }
                 else if(Input.GetMouseButtonDown(0))
                 {
+                    IncisionManager.Instance.IncisionUpdate();
                     AdjacencyList.Instance.ListUpdate();
                     IncisionManager.Instance.SetStartVerticesDF();
                 }
@@ -143,7 +139,6 @@ public class CHD : MonoBehaviour
                     IncisionManager.Instance.SetEndVerticesDF();
                     IncisionManager.Instance.SetDividingListDF();
                     IncisionManager.Instance.ExecuteDividing();
-                    //MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
                     AdjacencyList.Instance.ListUpdate();
                     IncisionManager.Instance.GenerateIncisionList();
                     MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();

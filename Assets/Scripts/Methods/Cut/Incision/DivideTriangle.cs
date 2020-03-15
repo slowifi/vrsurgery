@@ -327,13 +327,7 @@ public class DivideTriangle : MonoBehaviour
             IncisionManager.Instance.leftSide[currentIncisionIndex].Add(newVertexLength + 1);
             IncisionManager.Instance.rightSide[currentIncisionIndex].Add(newVertexLength + 2);
         }
-        else
-        {
-            // inner
-            IncisionManager.Instance.firstInnerVertexIndex = newVertexLength;
-            IncisionManager.Instance.rightSide[currentIncisionIndex].Add(newVertexLength + 1);
-            IncisionManager.Instance.leftSide[currentIncisionIndex].Add(newVertexLength + 2);
-        }
+        
 
         Dictionary<int, Vector3> newVertices = IncisionManager.Instance.newVertices;
         Dictionary<int, int> newTriangles = IncisionManager.Instance.newTriangles;
@@ -390,8 +384,7 @@ public class DivideTriangle : MonoBehaviour
 
         if (!isInner)
             IncisionManager.Instance.lastOuterVertexIndex = newVertexLength;
-        else
-            IncisionManager.Instance.lastInnerVertexIndex = newVertexLength;
+        
         
         //left
         newTriangles.Add(triangleIdx, newVertexLength);
@@ -438,11 +431,6 @@ public class DivideTriangle : MonoBehaviour
         {
             IncisionManager.Instance.leftSide[currentIncisionIndex].Add(newVertexLength);
             IncisionManager.Instance.rightSide[currentIncisionIndex].Add(newVertexLength + 1);
-        }
-        else
-        {
-            IncisionManager.Instance.rightSide[currentIncisionIndex].Add(newVertexLength);
-            IncisionManager.Instance.leftSide[currentIncisionIndex].Add(newVertexLength + 1);
         }
 
         Dictionary<int, Vector3> newVertices = IncisionManager.Instance.newVertices;
@@ -492,11 +480,6 @@ public class DivideTriangle : MonoBehaviour
         {
             IncisionManager.Instance.leftSide[currentIncisionIndex].Add(newVertexLength);
             IncisionManager.Instance.rightSide[currentIncisionIndex].Add(newVertexLength + 1);
-        }
-        else
-        {
-            IncisionManager.Instance.rightSide[currentIncisionIndex].Add(newVertexLength);
-            IncisionManager.Instance.leftSide[currentIncisionIndex].Add(newVertexLength + 1);
         }
 
         Dictionary<int, Vector3> newVertices = IncisionManager.Instance.newVertices;

@@ -91,6 +91,7 @@ public class BFS : Singleton<BFS>
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
         int currentIndex = IncisionManager.Instance.currentIndex;
+        Debug.Log(currentIndex);
         // vertex_num
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
@@ -117,9 +118,9 @@ public class BFS : Singleton<BFS>
 
         temp.Enqueue(vertex_num);
         // outerVertices.Add(vertex_num);
-        GameObject v_t = new GameObject();
-        v_t = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        v_t.transform.position = worldVertices[vertex_num];
+        //GameObject v_t = new GameObject();
+        //v_t = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        //v_t.transform.position = worldVertices[vertex_num];
 
         while (temp.Count != 0)
         {
