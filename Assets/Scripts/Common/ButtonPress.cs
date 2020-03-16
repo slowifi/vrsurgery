@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine;
 
-public class ButtonPress : MonoBehaviour
+public class ButtonPress : Singleton<ButtonPress>
 {
     public GameObject mainManager;
 
@@ -15,6 +15,17 @@ public class ButtonPress : MonoBehaviour
     public Button incisionButton;
 
     // event 처리로 바꾸는게 맞음... 기존의 방법대로 가는게 나으려나
+
+    public void ResetButton()
+    {
+        ColorBlock colorTemp = cutButton.colors;
+        colorTemp.normalColor = new Color32(137, 96, 96, 255);
+        cutButton.colors = colorTemp;
+        patchButton.colors = colorTemp;
+        incisionButton.colors = colorTemp;
+        measureButton.colors = colorTemp;
+    }
+
     public void Cutting()
     {
         // selected Color32(176, 48, 48, 255);
@@ -34,6 +45,7 @@ public class ButtonPress : MonoBehaviour
             incisionButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             cutButton.colors = colorTemp;
+            mainManager.SendMessage("Exit");
             mainManager.SendMessage("CutMode");
         }
     }
@@ -55,6 +67,7 @@ public class ButtonPress : MonoBehaviour
             incisionButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             patchButton.colors = colorTemp;
+            mainManager.SendMessage("Exit");
             mainManager.SendMessage("PatchMode");
         }
     }
@@ -76,6 +89,7 @@ public class ButtonPress : MonoBehaviour
             incisionButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             measureButton.colors = colorTemp;
+            mainManager.SendMessage("Exit");
             mainManager.SendMessage("MeasureMode");
         }
     }
@@ -97,6 +111,7 @@ public class ButtonPress : MonoBehaviour
             cutButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             incisionButton.colors = colorTemp;
+            mainManager.SendMessage("Exit");
             mainManager.SendMessage("IncisionMode");
         }
     }

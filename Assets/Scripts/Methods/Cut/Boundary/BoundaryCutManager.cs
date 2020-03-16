@@ -95,7 +95,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         isEndToVtx = false;
     }
 
-    public void SetDividingList()
+    public void SetDividingList(ref bool checkBool)
     {
         int side = 0;
         int edgeIdx = -1;
@@ -165,7 +165,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                     {
                         Debug.Log("몇개나 겹치는지 보자");
                         Debug.Log(count);
-                        Debug.Break();
+                        //Debug.Break();
                     }
                     if (checkIntersection)
                         edgeIdx = item;
@@ -194,7 +194,10 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             }
             Debug.Log(intersectionCount);
             if (intersectionCount >= 2)
-                Debug.Break();
+            {
+
+                //Debug.Break();
+            }
         }
         //Debug.Log(startVertexIndex);
         //if (isStartFromVtx)
@@ -282,7 +285,9 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
         if (side == -1)
         {
+            ChatManager.Instance.GenerateMessage(" Boundary가 적절하지 않습니다.");
             Debug.Log("Boundary 시작이 잘못되었다.");
+            checkBool = true;
             return;
         }
         
@@ -370,8 +375,18 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         while (true)
         {
             asdf++;
-            if (isStartFromVtx)
-                Debug.Log("start from vtx로 들어옴");
+            if (asdf==2000)
+            {
+                ChatManager.Instance.GenerateMessage(" Boundary가 너무 깁니다.");
+                checkBool = true;
+                return;
+            }
+            else if(triangleIndex == -1)
+            {
+                ChatManager.Instance.GenerateMessage(" Boundary가 잘못 그려졌습니다.");
+                checkBool = true;
+                return;
+            }
 
             for (int i = 0; i < 3; i++)
                 if (edgeList[edgeIdx].vtx1 == edgeList[triangleIndex + i].vtx2 && edgeList[edgeIdx].vtx2 == edgeList[triangleIndex + i].vtx1)
@@ -396,16 +411,20 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             // 여기서 계속 side를 정하지 못해서 에러가 생기는데 문제네 문제
 
             if (side == 0 || side == -1)
-                Debug.Break();
+            {
+                ChatManager.Instance.GenerateMessage("Edge와 라인이 intersect 되지 않았습니다.");
+                checkBool = true;
+                //Debug.Break();
+            }
             if (side == 2)
                 _dividingMethods.DivideTrianglesClockWiseBoundary(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
             else if (side == 1)
                 _dividingMethods.DivideTrianglesCounterClockWiseBoundary(edgePoint, edgeList[edgeIdx].tri1, ref triangleCount, edgeIdx, false);
             else
             {
-                Debug.Break();
                 ChatManager.Instance.GenerateMessage("Edge와 라인이 intersect 되지 않았습니다.");
-                break;
+                checkBool = true;
+                return;
             }
         }
 
@@ -472,16 +491,23 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         triangleCount = 0;
     }
 
-    public void PostProcess()
+    public bool PostProcess()
     {
         // 여기에 문제가 있을 가능성이 농후
+        bool checkBool = false;
         SetStartVertices(rays[0], intersectedPosition[0], startTriangleIndex);
         for (int i = 1; i < rays.Count; i++)
         {
             if (i == 1)
             {
                 SetEndVertices(rays[i]);
-                SetDividingList();
+                SetDividingList(ref checkBool);
+                if(checkBool)
+                {
+                    MeshManager.Instance.LoadOldMesh();
+                    BoundaryCutUpdate();
+                    return false;
+                }
                 ExecuteDividing();
                 AdjacencyList.Instance.ListUpdate();
             }
@@ -489,16 +515,29 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             {
                 ResetIndex();
                 SetEndVertices(rays[i]);
-                SetDividingList();
+                SetDividingList(ref checkBool);
+                if(checkBool)
+                {
+                    MeshManager.Instance.LoadOldMesh();
+                    BoundaryCutUpdate();
+                    return false;
+                }
                 ExecuteDividing();
+
                 AdjacencyList.Instance.ListUpdate();
             }
         }
         ResetIndex();
         SetEndVtxToStartVtx();
-        SetDividingList();
+        SetDividingList(ref checkBool);
+        if (checkBool)
+        {
+            MeshManager.Instance.LoadOldMesh();
+            BoundaryCutUpdate();
+            return false;
+        }
         ExecuteDividing();
-
+        return true;
     }
 
     public void ResetIndexDF()
@@ -538,7 +577,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         isEndToVtx = false;
     }
 
-    public void SetDividingListDF()
+    public void SetDividingListDF(ref bool checkEdge)
     {
         int side = 0;
         int edgeIdx = -1;
@@ -551,9 +590,6 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
         // 도대체 문제점이 뭘까 알 수가 없네.
         
-
-
-
         // start
         // 여기서 이제 edge index랑 찾기를 해야됨.
         if (isStartFromVtx)
@@ -595,6 +631,8 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
         if (side == -1)
         {
+            ChatManager.Instance.GenerateMessage(" Edge가 잘못되었습니다.");
+            checkEdge = true;
             Debug.Log("Boundary 시작이 잘못되었다.");
             return;
         }
@@ -655,7 +693,8 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             else
             {
                 ChatManager.Instance.GenerateMessage("Edge와 라인이 intersect 되지 않았습니다.");
-                break;
+                checkEdge = true;
+                return;
             }
         }
 

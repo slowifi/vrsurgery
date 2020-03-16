@@ -15,6 +15,15 @@ public class PatchManager : Singleton<PatchManager>
 
     private GeneratePatch _generatePatch;
 
+    public void RemovePatchVariables()
+    {
+        Destroy(newPatch[newPatch.Count - 1]);
+        newPatch.RemoveAt(newPatch.Count - 1);
+        avgNorm.RemoveAt(avgNorm.Count - 1);
+        weightCenterPos.RemoveAt(weightCenterPos.Count-1);
+        patchCenterPos.RemoveAt(patchCenterPos.Count-1);
+        insidePatchVertices.RemoveAt(insidePatchVertices.Count-1);
+    }
 
     public void Generate()
     {
@@ -38,7 +47,7 @@ public class PatchManager : Singleton<PatchManager>
         float curveValue = UIManager.Instance.curveBar.value;
 
         patchCenterPos[patchIndex] = weightCenterPos[patchIndex] + ((heightValue - 0.5f) * 40) * avgNorm[patchIndex];
-        patchWeight = curveValue * 20.0f * ObjManager.Instance.objTransform.lossyScale.z;
+        patchWeight = curveValue * 20.0f * ObjManager.Instance.pivotTransform.lossyScale.z;
         _generatePatch.RecalculateNormal(patchIndex);
     }
 

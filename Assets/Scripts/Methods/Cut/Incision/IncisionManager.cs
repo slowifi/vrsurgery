@@ -22,19 +22,17 @@ public class IncisionManager : Singleton<IncisionManager>
     private Ray endScreenRay;
 
     private Vector3 startOuterVertexPosition;
-    //private Vector3 startInnerVertexPosition;
+    
     private Vector3 endOuterVertexPosition;
-    //private Vector3 endInnerVertexPosition;
+    
 
     public int firstOuterVertexIndex;
     public int lastOuterVertexIndex;
-    //public int firstInnerVertexIndex;
-    //public int lastInnerVertexIndex;
-
+    
     private int startOuterTriangleIndex;
-    //private int startInnerTriangleIndex;
+    
     private int endOuterTriangleIndex;
-    //private int endInnerTriangleIndex;
+    
 
     private List<GameObject> leftVectorObject;
     private List<GameObject> rightVectorObject;
@@ -88,9 +86,7 @@ public class IncisionManager : Singleton<IncisionManager>
 
         startPointIndices.Add(newTriangles.Values.First());
         endPointIndices.Add(vertices.Length - 1);
-
         
-        //object처리에 대해 구상 해봐야됨.
         Vector3 normalVector = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[newTriangles.Values.First()];
 
         Transform objTransform = ObjManager.Instance.pivotTransform;
@@ -98,9 +94,8 @@ public class IncisionManager : Singleton<IncisionManager>
         Vector2 rightVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
         Vector2 leftVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
 
-        leftVectorObject.Add(GameObject.CreatePrimitive(PrimitiveType.Cube));
-        rightVectorObject.Add(GameObject.CreatePrimitive(PrimitiveType.Cube));
-
+        leftVectorObject.Add(new GameObject("Left Vector"+currentIndex+1));
+        rightVectorObject.Add(new GameObject("Right Vector"+currentIndex+1));
         
         leftVectorObject[currentIndex].transform.position = new Vector3(leftVector.x + worldPosition[startPointIndices[currentIndex]].x, leftVector.y + worldPosition[startPointIndices[currentIndex]].y, worldPosition[startPointIndices[currentIndex]].z);
         rightVectorObject[currentIndex].transform.position = new Vector3(rightVector.x + worldPosition[startPointIndices[currentIndex]].x, rightVector.y + worldPosition[startPointIndices[currentIndex]].y, worldPosition[startPointIndices[currentIndex]].z);
@@ -127,6 +122,7 @@ public class IncisionManager : Singleton<IncisionManager>
 
     public void Extending(int incisionIndex, float currentExtendValue, float oldExtendValue)
     {
+        Debug.Log(leftSide.Count);
         AdjacencyList.Instance.WorldPositionUpdate();
 
         int[] triangles = MeshManager.Instance.mesh.triangles;
@@ -160,19 +156,17 @@ public class IncisionManager : Singleton<IncisionManager>
     // 양면메쉬 전용 알고리즘
     public void SetStartVerticesDF()
     {
-        // screen point도 저장해야됨.
         startScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         IntersectionManager.Instance.GetIntersectedValues(startScreenRay, ref startOuterVertexPosition, ref startOuterTriangleIndex);
     }
 
     public void SetEndVerticesDF()
     {
-        // 여기에 라인렌더러 넣는걸
         endScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         IntersectionManager.Instance.GetIntersectedValues(endScreenRay, ref endOuterVertexPosition, ref endOuterTriangleIndex);
     }
 
-    public void SetDividingListDF()
+    public void SetDividingListDF(ref bool edgeCheck)
     {
         int outerSide = 0;
         int outerEdgeIdx = -1;
@@ -188,6 +182,8 @@ public class IncisionManager : Singleton<IncisionManager>
 
         if (outerSide == -1)
         {
+            ChatManager.Instance.GenerateMessage(" 자를 수 없는 Edge 입니다.");
+            edgeCheck = true;
             Debug.Log("error");
             return;
         }
@@ -216,6 +212,13 @@ public class IncisionManager : Singleton<IncisionManager>
 
         while (true)
         {
+            if(outerTriangleIndex == -1)
+            {
+                ChatManager.Instance.GenerateMessage(" 자를 수 없는 Edge 입니다.");
+                edgeCheck = true;
+                Debug.Log("error");
+                return;
+            }
             for (int i = 0; i < 3; i++)
                 if (edgeList[outerEdgeIdx].vtx1 == edgeList[outerTriangleIndex + i].vtx2 && edgeList[outerEdgeIdx].vtx2 == edgeList[outerTriangleIndex + i].vtx1)
                     outerEdgeIdx = outerTriangleIndex + i;
@@ -234,8 +237,10 @@ public class IncisionManager : Singleton<IncisionManager>
                 _dividingMethods.DivideTrianglesCounterClockWiseIncision(outerEdgePoint, edgeList[outerEdgeIdx].tri1, ref outerTriangleCount, outerEdgeIdx, false);
             else
             {
+                ChatManager.Instance.GenerateMessage(" 자를 수 없는 Edge 입니다.");
+                edgeCheck = true;
                 Debug.Log("error");
-                break;
+                return;
             }
         }
         trianglesCount = outerTriangleCount;

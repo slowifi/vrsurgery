@@ -10,18 +10,19 @@ public class GeneratePatch : MonoBehaviour
 
     public void GenerateInit()
     {
-        PatchManager.Instance.newPatch.Add(new GameObject("Patch", typeof(MeshFilter), typeof(MeshRenderer)));
+        PatchManager.Instance.newPatch.Add(new GameObject("", typeof(MeshFilter), typeof(MeshRenderer)));
         PatchManager.Instance.avgNorm.Add(Vector3.zero);
         PatchManager.Instance.weightCenterPos.Add(Vector3.zero);
         PatchManager.Instance.patchCenterPos.Add(Vector3.zero);
         PatchManager.Instance.insidePatchVertices.Add(new List<Vector3>[5]);
         PatchManager.Instance.patchVerticesIntervalValue = 3.0f;
-        PatchManager.Instance.patchWeight = UIManager.Instance.curveBar.value * 20f * ObjManager.Instance.objTransform.lossyScale.z;
+        PatchManager.Instance.patchWeight = UIManager.Instance.curveBar.value * 20f * ObjManager.Instance.pivotTransform.lossyScale.z;
 
         _patchVertexPosition = Vector3.zero;
         _patchVertices = new List<Vector3>();
         _insidePatchVertices = new List<Vector3>[5];
         _patchIndex = PatchManager.Instance.newPatch.Count-1;
+        PatchManager.Instance.newPatch[_patchIndex].name = "Patch" + _patchIndex;
 
         for (int i = 0; i < 5; i++)
             _insidePatchVertices[i] = new List<Vector3>();
@@ -74,19 +75,13 @@ public class GeneratePatch : MonoBehaviour
             _insidePatchVertices[4].Add(_patchVertices[i] + (vtrList[i] / 5 * 4));
         }
 
-        foreach (var item in _patchVertices)
-        {
-            GameObject v_test = new GameObject();
-            v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            v_test.transform.position = item;
-        }
         GeneratePatchObj();
     }
 
     private void GeneratePatchObj()
     {
-        PatchManager.Instance.newPatch.Add(new GameObject("Patch", typeof(MeshFilter), typeof(MeshRenderer)));
-        GameObject patchObj = PatchManager.Instance.newPatch[0];
+        //PatchManager.Instance.newPatch.Add(new GameObject("Patch", typeof(MeshFilter), typeof(MeshRenderer)));
+        GameObject patchObj = PatchManager.Instance.newPatch[PatchManager.Instance.newPatch.Count-1];
         Mesh mesh = new Mesh();
         patchObj.GetComponent<MeshFilter>().mesh = mesh;
         patchObj.transform.parent = GameObject.Find("HumanHeart").transform;

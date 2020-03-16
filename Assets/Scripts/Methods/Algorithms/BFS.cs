@@ -32,9 +32,12 @@ public class BFS : Singleton<BFS>
         while (temp.Count != 0)
         {
             asdf++;
-            if (asdf == 500)
-                break;
-
+            if (asdf == 2000)
+            {
+                ChatManager.Instance.GenerateMessage(" 자를 수 있는 영역이 아닙니다.");
+                MeshManager.Instance.LoadOldMesh();
+                return;
+            }
             foreach (int item in connectedVertices[temp.Dequeue()])
             {
                 //Debug.Log(item);
@@ -121,9 +124,14 @@ public class BFS : Singleton<BFS>
         //GameObject v_t = new GameObject();
         //v_t = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         //v_t.transform.position = worldVertices[vertex_num];
-
+        int exceptionalErrorCheck = 0;
         while (temp.Count != 0)
         {
+            exceptionalErrorCheck++;
+            if(exceptionalErrorCheck==4000)
+            {
+                //여기에 다른 초기화 함수들 다시 넣고 다 해야됨.
+            }
             foreach (int item in AdjacencyList.Instance.connectedVertices[temp.Dequeue()])
             {
                 bool temp_check = false;

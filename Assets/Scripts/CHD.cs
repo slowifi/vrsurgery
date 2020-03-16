@@ -9,9 +9,14 @@ public class CHD : MonoBehaviour
     public bool isPatchMode = false;
 
     public bool isIncisionMode = false;
+    private bool firstIncision = false;
     public bool isExtend = false;
     private float oldExtendValue;
     private int incisionCount;
+
+
+
+    private int patchCount;
 
     public bool isEraseMode = false;
 
@@ -38,6 +43,7 @@ public class CHD : MonoBehaviour
         isPatchMode = false;
         isIncisionMode = false;
         isExtend = false;
+        isFirstPatch = true;
     }
 
     public void PatchMode()
@@ -47,7 +53,11 @@ public class CHD : MonoBehaviour
         isMeasureMode = false;
         isPatchMode = true;
         isIncisionMode = false;
+        isFirstPatch = true;
         isExtend = false;
+        isPatchUpdate = false;
+        oldPosition = Vector3.zero;
+        patchCount = 0;
     }
 
     public void MeasureMode()
@@ -68,24 +78,43 @@ public class CHD : MonoBehaviour
         isPatchMode = false;
         isIncisionMode = true;
         isExtend = false;
-        incisionCount++;
+        firstIncision = false;
         oldExtendValue = 0;
+        oldPosition = Vector3.zero;
         UIManager.Instance.extendBar.value = 0;
     }
 
+    public void ButtonOff()
+    {
+        MeshManager.Instance.LoadOldMesh();
+        ButtonPress.Instance.ResetButton();
+        Exit();
+    }
+
+
     public void Exit()
     {
+        MeshManager.Instance.SaveCurrentMesh();
         isCutMode = false;
         isBoundaryCutMode = false;
         isMeasureMode = false;
         isPatchMode = false;
         isIncisionMode = false;
         isExtend = false;
+        isPatchUpdate = false;
+        isFirstPatch = true;
+        isLastBoundaryCut = false;
+        Destroy(GameObject.Find("MeasureLine"));
+        ObjManager.Instance.startMeasurePoint.SetActive(false);
+        ObjManager.Instance.endMeasurePoint.SetActive(false);
+
+        GameObject patchObject = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count-1));
+        if (patchObject)
+        {
+            MeshRenderer ren = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1)).GetComponent<MeshRenderer>();
+            ren.material.color = new Color32(115, 0, 0, 255);
+        }
     }
-
-
-
-
 
 
     void Start()
@@ -124,26 +153,75 @@ public class CHD : MonoBehaviour
                         IncisionManager.Instance.Extending(incisionCount, UIManager.Instance.extendBar.value, oldExtendValue);
                         oldExtendValue = UIManager.Instance.extendBar.value;
                         MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+                        return;
                     }
                     else
                         return;
                 }
                 else if(Input.GetMouseButtonDown(0))
                 {
+                    lineRenderers.Add(new GameObject("Incision Line", typeof(LineRenderer)));
+                    incisionCount++;
+                    firstIncision = true;
+                    IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref oldPosition);
                     IncisionManager.Instance.IncisionUpdate();
                     AdjacencyList.Instance.ListUpdate();
                     IncisionManager.Instance.SetStartVerticesDF();
                 }
                 else if(Input.GetMouseButtonUp(0))
                 {
+                    for (int i = 0; i < lineRenderers.Count; i++)
+                        Destroy(lineRenderers[i]);
+                    lineRenderers.Clear();
+                    bool checkEdge = false;
                     IncisionManager.Instance.SetEndVerticesDF();
-                    IncisionManager.Instance.SetDividingListDF();
+                    IncisionManager.Instance.SetDividingListDF(ref checkEdge);
+                    if (checkEdge)
+                    {
+                        IncisionManager.Instance.leftSide.RemoveAt(IncisionManager.Instance.currentIndex);
+                        IncisionManager.Instance.rightSide.RemoveAt(IncisionManager.Instance.currentIndex);
+                        incisionCount--;
+                        IncisionManager.Instance.IncisionUpdate();
+                        ButtonOff();
+                        return;
+                    }
+                    
+                    // 위에서 잘못되면 끊어야됨.
                     IncisionManager.Instance.ExecuteDividing();
                     AdjacencyList.Instance.ListUpdate();
                     IncisionManager.Instance.GenerateIncisionList();
                     MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+                    MeshManager.Instance.SaveCurrentMesh();
                     IncisionManager.Instance.currentIndex++;
                     isExtend = true;
+                }
+                else if(Input.GetMouseButton(0))
+                {
+                    // 이걸 수정을 좀 해야되는데
+                    if (!firstIncision)
+                    {
+                        
+                        return;
+                    }
+                    var lineRenderer = lineRenderers[0].GetComponent<LineRenderer>();
+                    Vector3 currentPosition = Vector3.zero;
+                    bool checkInside = IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition);
+                    if(!checkInside)
+                    {
+                        for (int i = 0; i < lineRenderers.Count; i++)
+                            Destroy(lineRenderers[i]);
+                        lineRenderers.Clear();
+                        ChatManager.Instance.GenerateMessage(" 심장을 벗어났습니다.");
+                        incisionCount--;
+                        ButtonOff();
+                        return;
+                    }
+                    Vector3 curPos = currentPosition;
+                    Vector3 oldPos = oldPosition;
+                    curPos.z += 1f;
+                    oldPos.z += 1f;
+                    lineRenderer.material.color = Color.black;
+                    lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
                 }
             }
             else if(isEraseMode)
@@ -177,13 +255,12 @@ public class CHD : MonoBehaviour
                             return;
                         else
                             BFS.Instance.BFS_Boundary(vertexIndex, BoundaryCutManager.Instance.removeBoundaryVertices);
+
                         MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
                         MeshManager.Instance.SaveCurrentMesh();
                         //MeshManager.Instance.LoadOldMesh();
                         BoundaryCutManager.Instance.BoundaryCutUpdate();
-                        isLastBoundaryCut = false;
-                        isBoundaryCutMode = false;
-                        isFirstPatch = true;
+                        ButtonOff();
                     }
                     return;
                 }
@@ -193,7 +270,6 @@ public class CHD : MonoBehaviour
                 {
                     AdjacencyList.Instance.ListUpdate();
                     boundaryCount = 0;
-                    //ChatManager.Instance.GenerateMessage("첫 진입");
                     oldPosition = Vector3.zero;
                     Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
 
@@ -204,13 +280,6 @@ public class CHD : MonoBehaviour
                         BoundaryCutManager.Instance.rays.Add(ray);
                         BoundaryCutManager.Instance.intersectedPosition.Add(startVertexPosition);
                         BoundaryCutManager.Instance.startTriangleIndex = startTriangleIndex;
-
-                        //// 이부분이 추후 작업에 들어가야됨.
-                        //BoundaryCutManager.Instance.SetStartVertices(ray, startVertexPosition, startTriangleIndex);
-
-                        //GameObject v_test = new GameObject();
-                        //v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        //v_test.transform.position = startVertexPosition;
 
                         oldPosition = startVertexPosition;
                         firstPosition = oldPosition;
@@ -228,11 +297,6 @@ public class CHD : MonoBehaviour
                     {
                         if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 3f*ObjManager.Instance.pivotTransform.lossyScale.z)
                         {
-                            //추후작업
-                            //BoundaryCutManager.Instance.ResetIndex();
-                            //BoundaryCutManager.Instance.SetEndVtxToStartVtx();
-                            //BoundaryCutManager.Instance.SetDividingList();
-                            //BoundaryCutManager.Instance.ExecuteDividing();
                             lineRenderers.Add(new GameObject("Boundary Line", typeof(LineRenderer)));
                             var lineRenderer = lineRenderers[boundaryCount - 1].GetComponent<LineRenderer>();
                             Vector3 curPos = firstPosition;
@@ -241,8 +305,16 @@ public class CHD : MonoBehaviour
                             oldPos.z += 1f;
                             lineRenderer.material.color = Color.black;
                             lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
-
-                            BoundaryCutManager.Instance.PostProcess();
+                            bool checkError = true;
+                            checkError = BoundaryCutManager.Instance.PostProcess();
+                            if(!checkError)
+                            {
+                                for (int i = 0; i < lineRenderers.Count; i++)
+                                    Destroy(lineRenderers[i]);
+                                lineRenderers.Clear();
+                                ButtonOff();
+                                return;
+                            }
                             isLastBoundaryCut = true;
                         }
                         else if (Vector3.Distance(currentPosition, oldPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
@@ -282,6 +354,19 @@ public class CHD : MonoBehaviour
                             boundaryCount++;
                         }
                     }
+                    else
+                    {
+                        if(boundaryCount==0)
+                        {
+                            return;
+                        }
+                        for (int i = 0; i < lineRenderers.Count; i++)
+                            Destroy(lineRenderers[i]);
+                        lineRenderers.Clear();
+                        BoundaryCutManager.Instance.BoundaryCutUpdate();
+                        ChatManager.Instance.GenerateMessage(" 심장이 아닙니다.");
+                        ButtonOff();
+                    }
                 }
                 else if (Input.GetMouseButtonUp(0))
                 {
@@ -295,8 +380,16 @@ public class CHD : MonoBehaviour
                         oldPos.z += 1f;
                         lineRenderer.material.color = Color.black;
                         lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
-
-                        BoundaryCutManager.Instance.PostProcess();
+                        bool checkError = true;
+                        checkError = BoundaryCutManager.Instance.PostProcess();
+                        if (!checkError)
+                        {
+                            for (int i = 0; i < lineRenderers.Count; i++)
+                                Destroy(lineRenderers[i]);
+                            lineRenderers.Clear();
+                            ButtonOff();
+                            return;
+                        }
                         isLastBoundaryCut = true;
                     }
                 }
@@ -319,30 +412,64 @@ public class CHD : MonoBehaviour
             if (isFirstPatch)
             {
                 isFirstPatch = false;
-                AdjacencyList.Instance.ListUpdate();
-                PatchManager.Instance.Generate();
                 return;
             }
             else if(isPatchUpdate)
             {
-                // isPatchUpdate = false;
-                PatchManager.Instance.UpdateCurve(0);
+                // 숫자에 patch index들어가는게 좋을듯. 지금 patch, incision 관련해서는 리스트화는 시켜놨음. 추후 undo등 작업 가능.
+                PatchManager.Instance.UpdateCurve(PatchManager.Instance.newPatch.Count-1);
             }
             else if (Input.GetMouseButtonUp(0))
             {
+                for (int i = 0; i < lineRenderers.Count; i++)
+                    Destroy(lineRenderers[i]);
+                lineRenderers.Clear();
                 PatchManager.Instance.GenerateMesh();
                 isPatchUpdate = true;
             }
             else if (Input.GetMouseButton(0))
             {
                 Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                PatchManager.Instance.AddVertex(vertexPosition);
+                if(vertexPosition!=Vector3.zero)
+                {
+                    if(oldPosition!=Vector3.zero)
+                    {
+                        PatchManager.Instance.AddVertex(vertexPosition);
+
+                        lineRenderers.Add(new GameObject("Patch Line", typeof(LineRenderer)));
+                        var lineRenderer = lineRenderers[patchCount].GetComponent<LineRenderer>();
+                        Vector3 curPos = vertexPosition;
+                        Vector3 oldPos = oldPosition;
+                        curPos.z += 1f;
+                        oldPos.z += 1f;
+                        lineRenderer.material.color = Color.black;
+                        lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
+                        patchCount++;
+                    }
+                    else
+                    {
+                        AdjacencyList.Instance.ListUpdate();
+                        PatchManager.Instance.Generate();
+                        PatchManager.Instance.AddVertex(vertexPosition);
+                    }
+                    oldPosition = vertexPosition;
+                    return;
+                }
+                else
+                {
+                    if (patchCount == 0)
+                        return;
+                    for (int i = 0; i < lineRenderers.Count; i++)
+                        Destroy(lineRenderers[i]);
+                    lineRenderers.Clear();
+                    PatchManager.Instance.RemovePatchVariables();
+                    ChatManager.Instance.GenerateMessage(" 패치 라인이 심장을 벗어났습니다.");
+                    // 이게 또 겹쳐부렀네
+                    ButtonOff();
+                }
             }
         }
-        else if(isTestMode)
-        {
-
-        }
+        
     }
 
 

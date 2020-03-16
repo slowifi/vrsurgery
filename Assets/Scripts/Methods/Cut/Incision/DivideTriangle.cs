@@ -95,8 +95,8 @@ public class DivideTriangle : MonoBehaviour
 
     public void DivideTrianglesEndToVtx(int endVtxIndex, int triangleIdx, ref int triangleCount, int edgeIdx)
     {
-        int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
-        int newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
+        int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
+        int newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
 
         Transform objTransform = ObjManager.Instance.objTransform;
         List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;

@@ -51,27 +51,23 @@ public class Player : MonoBehaviour
 
         // android용은 수정 해야됨.
 #if UNITY_ANDROID
-        int fingerCount = 0;
+        //int fingerCount = 0;
         
         Resolution resolutions = Screen.currentResolution;
         float XResolution = resolutions.width;
         float YResolution = resolutions.height;
 
-        if (fingerCount == 1) // For Touch Input with a finger
-        // Drag: Convert 2D translational movement to 3D rotation
-        // Touch: Select an anchor
+        if (Input.touchCount == 1) // For Touch Input with a finger
         {
-
-            touch1 = Input.GetTouch(0);
             if (Input.GetTouch(0).phase == TouchPhase.Moved)
             {
                 float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
                 float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
                 // select the axis by which you want to rotate the GameObject                               
-                pivot.transform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation);
-                pivot.transform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation);
-                updatePlaneModel();
+                ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation);
+                ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation);
             }
+            AdjacencyList.Instance.WorldPositionUpdate();
             return;
         }
 
@@ -92,36 +88,28 @@ public class Player : MonoBehaviour
 
             // Find the difference in the distances between each frame.
             float deltaMagnitudeDiff = touchDeltaMag - prevTouchDeltaMag;
-           
-            zoomConstant = 1f + deltaMagnitudeDiff / 1000f;
-            InitScale *= zoomConstant;
-            TargetScale *= zoomConstant;
-            _currentScale *= zoomConstant;
 
-            if (TargetScale >= 6.0f)
-            {
-                TargetScale = 6.0f;
-                InitScale = 3.9f;
-                _currentScale = 3.9f;
-            }
-                
-            Breathing();
+            //여기서 조건 두개임. 하나는 그냥 확대고, 하나는 ui에서 스크롤 조절하게.
+            ObjManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/1000;
+
+            if (transform.localScale.x <= 0.2f)
+                transform.localScale = Vector3.one * 0.2f;
+            AdjacencyList.Instance.WorldPositionUpdate();
+
             return;
         }
 
-
-        Scene scene = SceneManager.GetActiveScene();
-        if (Input.touchCount == 3 && scene.name == "scene_2019")
+        if (Input.touchCount == 3)
         {
-            touch1 = Input.GetTouch(0);
             if (Input.GetTouch(0).phase == TouchPhase.Moved)
             {
                 float xPos = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
                 float yPos = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
                 // select the axis by which you want to rotate the GameObject                               
-                pivot.transform.position += Vector3.left * xPos;
-                pivot.transform.position += Vector3.up * yPos;
+                ObjManager.Instance.pivotTransform.position += Vector3.left * xPos;
+                ObjManager.Instance.pivotTransform.position += Vector3.up * yPos;
             }
+            AdjacencyList.Instance.WorldPositionUpdate();
         }
 #endif
 
