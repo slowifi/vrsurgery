@@ -14,7 +14,7 @@ public class CHD : MonoBehaviour
     private float oldExtendValue;
     private int incisionCount;
 
-
+    public GameObject playerObject;
 
     private int patchCount;
 
@@ -72,6 +72,7 @@ public class CHD : MonoBehaviour
 
     public void IncisionMode()
     {
+        playerObject.SendMessage("IncisionModeOn");
         isCutMode = true;
         isBoundaryCutMode = false;
         isMeasureMode = false;
@@ -86,14 +87,17 @@ public class CHD : MonoBehaviour
 
     public void ButtonOff()
     {
+        playerObject.SetActive(true);
+        playerObject.SendMessage("IncisionModeOff");
         MeshManager.Instance.LoadOldMesh();
         ButtonPress.Instance.ResetButton();
         Exit();
     }
 
-
     public void Exit()
     {
+        playerObject.SetActive(true);
+        playerObject.SendMessage("IncisionModeOff");
         MeshManager.Instance.SaveCurrentMesh();
         isCutMode = false;
         isBoundaryCutMode = false;
@@ -160,6 +164,7 @@ public class CHD : MonoBehaviour
                 }
                 else if(Input.GetMouseButtonDown(0))
                 {
+                    playerObject.SetActive(false);
                     lineRenderers.Add(new GameObject("Incision Line", typeof(LineRenderer)));
                     incisionCount++;
                     firstIncision = true;
@@ -182,6 +187,7 @@ public class CHD : MonoBehaviour
                         IncisionManager.Instance.rightSide.RemoveAt(IncisionManager.Instance.currentIndex);
                         incisionCount--;
                         IncisionManager.Instance.IncisionUpdate();
+                        playerObject.SendMessage("IncisionModeOff");
                         ButtonOff();
                         return;
                     }
@@ -193,6 +199,7 @@ public class CHD : MonoBehaviour
                     MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
                     MeshManager.Instance.SaveCurrentMesh();
                     IncisionManager.Instance.currentIndex++;
+                    playerObject.SetActive(true);
                     isExtend = true;
                 }
                 else if(Input.GetMouseButton(0))
@@ -200,7 +207,8 @@ public class CHD : MonoBehaviour
                     // 이걸 수정을 좀 해야되는데
                     if (!firstIncision)
                     {
-                        
+                        playerObject.SendMessage("IncisionModeOff");
+                        // 여기에다가 넣으면 여러개가 찍히는게 좀 에반데.
                         return;
                     }
                     var lineRenderer = lineRenderers[0].GetComponent<LineRenderer>();
@@ -214,6 +222,7 @@ public class CHD : MonoBehaviour
                         ChatManager.Instance.GenerateMessage(" 심장을 벗어났습니다.");
                         incisionCount--;
                         ButtonOff();
+                        playerObject.SendMessage("IncisionModeOff");
                         return;
                     }
                     Vector3 curPos = currentPosition;
@@ -234,6 +243,7 @@ public class CHD : MonoBehaviour
 
                 if (isFirstPatch)
                 {
+                    playerObject.SetActive(false);
                     MeshManager.Instance.SaveCurrentMesh();
                     AdjacencyList.Instance.ListUpdate();
                     isFirstPatch = false;
@@ -417,6 +427,7 @@ public class CHD : MonoBehaviour
             else if(isPatchUpdate)
             {
                 // 숫자에 patch index들어가는게 좋을듯. 지금 patch, incision 관련해서는 리스트화는 시켜놨음. 추후 undo등 작업 가능.
+                playerObject.SetActive(true);
                 PatchManager.Instance.UpdateCurve(PatchManager.Instance.newPatch.Count-1);
             }
             else if (Input.GetMouseButtonUp(0))
@@ -448,6 +459,7 @@ public class CHD : MonoBehaviour
                     }
                     else
                     {
+                        playerObject.SetActive(false);
                         AdjacencyList.Instance.ListUpdate();
                         PatchManager.Instance.Generate();
                         PatchManager.Instance.AddVertex(vertexPosition);

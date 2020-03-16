@@ -8,8 +8,19 @@ public class Player : MonoBehaviour
 
 
 
+    private bool incision = false;
 
+    public void IncisionModeOn()
+    {
+        incision = true;
+        Debug.Log(incision);
+    }
 
+    public void IncisionModeOff()
+    {
+        incision = false;
+        Debug.Log(incision);
+    }
 
     void Update()
     {
@@ -90,6 +101,20 @@ public class Player : MonoBehaviour
             float deltaMagnitudeDiff = touchDeltaMag - prevTouchDeltaMag;
 
             //여기서 조건 두개임. 하나는 그냥 확대고, 하나는 ui에서 스크롤 조절하게.
+
+            // incision임을 안다면 scroll값만 바꾸게 해야되는데 흠...
+            Debug.Log(incision);
+            if(incision)
+            {
+                float extendValue = UIManager.Instance.extendBar.value + deltaMagnitudeDiff/1000;
+                if (extendValue >= 1)
+                    UIManager.Instance.extendBar.value = 1;
+                else if (extendValue <= 0)
+                    UIManager.Instance.extendBar.value = 0;
+                else
+                    UIManager.Instance.extendBar.value = extendValue;
+                return;
+            }
             ObjManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/1000;
 
             if (transform.localScale.x <= 0.2f)

@@ -26,11 +26,15 @@ public class MeasureManager : Singleton<MeasureManager>
                 measureEnd = cameraRay.direction;
                 // Debug.DrawLine(startPoint.transform.position, endPoint.transform.position, Color.yellow, 2, false);
                 GameObject lineRenderer = new GameObject("MeasureLine");
+                
                 var line = lineRenderer.AddComponent<LineRenderer>();
+                line.useWorldSpace = false;
                 line.material.color = Color.white;
                 line.SetWidth(0.6f, 0.6f);
                 line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 5f * ObjManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 5f * ObjManager.Instance.objTransform.lossyScale.z });
+                line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 0.5f * ObjManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 0.5f * ObjManager.Instance.objTransform.lossyScale.z });
+                //line.SetPositions(new Vector3[] { startPoint.transform.position, endPoint.transform.position});
+                line.transform.SetParent(ObjManager.Instance.pivotTransform);
                 distanceStartToEnd = Vector3.Distance(endPoint.transform.position, startPoint.transform.position);
             }
             else

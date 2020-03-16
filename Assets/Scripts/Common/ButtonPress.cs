@@ -8,7 +8,6 @@ using UnityEngine;
 public class ButtonPress : Singleton<ButtonPress>
 {
     public GameObject mainManager;
-
     public Button cutButton;
     public Button patchButton;
     public Button measureButton;
