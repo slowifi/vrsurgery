@@ -548,16 +548,9 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             }
         }
 
-        GameObject v_test3 = new GameObject("안잘리는 vtx3");
-        v_test3 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        v_test3.transform.position = worldVertices[bfsVtx1];
-
-        GameObject v_test4 = new GameObject("안잘리는 vtx4");
-        v_test4 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        v_test4.transform.position = worldVertices[bfsVtx2];
-
+        
         Debug.Log(triangles.Length);
-        // 겨우 bfs두번 들어갔을뿐인데 왜 update의 triangle 개수가 바뀌는걸까??????????????
+        
         if (!BFS.Instance.BFS_Boundary(bfsVtx1, removeBoundaryVertices))
             if (!BFS.Instance.BFS_Boundary(bfsVtx2, removeBoundaryVertices))
                 return false;

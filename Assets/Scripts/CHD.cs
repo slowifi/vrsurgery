@@ -123,6 +123,7 @@ public class CHD : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("Load되었습니다.");
         ObjManager.Instance.ObjUpdate();
         MeshManager.Instance.Initialize();
         AdjacencyList.Instance.Initialize();
@@ -301,6 +302,7 @@ public class CHD : MonoBehaviour
 
                 if (Input.GetMouseButtonDown(0))
                 {
+                    //test();
                     AdjacencyList.Instance.ListUpdate();
                     boundaryCount = 0;
                     oldPosition = Vector3.zero;
@@ -349,7 +351,7 @@ public class CHD : MonoBehaviour
                                 return;
                             }
                             MeshManager.Instance.mesh.RecalculateNormals();
-                            ChatManager.Instance.GenerateMessage(" vertex를 선택해 주세요.");
+                            //ChatManager.Instance.GenerateMessage(" vertex를 선택해 주세요.");
                             isLastBoundaryCut = true;
                         }
                         else if (Vector3.Distance(currentPosition, oldPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
@@ -426,7 +428,7 @@ public class CHD : MonoBehaviour
                             return;
                         }
                         MeshManager.Instance.mesh.RecalculateNormals();
-                        ChatManager.Instance.GenerateMessage(" vertex를 선택해 주세요.");
+                        //ChatManager.Instance.GenerateMessage(" vertex를 선택해 주세요.");
                         isLastBoundaryCut = true;
                     }
                 }

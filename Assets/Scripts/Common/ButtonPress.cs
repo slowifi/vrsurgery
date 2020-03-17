@@ -13,8 +13,6 @@ public class ButtonPress : Singleton<ButtonPress>
     public Button measureButton;
     public Button incisionButton;
 
-    // event 처리로 바꾸는게 맞음... 기존의 방법대로 가는게 나으려나
-
     public void ResetButton()
     {
         ColorBlock colorTemp = cutButton.colors;

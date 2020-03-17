@@ -212,6 +212,7 @@ public class IncisionManager : Singleton<IncisionManager>
 
         while (true)
         {
+            Debug.Log("얼마나 ㅁ낳이");
             if(outerTriangleIndex == -1)
             {
                 ChatManager.Instance.GenerateMessage(" 자를 수 없는 Edge 입니다.");

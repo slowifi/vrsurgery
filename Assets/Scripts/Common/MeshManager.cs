@@ -6,6 +6,7 @@ public class MeshManager : Singleton<MeshManager>
 {
     public GameObject heart;
     private GameObject disableHeart;
+    public Mesh testMesh;
     public Mesh mesh;
     public Mesh oldMesh;
     public int vertexCount;
@@ -17,9 +18,6 @@ public class MeshManager : Singleton<MeshManager>
         // heart = GameObject.Find("heart_2");
         mesh = heart.GetComponent<MeshFilter>().mesh;
         mesh.RecalculateNormals();
-        vertexCount = mesh.vertexCount;
-        triangles = mesh.triangles;
-        vertices = mesh.vertices;
     }
 
 

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 public class DivideTriangle : MonoBehaviour
 {
-    public bool isBoundary = false;
-
+    
     /// <summary>
     ///  지금 divide되는 triangle들은 버텍스가 두개씩 존재함.
     /// </summary>

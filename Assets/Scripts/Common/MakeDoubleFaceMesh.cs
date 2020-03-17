@@ -5,6 +5,7 @@ using UnityEngine;
 public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
 {
     public GameObject oppositeObject;
+    public GameObject testObject;
     private Mesh originalMesh;
     private Mesh oppositeMesh;
 

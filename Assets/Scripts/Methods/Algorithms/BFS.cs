@@ -79,10 +79,6 @@ public class BFS : Singleton<BFS>
             }
             else
             {
-                if(newTriangleCount == triangles.Length - removeTrianglesList.Count * 3)
-                {
-                    Debug.Break();
-                }
                 newTriangles[newTriangleCount++] = triangles[i];
                 newTriangles[newTriangleCount++] = triangles[i+1];
                 newTriangles[newTriangleCount++] = triangles[i+2];
