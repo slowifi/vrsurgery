@@ -152,7 +152,7 @@ public class AdjacencyList : Singleton<AdjacencyList>
             connectedVertices.Add(j, new HashSet<int>());
             connectedTriangles.Add(j, new HashSet<int>());
         }
-
+        
         for (int i = 0; i < triangles.Length; i += 3)
         {
             connectedVertices[triangles[i]].Add(triangles[i + 1]);

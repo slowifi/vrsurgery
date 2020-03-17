@@ -1177,7 +1177,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &312368822
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2869,7 +2869,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Incl. Cut
+  m_Text: Reset
 --- !u!222 &777527110
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3439,7 +3439,6 @@ GameObject:
   - component: {fileID: 900638278}
   - component: {fileID: 900638281}
   - component: {fileID: 900638280}
-  - component: {fileID: 900638279}
   m_Layer: 5
   m_Name: Reset button
   m_TagString: Untagged
@@ -3466,18 +3465,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0.0000076293945, y: 0.0000019073486}
   m_SizeDelta: {x: 0, y: -0.0049973}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &900638279
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 900638277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcb411aea7cacb8419ba338ba3861e39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &900638280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3511,7 +3498,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Position & Scale
+  m_Text: Quit
 --- !u!222 &900638281
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4109,6 +4096,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1112649146}
   - component: {fileID: 1112649147}
+  - component: {fileID: 1112649148}
   m_Layer: 0
   m_Name: AlgorithmManager
   m_TagString: Untagged
@@ -4140,6 +4128,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 529ce0fa5f4f6fb4fafc34bebef80c24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1112649148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1112649145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9e5d857564ba2e4b9b75930bc041bd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1134621220
@@ -4521,8 +4521,9 @@ GameObject:
   - component: {fileID: 1257441728}
   - component: {fileID: 1257441727}
   - component: {fileID: 1257441726}
+  - component: {fileID: 1257441729}
   m_Layer: 5
-  m_Name: Reset button
+  m_Name: Quit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4590,7 +4591,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1257441727}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1257441729}
+        m_MethodName: SceneQuit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, Unity.ugui, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1257441727
@@ -4631,6 +4643,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1257441724}
   m_CullTransparentMesh: 0
+--- !u!114 &1257441729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1257441724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c2788290f722245965fd16793ba0e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1266834403
 Transform:
   m_ObjectHideFlags: 0

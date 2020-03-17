@@ -5,16 +5,19 @@ using System.Linq;
 
 public class BFS : Singleton<BFS>
 {
-    public void BFS_Boundary(int vertex, List<int> boundaryList)
+    public bool BFS_Boundary(int vertex, List<int> boundaryList)
     {
         // start point부터 end point까지 겹치는 point들 전부가 boundary list에 들어가야됨.
         // 일단 incision에서 사용한 기능부터 만들어 보고
         // 여기는 그냥 BFS만 구현 하면됨.
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
-        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
+
+        //AdjacencyList.Instance.ListUpdate();
+        //List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
         temp.Enqueue(vertex);
         duplicateCheck.Add(vertex);
+        Debug.Log(MeshManager.Instance.mesh.triangles.Length);
         Dictionary<int, HashSet<int>> connectedVertices = AdjacencyList.Instance.connectedVertices;
         Dictionary<int, HashSet<int>> connectedTriangles = AdjacencyList.Instance.connectedTriangles;
         HashSet<int> removeTrianglesSet = new HashSet<int>();
@@ -22,9 +25,6 @@ public class BFS : Singleton<BFS>
         {
             duplicateCheck.Add(item);
 
-            //GameObject v_test = new GameObject();
-            //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            //v_test.transform.position = worldVertices[item];
         }
         foreach (int item2 in connectedTriangles[vertex])
             removeTrianglesSet.Add(item2);
@@ -32,11 +32,12 @@ public class BFS : Singleton<BFS>
         while (temp.Count != 0)
         {
             asdf++;
-            if (asdf == 2000)
+            if (asdf == 3000)
             {
-                ChatManager.Instance.GenerateMessage(" 자를 수 있는 영역이 아닙니다.");
-                MeshManager.Instance.LoadOldMesh();
-                return;
+                //ChatManager.Instance.GenerateMessage(" 자를 수 있는 영역이 아닙니다.");
+                //Debug.Break();
+                //MeshManager.Instance.LoadOldMesh();
+                return false;
             }
             foreach (int item in connectedVertices[temp.Dequeue()])
             {
@@ -58,23 +59,30 @@ public class BFS : Singleton<BFS>
                 temp.Enqueue(item);
             }
         }
-
+        Debug.Log("이게 실패여도 출력이 되나?");
         List<int> removeTrianglesList = removeTrianglesSet.ToList();
         removeTrianglesList.Sort();
-        // triangles를 지울 수 있는 걸 만들어야됨.
+
         int[] triangles = MeshManager.Instance.mesh.triangles;
+        
         int[] newTriangles = new int[triangles.Length - removeTrianglesList.Count * 3];
+
         int removeCount = 0, newTriangleCount = 0;
+        bool checkRemove = true;
         for (int i = 0; i < triangles.Length; i+=3)
         {
-            if(removeTrianglesList[removeCount] == i)
+            if(checkRemove && removeTrianglesList[removeCount] == i)
             {
                 removeCount++;
                 if (removeCount == removeTrianglesList.Count)
-                    removeCount = 0;
+                    checkRemove = false;
             }
             else
             {
+                if(newTriangleCount == triangles.Length - removeTrianglesList.Count * 3)
+                {
+                    Debug.Break();
+                }
                 newTriangles[newTriangleCount++] = triangles[i];
                 newTriangles[newTriangleCount++] = triangles[i+1];
                 newTriangles[newTriangleCount++] = triangles[i+2];
@@ -83,7 +91,7 @@ public class BFS : Singleton<BFS>
 
         MeshManager.Instance.mesh.triangles = newTriangles;
 
-        return;
+        return true;
         
     }
     

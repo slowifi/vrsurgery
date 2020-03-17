@@ -32,6 +32,8 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
     public bool isStartFromVtx;
     public bool isEndToVtx;
 
+    private int edgeVertexIndex;
+
     private int triangleCount;
 
     private DivideTriangle _dividingMethods;
@@ -441,6 +443,9 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         Vector3[] vertices = new Vector3[mesh.vertexCount + newVertices.Count];
         int[] triangles = new int[triangleCount];
 
+        //boundary cut 자동을 위한 vertex index를 저장함.
+        edgeVertexIndex = mesh.vertexCount;
+
         for (int i = 0; i < oldVertices.Length; i++)
             vertices[i] = oldVertices[i];
         for (int i = 0; i < oldTriangles.Length; i++)
@@ -491,6 +496,82 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         triangleCount = 0;
     }
 
+    public bool AutomaticallyRemoveTriangles()
+    {
+        //저 버텍스 두개를 index로 갖는 edge로 좌우 버텍스의 
+        int firstIndex = removeBoundaryVertices[3];
+        int secondIndex = removeBoundaryVertices[4];
+        int tri1 = 0, tri2 = 0;
+        AdjacencyList.Instance.ListUpdate();
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+
+        for (int i = 0; i < edgeList.Count; i+=3)
+        {
+            if ((edgeList[i].vtx1 == firstIndex && edgeList[i].vtx2 == secondIndex) || (edgeList[i].vtx2 == firstIndex && edgeList[i].vtx1 == secondIndex))
+            {
+                tri1 = edgeList[i].tri1;
+                tri2 = edgeList[i].tri2;
+                break;
+            }
+            else if ((edgeList[i+1].vtx1 == firstIndex && edgeList[i+1].vtx2 == secondIndex) || (edgeList[i+1].vtx2 == firstIndex && edgeList[i+1].vtx1 == secondIndex))
+            {
+                tri1 = edgeList[i+1].tri1;
+                tri2 = edgeList[i+1].tri2;
+                break;
+            }
+            else if ((edgeList[i+2].vtx1 == firstIndex && edgeList[i+2].vtx2 == secondIndex) || (edgeList[i+2].vtx2 == firstIndex && edgeList[i+2].vtx1 == secondIndex))
+            {
+                tri1 = edgeList[i+2].tri1;
+                tri2 = edgeList[i+2].tri2;
+                break;
+            }
+        }
+
+        int bfsVtx1 = 0, bfsVtx2 = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            if (triangles[tri1 + i] != firstIndex && triangles[tri1 + i] != secondIndex)
+            {
+                bfsVtx1 = triangles[tri1 + i];
+                break;
+            }
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (triangles[tri2 + i] != firstIndex && triangles[tri2 + i] != secondIndex)
+            {
+                bfsVtx2 = triangles[tri2 + i];
+                break;
+            }
+        }
+
+        GameObject v_test3 = new GameObject("안잘리는 vtx3");
+        v_test3 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        v_test3.transform.position = worldVertices[bfsVtx1];
+
+        GameObject v_test4 = new GameObject("안잘리는 vtx4");
+        v_test4 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        v_test4.transform.position = worldVertices[bfsVtx2];
+
+        Debug.Log(triangles.Length);
+        // 겨우 bfs두번 들어갔을뿐인데 왜 update의 triangle 개수가 바뀌는걸까??????????????
+        if (!BFS.Instance.BFS_Boundary(bfsVtx1, removeBoundaryVertices))
+            if (!BFS.Instance.BFS_Boundary(bfsVtx2, removeBoundaryVertices))
+                return false;
+        return true;
+    }
+
+    public void RemoveBoundaryTriangles()
+    {
+
+    }
+
+
+
+
     public bool PostProcess()
     {
         // 여기에 문제가 있을 가능성이 농후
@@ -537,6 +618,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             return false;
         }
         ExecuteDividing();
+        
         return true;
     }
 

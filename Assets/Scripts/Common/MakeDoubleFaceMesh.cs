@@ -41,6 +41,7 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
         }
         oppositeMesh.vertices = vertices;
         oppositeMesh.triangles = newTriangles;
+        oppositeMesh.RecalculateNormals();
     }
 
     protected override void InitializeChild()

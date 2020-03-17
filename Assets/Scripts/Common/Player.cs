@@ -75,8 +75,8 @@ public class Player : MonoBehaviour
                 float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
                 float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
                 // select the axis by which you want to rotate the GameObject                               
-                ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation);
-                ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation);
+                ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation * 3f);
+                ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation * 3f);
             }
             AdjacencyList.Instance.WorldPositionUpdate();
             return;
@@ -106,7 +106,7 @@ public class Player : MonoBehaviour
             Debug.Log(incision);
             if(incision)
             {
-                float extendValue = UIManager.Instance.extendBar.value + deltaMagnitudeDiff/1000;
+                float extendValue = UIManager.Instance.extendBar.value + deltaMagnitudeDiff/500;
                 if (extendValue >= 1)
                     UIManager.Instance.extendBar.value = 1;
                 else if (extendValue <= 0)
@@ -131,8 +131,8 @@ public class Player : MonoBehaviour
                 float xPos = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
                 float yPos = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
                 // select the axis by which you want to rotate the GameObject                               
-                ObjManager.Instance.pivotTransform.position += Vector3.left * xPos;
-                ObjManager.Instance.pivotTransform.position += Vector3.up * yPos;
+                ObjManager.Instance.pivotTransform.position += Vector3.left * -xPos;
+                ObjManager.Instance.pivotTransform.position += Vector3.up * -yPos;
             }
             AdjacencyList.Instance.WorldPositionUpdate();
         }

@@ -22,14 +22,16 @@ public class MeshManager : Singleton<MeshManager>
         vertices = mesh.vertices;
     }
 
+
+
     public void SaveCurrentMesh()
     {
         disableHeart = Instantiate(heart);
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         Destroy(disableHeart);
 
-        int[] triangles = (int[])mesh.triangles.Clone();
-        Vector3[] vertices = (Vector3[])mesh.vertices.Clone();
+        int[] triangles = (int[])heart.GetComponent<MeshFilter>().mesh.triangles.Clone();
+        Vector3[] vertices = (Vector3[])heart.GetComponent<MeshFilter>().mesh.vertices.Clone();
 
         oldMesh.triangles = triangles;
         oldMesh.vertices = vertices;

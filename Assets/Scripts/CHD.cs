@@ -199,6 +199,8 @@ public class CHD : MonoBehaviour
                     MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
                     MeshManager.Instance.SaveCurrentMesh();
                     IncisionManager.Instance.currentIndex++;
+                    MeshManager.Instance.mesh.RecalculateNormals();
+                    ChatManager.Instance.GenerateMessage(" 절개하였습니다. 확장이 가능합니다.");
                     playerObject.SetActive(true);
                     isExtend = true;
                 }
@@ -253,29 +255,50 @@ public class CHD : MonoBehaviour
 
                 if (isLastBoundaryCut)
                 {
-                    if (Input.GetMouseButtonDown(0))
+                    for (int i = 0; i < lineRenderers.Count; i++)
+                        Destroy(lineRenderers[i]);
+                    lineRenderers.Clear();
+                    AdjacencyList.Instance.ListUpdate();
+                    if (!BoundaryCutManager.Instance.AutomaticallyRemoveTriangles())
                     {
-                        for (int i = 0; i < lineRenderers.Count; i++)
-                            Destroy(lineRenderers[i]);
-                        lineRenderers.Clear();
-                        AdjacencyList.Instance.ListUpdate();
-
-                        int vertexIndex = IntersectionManager.Instance.GetIntersectedValues(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                        if (vertexIndex == -1)
-                            return;
-                        else
-                            BFS.Instance.BFS_Boundary(vertexIndex, BoundaryCutManager.Instance.removeBoundaryVertices);
-
-                        MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
-                        MeshManager.Instance.SaveCurrentMesh();
-                        //MeshManager.Instance.LoadOldMesh();
-                        BoundaryCutManager.Instance.BoundaryCutUpdate();
-                        ButtonOff();
+                        ChatManager.Instance.GenerateMessage(" 영역이 잘못 지정되었습니다.");
+                        MeshManager.Instance.LoadOldMesh();
                     }
+                    else
+                        MeshManager.Instance.SaveCurrentMesh();
+                    AdjacencyList.Instance.ListUpdate();
+                    MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+                    BoundaryCutManager.Instance.BoundaryCutUpdate();
+                    ButtonOff();
                     return;
+                    //if (Input.GetMouseButtonDown(0))
+                    //{
+                    //    for (int i = 0; i < lineRenderers.Count; i++)
+                    //        Destroy(lineRenderers[i]);
+                    //    lineRenderers.Clear();
+                    //    AdjacencyList.Instance.ListUpdate();
+
+                    //    int vertexIndex = IntersectionManager.Instance.GetIntersectedValues(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                    //    if (vertexIndex == -1)
+                    //        return;
+                    //    else
+                    //    {
+                    //        BoundaryCutManager.Instance.AutomaticallyRemoveTriangles();
+
+                    //        //여기에 지금 판단을 해서 아예 잘라지게 해놔야되는데 어떻게 할까
+                    //        //BFS.Instance.BFS_Boundary(vertexIndex, BoundaryCutManager.Instance.removeBoundaryVertices);
+                    //    }
+
+                    //    MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+                    //    MeshManager.Instance.SaveCurrentMesh();
+                    //    //MeshManager.Instance.LoadOldMesh();
+                    //    BoundaryCutManager.Instance.BoundaryCutUpdate();
+                    //    ButtonOff();
+                    //}
+                    //return;
                 }
 
-                
+
                 if (Input.GetMouseButtonDown(0))
                 {
                     AdjacencyList.Instance.ListUpdate();
@@ -325,6 +348,8 @@ public class CHD : MonoBehaviour
                                 ButtonOff();
                                 return;
                             }
+                            MeshManager.Instance.mesh.RecalculateNormals();
+                            ChatManager.Instance.GenerateMessage(" vertex를 선택해 주세요.");
                             isLastBoundaryCut = true;
                         }
                         else if (Vector3.Distance(currentPosition, oldPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
@@ -400,6 +425,8 @@ public class CHD : MonoBehaviour
                             ButtonOff();
                             return;
                         }
+                        MeshManager.Instance.mesh.RecalculateNormals();
+                        ChatManager.Instance.GenerateMessage(" vertex를 선택해 주세요.");
                         isLastBoundaryCut = true;
                     }
                 }

@@ -11,4 +11,9 @@ public class ResetScene : MonoBehaviour
         // SceneManager.LoadScene("SampleScene");
         SceneManager.LoadScene(scene.name);
     }
+
+    public void SceneQuit()
+    {
+        Application.Quit();
+    }
 }
