@@ -6,6 +6,7 @@ public class MeshManager : Singleton<MeshManager>
 {
     public GameObject heart;
     private GameObject disableHeart;
+    public Material material;
     public Mesh testMesh;
     public Mesh mesh;
     public Mesh oldMesh;
@@ -44,16 +45,32 @@ public class MeshManager : Singleton<MeshManager>
         mesh.vertices = vertices;
     }
 
-    protected override void InitializeChild()
+    public void Reinitialize()
     {
+        Renderer mat = heart.GetComponent<Renderer>();
+        mat.material = material;
         mesh = heart.GetComponent<MeshFilter>().mesh;
         disableHeart = Instantiate(heart);
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         Destroy(disableHeart);
 
-        vertexCount = mesh.vertexCount;
-        triangles = mesh.triangles;
-        vertices = mesh.vertices;
         mesh.RecalculateNormals();
+        Debug.Log(mesh.normals.Length);
+        Debug.Log(mesh.vertexCount);
+    }
+
+    protected override void InitializeChild()
+    {
+        Renderer mat = heart.GetComponent<Renderer>();
+        mat.material = material;
+        mesh = heart.GetComponent<MeshFilter>().mesh;
+        disableHeart = Instantiate(heart);
+        oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
+        Destroy(disableHeart);
+
+        mesh.RecalculateNormals();
+        ChatManager.Instance.GenerateMessage(" " + mesh.normals.Length);
+        Debug.Log(mesh.normals.Length);
+        Debug.Log(mesh.vertexCount);
     }
 }

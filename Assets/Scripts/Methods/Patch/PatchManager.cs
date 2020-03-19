@@ -50,6 +50,20 @@ public class PatchManager : Singleton<PatchManager>
         patchWeight = curveValue * 20.0f * ObjManager.Instance.pivotTransform.lossyScale.z;
         _generatePatch.RecalculateNormal(patchIndex);
     }
+    
+    public void Reinitialize()
+    {
+        newPatch = new List<GameObject>();
+        avgNorm = new List<Vector3>();
+        weightCenterPos = new List<Vector3>();
+        patchCenterPos = new List<Vector3>();
+
+        insidePatchVertices = new List<List<Vector3>[]>();
+        patchVerticesCount = new List<int>();
+        patchVerticesIntervalValue = 3.0f;
+
+        patchWeight = 0f;
+    }
 
     protected override void InitializeChild()
     {

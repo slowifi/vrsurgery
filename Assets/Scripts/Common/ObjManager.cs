@@ -11,7 +11,7 @@ public class ObjManager : Singleton<ObjManager>
     public void ObjUpdate()
     {
         objTransform = objTransform.GetComponent<Transform>();
-        //objTransform = GameObject.Find("OuterSurface").transform;
+        //objTransform = GameObject.Find("PartialModel").transform;
         pivotTransform = pivotTransform.GetComponent<Transform>();
     }
 }

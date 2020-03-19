@@ -120,6 +120,43 @@ public class CHD : MonoBehaviour
         }
     }
 
+    public void ResetMain()
+    {
+        ObjManager.Instance.ObjUpdate();
+        MeshManager.Instance.Reinitialize();
+        AdjacencyList.Instance.ListUpdate();
+        PatchManager.Instance.Reinitialize();
+        IncisionManager.Instance.Reinitialize();
+        BoundaryCutManager.Instance.Reinitialize();
+        MakeDoubleFaceMesh.Instance.Reinitialize();
+        playerObject.SetActive(true);
+        playerObject.SendMessage("IncisionModeOff");
+        lineRenderers = new List<GameObject>();
+        Destroy(GameObject.Find("MeasureLine"));
+        ObjManager.Instance.startMeasurePoint.SetActive(false);
+        ObjManager.Instance.endMeasurePoint.SetActive(false);
+
+        GameObject patchObject = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1));
+        if (patchObject)
+        {
+            MeshRenderer ren = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1)).GetComponent<MeshRenderer>();
+            ren.material.color = new Color32(115, 0, 0, 255);
+        }
+        isCutMode = false;
+        isBoundaryCutMode = false;
+        isMeasureMode = false;
+        isPatchMode = false;
+        isIncisionMode = false;
+        isExtend = false;
+        isPatchUpdate = false;
+        isFirstPatch = true;
+        isLastBoundaryCut = false;
+
+        boundaryCount = 0;
+        oldExtendValue = 0;
+        incisionCount = -1;
+    }
+
 
     void Start()
     {
@@ -131,6 +168,7 @@ public class CHD : MonoBehaviour
         IncisionManager.Instance.Initialize();
         BoundaryCutManager.Instance.Initialize();
         MakeDoubleFaceMesh.Instance.Initialize();
+        playerObject.SetActive(true);
         lineRenderers = new List<GameObject>();
         boundaryCount = 0;
         oldExtendValue = 0;

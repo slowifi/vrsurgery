@@ -46,7 +46,6 @@ public class GeneratePatch : MonoBehaviour
 
     public void GeneratePatchTriangle()
     {
-        
         Vector3 _patchCenterPos = PatchManager.Instance.patchCenterPos[_patchIndex];
         Vector3[] vtrList = new Vector3[_patchVertices.Count];
 

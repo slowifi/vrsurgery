@@ -91,8 +91,8 @@ public class IncisionManager : Singleton<IncisionManager>
 
         Transform objTransform = ObjManager.Instance.pivotTransform;
         
-        Vector2 rightVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
-        Vector2 leftVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
+        Vector2 leftVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
+        Vector2 rightVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
 
         leftVectorObject.Add(new GameObject("Left Vector"+currentIndex+1));
         rightVectorObject.Add(new GameObject("Right Vector"+currentIndex+1));
@@ -265,6 +265,37 @@ public class IncisionManager : Singleton<IncisionManager>
 
         newVertices.Clear();
         newTriangles.Clear();
+    }
+
+    public void Reinitialize()
+    {
+        startOuterVertexPosition = Vector3.zero;
+        endOuterVertexPosition = Vector3.zero;
+
+        startOuterTriangleIndex = -1;
+        endOuterTriangleIndex = -1;
+        trianglesCount = 0;
+        currentIndex = 0;
+
+        startScreenRay = new Ray();
+        endScreenRay = new Ray();
+
+        startPointIndices = new List<int>();
+        endPointIndices = new List<int>();
+
+        leftSide = new List<List<int>>();
+        rightSide = new List<List<int>>();
+
+        leftVectorObject = new List<GameObject>();
+        rightVectorObject = new List<GameObject>();
+
+        leftSideWeight = new List<List<float>>();
+        rightSideWeight = new List<List<float>>();
+
+        newVertices = new Dictionary<int, Vector3>();
+        newTriangles = new Dictionary<int, int>();
+
+        _dividingMethods = gameObject.AddComponent<DivideTriangle>();
     }
 
     // elements가 10만개 넘으면 reinitializing이 효과적이고 밑이면 그냥 clear 쓰는게 이득.

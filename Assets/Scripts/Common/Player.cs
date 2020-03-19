@@ -32,8 +32,9 @@ public class Player : MonoBehaviour
             // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
             ObjManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
 
-            if (transform.localScale.x <= 0.2f)
-                transform.localScale = Vector3.one * 0.2f;
+            if (ObjManager.Instance.pivotTransform.localScale.x <= 0.2f)
+                ObjManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
+
             AdjacencyList.Instance.WorldPositionUpdate();
         }
         else if (Input.GetMouseButton(1))
@@ -117,8 +118,8 @@ public class Player : MonoBehaviour
             }
             ObjManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/1000;
 
-            if (transform.localScale.x <= 0.2f)
-                transform.localScale = Vector3.one * 0.2f;
+            if (ObjManager.Instance.pivotTransform.localScale.x <= 0.2f)
+                ObjManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
             AdjacencyList.Instance.WorldPositionUpdate();
 
             return;
