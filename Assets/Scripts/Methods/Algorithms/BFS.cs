@@ -92,6 +92,13 @@ public class BFS : Singleton<BFS>
     }
     
 
+    /// <summary>
+    /// Incision 전용
+    /// </summary>
+    /// <param name="vertex_num"></param>
+    /// <param name="startPoint"></param>
+    /// <param name="endPoint"></param>
+    /// <param name="isLeft"></param>
     public void BFS_Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, bool isLeft)
     {
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
@@ -103,37 +110,18 @@ public class BFS : Singleton<BFS>
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
         duplicateCheck.Add(vertex_num);
-        //duplicateCheck.Add(IncisionManager.Instance.firstInnerVertexIndex);
         duplicateCheck.Add(IncisionManager.Instance.firstOuterVertexIndex);
-        //duplicateCheck.Add(IncisionManager.Instance.lastInnerVertexIndex);
         duplicateCheck.Add(IncisionManager.Instance.lastOuterVertexIndex);
-        //시작점과 끝점을 하나씩 넣어주는게 좋음.
-        //duplicateCheck.Add()
-
-        //if (_left)
-        //{
-        //    IncisionManager.Instance.leftSide.Add(vertex_num);
-        //    foreach (int item in IncisionManager.Instance.leftSide)
-        //        duplicateCheck.Add(item);
-        //}
-        //else
-        //{
-        //    IncisionManager.Instance.rightSide.Add(vertex_num);
-        //    foreach (int item in IncisionManager.Instance.rightSide)
-        //        duplicateCheck.Add(item);
-        //}
-
+        
         temp.Enqueue(vertex_num);
-        // outerVertices.Add(vertex_num);
-        //GameObject v_t = new GameObject();
-        //v_t = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        //v_t.transform.position = worldVertices[vertex_num];
         int exceptionalErrorCheck = 0;
         while (temp.Count != 0)
         {
             exceptionalErrorCheck++;
             if(exceptionalErrorCheck==4000)
             {
+                ChatManager.Instance.GenerateMessage(" BFS 에러");
+                return;
                 //여기에 다른 초기화 함수들 다시 넣고 다 해야됨.
             }
             foreach (int item in AdjacencyList.Instance.connectedVertices[temp.Dequeue()])
@@ -156,40 +144,16 @@ public class BFS : Singleton<BFS>
                 if (Vector2.Distance(center, worldVertices[item]) < dst)
                 {
                     duplicateCheck.Add(item);
+                    //여기서 depth관련된 조건을 하나 넣어주는식으로 해야됨.
+                    //if (worldVertices[item])
+                    //{
+
+                    //}
                     temp.Enqueue(item);
                     if(isLeft)
                         IncisionManager.Instance.leftSide[currentIndex].Add(item);
                     else
                         IncisionManager.Instance.rightSide[currentIndex].Add(item);
-                    //if (AlgorithmsManager.Instance.isLeft(startPoint, endPoint, worldVertices[item]))
-                    //{
-                    //    if (_left)
-                    //    {
-                    //        duplicateCheck.Add(item);
-                    //        temp.Enqueue(item);
-                    //        IncisionManager.Instance.leftSide.Add(item);
-
-                    //        GameObject v_test = new GameObject();
-                    //        v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    //        v_test.transform.position = worldVertices[item];
-                    //    }
-                    //    else
-                    //        continue;
-                    //}
-                    //else
-                    //{
-                    //    if (!_left)
-                    //    {
-                    //        duplicateCheck.Add(item);
-                    //        temp.Enqueue(item);
-                    //        IncisionManager.Instance.rightSide.Add(item);
-                    //        GameObject v_test = new GameObject();
-                    //        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    //        v_test.transform.position = worldVertices[item];
-                    //    }
-                    //    else
-                    //        continue;
-                    //}
                 }
             }
         }

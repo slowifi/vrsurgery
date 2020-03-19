@@ -87,12 +87,25 @@ public class IncisionManager : Singleton<IncisionManager>
         startPointIndices.Add(newTriangles.Values.First());
         endPointIndices.Add(vertices.Length - 1);
         
-        Vector3 normalVector = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[newTriangles.Values.First()];
+        //Vector3 normalVector = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[newTriangles.Values.First()];
 
         Transform objTransform = ObjManager.Instance.pivotTransform;
+
+        //여기에다가 안쪽면인지 바깥면인지를 판단 필요.
+        Vector2 rightVector = Vector2.zero;
+        Vector2 leftVector = Vector2.zero;
+
+        if (worldPosition[endPointIndices[currentIndex]].z - ObjManager.Instance.objTransform.TransformPoint(MeshManager.Instance.mesh.normals[endPointIndices[currentIndex]] + MeshManager.Instance.mesh.vertices[endPointIndices[currentIndex]]).z < 0)
+        {
+            leftVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
+            rightVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
+        }
+        else
+        {
+            rightVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
+            leftVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
+        }
         
-        Vector2 leftVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
-        Vector2 rightVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
 
         leftVectorObject.Add(new GameObject("Left Vector"+currentIndex+1));
         rightVectorObject.Add(new GameObject("Right Vector"+currentIndex+1));
@@ -122,7 +135,6 @@ public class IncisionManager : Singleton<IncisionManager>
 
     public void Extending(int incisionIndex, float currentExtendValue, float oldExtendValue)
     {
-        Debug.Log(leftSide.Count);
         AdjacencyList.Instance.WorldPositionUpdate();
 
         int[] triangles = MeshManager.Instance.mesh.triangles;
@@ -135,7 +147,6 @@ public class IncisionManager : Singleton<IncisionManager>
 
         Vector3 leftVector = leftVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
         Vector3 rightVector = rightVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
-        Debug.Log(incisionIndex);
         int count = 0;
         foreach (int item in leftSide[incisionIndex])
         {

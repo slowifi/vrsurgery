@@ -284,7 +284,7 @@ public class CHD : MonoBehaviour
 
                 if (isFirstPatch)
                 {
-                    playerObject.SetActive(false);
+                    //playerObject.SetActive(false);
                     MeshManager.Instance.SaveCurrentMesh();
                     AdjacencyList.Instance.ListUpdate();
                     isFirstPatch = false;
