@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
 
 
     private bool incision = false;
+    private bool boundary = false;
 
     public void IncisionModeOn()
     {
@@ -20,6 +21,20 @@ public class Player : MonoBehaviour
     {
         incision = false;
         Debug.Log(incision);
+    }
+
+    public void BoundaryModeOn()
+    {
+        boundary = true;
+
+
+    }
+
+    public void BoundaryModeOff()
+    {
+        boundary = false;
+
+
     }
 
     void Update()
@@ -71,15 +86,18 @@ public class Player : MonoBehaviour
 
         if (Input.touchCount == 1) // For Touch Input with a finger
         {
-            if (Input.GetTouch(0).phase == TouchPhase.Moved)
-            {
-                float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
-                float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
-                // select the axis by which you want to rotate the GameObject                               
-                ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation * 3f);
-                ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation * 3f);
+            if(!boundary)
+            {    
+                if (Input.GetTouch(0).phase == TouchPhase.Moved)
+                {
+                    float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
+                    float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
+                    // select the axis by which you want to rotate the GameObject                               
+                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation * 3f);
+                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation * 3f);
+                }
+                AdjacencyList.Instance.WorldPositionUpdate();
             }
-            AdjacencyList.Instance.WorldPositionUpdate();
             return;
         }
 
@@ -116,7 +134,7 @@ public class Player : MonoBehaviour
                     UIManager.Instance.extendBar.value = extendValue;
                 return;
             }
-            ObjManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/1000;
+            ObjManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/700;
 
             if (ObjManager.Instance.pivotTransform.localScale.x <= 0.2f)
                 ObjManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;

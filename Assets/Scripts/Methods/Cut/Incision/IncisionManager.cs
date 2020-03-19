@@ -81,8 +81,22 @@ public class IncisionManager : Singleton<IncisionManager>
         leftSideWeight.Add(new List<float>());
         rightSideWeight.Add(new List<float>());
 
-        BFS.Instance.BFS_Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, true);
-        BFS.Instance.BFS_Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, false);
+        float zMin = 1000000;
+        float zMax = -1000000;
+
+        for (int i = 0; i < leftSide[currentIndex].Count; i++)
+        {
+            float tempZ = worldPosition[leftSide[currentIndex][i]].z;
+            if (tempZ < zMin)
+                zMin = tempZ;
+            if (tempZ > zMax)
+                zMax = tempZ;
+        }
+        zMax += (zMax - zMin) * 1.5f;
+        zMin -= (zMax - zMin) * 1.5f;
+
+        BFS.Instance.BFS_Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, true, zMin, zMax);
+        BFS.Instance.BFS_Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, false, zMin, zMax);
 
         startPointIndices.Add(newTriangles.Values.First());
         endPointIndices.Add(vertices.Length - 1);

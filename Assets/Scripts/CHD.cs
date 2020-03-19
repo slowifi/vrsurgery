@@ -37,6 +37,7 @@ public class CHD : MonoBehaviour
 
     public void CutMode()
     {
+        playerObject.SendMessage("BoundaryModeOn");
         isCutMode = true;
         isBoundaryCutMode = true;
         isMeasureMode = false;
@@ -88,6 +89,7 @@ public class CHD : MonoBehaviour
     public void ButtonOff()
     {
         playerObject.SetActive(true);
+        playerObject.SendMessage("BoundaryModeOff");
         playerObject.SendMessage("IncisionModeOff");
         MeshManager.Instance.LoadOldMesh();
         ButtonPress.Instance.ResetButton();
@@ -97,6 +99,7 @@ public class CHD : MonoBehaviour
     public void Exit()
     {
         playerObject.SetActive(true);
+        playerObject.SendMessage("BoundaryModeOff");
         playerObject.SendMessage("IncisionModeOff");
         MeshManager.Instance.SaveCurrentMesh();
         isCutMode = false;
@@ -131,6 +134,7 @@ public class CHD : MonoBehaviour
         MakeDoubleFaceMesh.Instance.Reinitialize();
         playerObject.SetActive(true);
         playerObject.SendMessage("IncisionModeOff");
+        playerObject.SendMessage("BoundaryModeOff");
         lineRenderers = new List<GameObject>();
         Destroy(GameObject.Find("MeasureLine"));
         ObjManager.Instance.startMeasurePoint.SetActive(false);
