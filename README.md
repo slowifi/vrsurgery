@@ -1,6 +1,3 @@
-# chd_vr
-unity code for vr 
-
 *유니티 버전이 변경되었습니다.(2020.03.19)
 Unity version : 2019.3.0a5 -> 2019.3.0f6
 
