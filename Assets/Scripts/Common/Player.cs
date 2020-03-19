@@ -26,15 +26,11 @@ public class Player : MonoBehaviour
     public void BoundaryModeOn()
     {
         boundary = true;
-
-
     }
 
     public void BoundaryModeOff()
     {
         boundary = false;
-
-
     }
 
     void Update()

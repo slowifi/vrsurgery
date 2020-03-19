@@ -372,7 +372,7 @@ public class CHD : MonoBehaviour
                     Vector3 currentPosition = Vector3.zero;
                     if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition))
                     {
-                        if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 3f*ObjManager.Instance.pivotTransform.lossyScale.z)
+                        if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 2f*ObjManager.Instance.pivotTransform.lossyScale.z)
                         {
                             lineRenderers.Add(new GameObject("Boundary Line", typeof(LineRenderer)));
                             var lineRenderer = lineRenderers[boundaryCount - 1].GetComponent<LineRenderer>();
@@ -383,6 +383,7 @@ public class CHD : MonoBehaviour
                             lineRenderer.material.color = Color.black;
                             lineRenderer.SetPositions(new Vector3[] { oldPos, curPos });
                             bool checkError = true;
+                            // 이걸 뒤에 넣어서 한프레임 늦게 실행 되도록 하기.
                             checkError = BoundaryCutManager.Instance.PostProcess();
                             if(!checkError)
                             {
@@ -396,7 +397,7 @@ public class CHD : MonoBehaviour
                             //ChatManager.Instance.GenerateMessage(" vertex를 선택해 주세요.");
                             isLastBoundaryCut = true;
                         }
-                        else if (Vector3.Distance(currentPosition, oldPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
+                        else if (Vector3.Distance(currentPosition, oldPosition) < 1.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
                             return;
                         else if (boundaryCount == 1)
                         {
