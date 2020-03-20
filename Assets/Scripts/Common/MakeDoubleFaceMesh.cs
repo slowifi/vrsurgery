@@ -46,13 +46,14 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
     public void Reinitialize()
     {
         originalMesh = MeshManager.Instance.mesh;
-        oppositeObject = new GameObject("Heart_Inner", typeof(MeshFilter), typeof(MeshRenderer));
-        oppositeObject.GetComponent<MeshRenderer>().material = MeshManager.Instance.heart.GetComponent<MeshRenderer>().material;
+        GameObject newHeart = new GameObject("Heart_Inner", typeof(MeshFilter), typeof(MeshRenderer));
 
-        oppositeObject.transform.SetParent(GameObject.Find("PartialModel").transform);
+        oppositeObject = newHeart;
+        oppositeObject.GetComponent<MeshRenderer>().material = MeshManager.Instance.heart.GetComponent<MeshRenderer>().material;
+        oppositeObject.transform.SetParent(ObjManager.Instance.objTransform.parent);
         oppositeObject.transform.localPosition = Vector3.zero;
         oppositeObject.transform.localScale = Vector3.one;
-        //oppositeObject.transform.SetPositionAndRotation(ObjManager.Instance.objTransform.position, ObjManager.Instance.objTransform.rotation);
+        
         oppositeMesh = oppositeObject.GetComponent<MeshFilter>().mesh;
 
         int[] triangles = (int[])originalMesh.triangles.Clone();

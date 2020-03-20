@@ -285,7 +285,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             //side = IntersectionManager.Instance.PlaneEdgeIntersectionStart(ref edgeIdx, ref edgePoint, startVertexPosition, endVertexPosition, ref triangleIndex, startScreenRay, endScreenRay);
 
 
-        if (side == -1)
+        if (side == -1 || edgeIdx == -1)
         {
             ChatManager.Instance.GenerateMessage(" Boundary가 적절하지 않습니다.");
             Debug.Log("Boundary 시작이 잘못되었다.");

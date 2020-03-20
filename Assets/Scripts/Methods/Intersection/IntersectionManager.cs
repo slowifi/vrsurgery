@@ -437,7 +437,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
                 return 0;
             else
             {
-                Debug.Break();
+                Debug.Log("intersection이 안됨.");
                 return -1;
             }
         }

@@ -42,12 +42,14 @@ public class ImportMesh : MonoBehaviour
         // 여기에 추가 해야될 것은 새로 읽어드렸을 때, 리셋 기능.
 
         //ObjImporter asdf = new ObjImporter();
-        Debug.Log("ㅁㄴㅇㄹ");
+        
         if (mainObject.activeSelf)
         {
+            //이부분 수정이 필요함.
             pivotObject.transform.localPosition = Vector3.zero;
             pivotObject.transform.localScale = Vector3.one;
             pivotObject.transform.localEulerAngles = Vector3.zero;
+
             Destroy(GameObject.Find("PartialModel"));
             GameObject newLocalHeart = new OBJLoader().Load(path);
             newLocalHeart.name = "PartialModel";
@@ -58,9 +60,9 @@ public class ImportMesh : MonoBehaviour
             mainObject.SendMessage("ResetMain");
             return;
         }
-        Debug.Log("ㅁㄴㅇㄹ");
+        
         GameObject newHeart = new OBJLoader().Load(path);
-        Debug.Log("ㅁㄴㅇㄹ");
+        
         newHeart.name = "PartialModel";
         ChatManager.Instance.GenerateMessage(newHeart.name);
         newHeart.transform.SetParent(GameObject.Find("HumanHeart").transform);
