@@ -3433,11 +3433,6 @@ public class RayIntersection : MonoBehaviour
                 edgeIdx = incisionPointIdx + i;
                 edgePoint = intersectionPoint;
                 intersectionCount++;
-                /*
-                GameObject v_test = new GameObject();
-                v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                v_test.transform.position = intersectionPoint;
-                */
             }
         }
 

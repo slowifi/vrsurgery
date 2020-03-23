@@ -98,6 +98,7 @@ public class CHD : MonoBehaviour
 
     public void Exit()
     {
+        Debug.Log("Exit");
         playerObject.SetActive(true);
         playerObject.SendMessage("BoundaryModeOff");
         playerObject.SendMessage("IncisionModeOff");
@@ -118,13 +119,19 @@ public class CHD : MonoBehaviour
         GameObject patchObject = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count-1));
         if (patchObject)
         {
-            MeshRenderer ren = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1)).GetComponent<MeshRenderer>();
+            MeshRenderer ren = patchObject.GetComponent<MeshRenderer>();
             ren.material.color = new Color32(115, 0, 0, 255);
+            if(ren.material.color != new Color32(115, 0, 0, 255))
+                MakeDoubleFaceMesh.Instance.MakePatchInnerFace(patchObject);
         }
     }
 
     public void ResetMain()
     {
+        for (int i = 0; i < PatchManager.Instance.newPatch.Count; i++)
+        {
+            Destroy(PatchManager.Instance.newPatch[i]);
+        }
         ObjManager.Instance.ObjUpdate();
         MeshManager.Instance.Reinitialize();
         AdjacencyList.Instance.ListUpdate();
@@ -139,13 +146,14 @@ public class CHD : MonoBehaviour
         Destroy(GameObject.Find("MeasureLine"));
         ObjManager.Instance.startMeasurePoint.SetActive(false);
         ObjManager.Instance.endMeasurePoint.SetActive(false);
-
-        GameObject patchObject = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1));
-        if (patchObject)
-        {
-            MeshRenderer ren = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1)).GetComponent<MeshRenderer>();
-            ren.material.color = new Color32(115, 0, 0, 255);
-        }
+        //GameObject patchObject = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1));
+        //if (patchObject)
+        //{
+        //    MeshRenderer ren = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1)).GetComponent<MeshRenderer>();
+        //    ren.material.color = new Color32(115, 0, 0, 255);
+        //    if (ren.material.color != new Color32(115, 0, 0, 255))
+        //        MakeDoubleFaceMesh.Instance.MakePatchInnerFace(patchObject);
+        //}
         isCutMode = false;
         isBoundaryCutMode = false;
         isMeasureMode = false;
@@ -197,7 +205,7 @@ public class CHD : MonoBehaviour
                     //추후 incision된 파트들 indexing 해서 관리를 해줘야됨 + undo를 위한 작업도 미리미리 해놓는게 좋음.
                     if (oldExtendValue != UIManager.Instance.extendBar.value)
                     {
-                        IncisionManager.Instance.Extending(incisionCount, UIManager.Instance.extendBar.value, oldExtendValue);
+                        IncisionManager.Instance.Extending(IncisionManager.Instance.currentIndex - 1, UIManager.Instance.extendBar.value, oldExtendValue);
                         oldExtendValue = UIManager.Instance.extendBar.value;
                         MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
                         return;
@@ -207,9 +215,10 @@ public class CHD : MonoBehaviour
                 }
                 else if(Input.GetMouseButtonDown(0))
                 {
+                    Debug.Log("Incision 실행");
                     playerObject.SetActive(false);
                     lineRenderers.Add(new GameObject("Incision Line", typeof(LineRenderer)));
-                    incisionCount++;
+                    //incisionCount++;
                     firstIncision = true;
                     IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref oldPosition);
                     IncisionManager.Instance.IncisionUpdate();
@@ -228,7 +237,7 @@ public class CHD : MonoBehaviour
                     {
                         IncisionManager.Instance.leftSide.RemoveAt(IncisionManager.Instance.currentIndex);
                         IncisionManager.Instance.rightSide.RemoveAt(IncisionManager.Instance.currentIndex);
-                        incisionCount--;
+                        //incisionCount--;
                         IncisionManager.Instance.IncisionUpdate();
                         playerObject.SendMessage("IncisionModeOff");
                         ButtonOff();
@@ -265,7 +274,7 @@ public class CHD : MonoBehaviour
                             Destroy(lineRenderers[i]);
                         lineRenderers.Clear();
                         ChatManager.Instance.GenerateMessage(" 심장을 벗어났습니다.");
-                        incisionCount--;
+                        //incisionCount--;
                         ButtonOff();
                         playerObject.SendMessage("IncisionModeOff");
                         return;
@@ -288,6 +297,7 @@ public class CHD : MonoBehaviour
 
                 if (isFirstPatch)
                 {
+                    Debug.Log("Boundary cut 실행");
                     //playerObject.SetActive(false);
                     MeshManager.Instance.SaveCurrentMesh();
                     AdjacencyList.Instance.ListUpdate();
@@ -502,7 +512,6 @@ public class CHD : MonoBehaviour
         }
         else if(isMeasureMode)
         {
-            
             if (Input.GetMouseButtonDown(0))
             {
                 Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
@@ -516,6 +525,7 @@ public class CHD : MonoBehaviour
             // 처음에 실행되어야함.
             if (isFirstPatch)
             {
+                Debug.Log("Patch 실행");
                 isFirstPatch = false;
                 return;
             }
@@ -540,6 +550,8 @@ public class CHD : MonoBehaviour
             }
             else if (Input.GetMouseButtonUp(0))
             {
+                if (oldPosition == Vector3.zero)
+                    return;
                 for (int i = 0; i < lineRenderers.Count; i++)
                     Destroy(lineRenderers[i]);
                 lineRenderers.Clear();
@@ -548,6 +560,8 @@ public class CHD : MonoBehaviour
             }
             else if (Input.GetMouseButton(0))
             {
+                if (oldPosition == Vector3.zero)
+                    return;
                 Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
                 if(vertexPosition!=Vector3.zero)
                 {

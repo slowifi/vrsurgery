@@ -9,6 +9,31 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
     private Mesh originalMesh;
     private Mesh oppositeMesh;
 
+    public void MakePatchInnerFace(GameObject patch)
+    {
+        GameObject innerPatch = new GameObject(patch.name + "_Inner", typeof(MeshFilter), typeof(MeshRenderer));
+        //innerPatch.GetComponent<MeshFilter>().mesh;
+        innerPatch.transform.SetParent(ObjManager.Instance.pivotTransform);
+        //innerPatch.transform.localPosition = Vector3.zero;
+        //innerPatch.transform.localScale = Vector3.one;
+        Mesh innerMesh = innerPatch.GetComponent<MeshFilter>().mesh;
+
+        int[] triangles = (int[])patch.GetComponent<MeshFilter>().mesh.triangles.Clone();
+        innerMesh.vertices = patch.GetComponent<MeshFilter>().mesh.vertices;
+        int[] newTriangles = (int[])triangles.Clone();
+
+        for (int i = 0; i < triangles.Length; i += 3)
+        {
+            newTriangles[i + 1] = triangles[i + 2];
+            newTriangles[i + 2] = triangles[i + 1];
+        }
+        innerMesh.triangles = newTriangles;
+        innerMesh.RecalculateNormals();
+
+        MeshRenderer ren = innerPatch.GetComponent<MeshRenderer>();
+        ren.material.color = new Color32(115, 0, 0, 255);
+    }
+
     public void MakeDoubleFace()
     {
         originalMesh = MeshManager.Instance.mesh;

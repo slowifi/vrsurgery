@@ -14,13 +14,11 @@ public class Player : MonoBehaviour
     public void IncisionModeOn()
     {
         incision = true;
-        Debug.Log(incision);
     }
 
     public void IncisionModeOff()
     {
         incision = false;
-        Debug.Log(incision);
     }
 
     public void BoundaryModeOn()
