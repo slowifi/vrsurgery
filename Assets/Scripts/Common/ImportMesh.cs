@@ -9,6 +9,7 @@ using SimpleFileBrowser;
 public class ImportMesh : MonoBehaviour
 {
     public GameObject mainObject;
+    public GameObject playerObject;
     public GameObject pivotObject;
     public GameObject buttonPressScript;
 
@@ -16,8 +17,8 @@ public class ImportMesh : MonoBehaviour
     {
         // Show a load file dialog and wait for a response from user
         // Load file/folder: file, Initial path: default (Documents), Title: "Load File", submit button text: "Load"
-        yield return FileBrowser.WaitForLoadDialog(false, null, "Load File", "Load");
-
+        yield return FileBrowser.WaitForLoadDialog(false, "/storage/emulated/0/hearts", "Load File", "Load");
+        
         
         if (FileBrowser.Success)
         {
@@ -28,6 +29,7 @@ public class ImportMesh : MonoBehaviour
     public void FileBrowsing()
     {
         FileBrowser.SetFilters(false, new FileBrowser.Filter("obj files", ".obj"));
+        playerObject.SetActive(false);
         StartCoroutine(ShowLoadDialogCoroutine());
     }
 
@@ -50,7 +52,7 @@ public class ImportMesh : MonoBehaviour
             pivotObject.transform.localPosition = Vector3.zero;
             pivotObject.transform.localScale = Vector3.one;
             pivotObject.transform.localEulerAngles = Vector3.zero;
-
+            
             Destroy(GameObject.Find("PartialModel"));
             GameObject newLocalHeart = new OBJLoader().Load(path);
             newLocalHeart.name = "PartialModel";

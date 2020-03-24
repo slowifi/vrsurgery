@@ -365,7 +365,7 @@ public class CHD : MonoBehaviour
                 if (Input.GetMouseButtonDown(0))
                 {
                     //test();
-                    AdjacencyList.Instance.ListUpdate();
+                    //AdjacencyList.Instance.ListUpdate();
                     boundaryCount = 0;
                     oldPosition = Vector3.zero;
                     Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
@@ -392,7 +392,7 @@ public class CHD : MonoBehaviour
                     Vector3 currentPosition = Vector3.zero;
                     if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition))
                     {
-                        if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 3f * ObjManager.Instance.pivotTransform.lossyScale.z)
+                        if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 2f * ObjManager.Instance.pivotTransform.lossyScale.z)
                         {
                             var line = lineRenderer.GetComponent<LineRenderer>();
                             line.positionCount++;
@@ -405,13 +405,16 @@ public class CHD : MonoBehaviour
                             ChatManager.Instance.GenerateMessage(" 작업이 진행중입니다.");
                             isLastBoundaryCut = true;
                         }
-                        else if (Vector3.Distance(currentPosition, oldPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
+                        else if (Vector3.Distance(currentPosition, oldPosition) < 1.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
                         {
                             if (oldPosition == Vector3.zero)
                                 return;
-                            var line = lineRenderer.GetComponent<LineRenderer>();
-                            
-                            line.SetPosition(boundaryCount-1, currentPosition);
+                            if(lineRenderer)
+                            {
+                                var line = lineRenderer.GetComponent<LineRenderer>();
+                                line.SetPosition(boundaryCount - 1, currentPosition);
+                            }
+                                
                             return;
                         }
                         else if (boundaryCount == 1)
@@ -463,7 +466,6 @@ public class CHD : MonoBehaviour
                     {
                         var line = lineRenderer.GetComponent<LineRenderer>();
                         line.positionCount++;
-                        //line.positionCount++;
                         line.material.color = Color.blue;
                         line.SetPosition(boundaryCount-1, oldPosition);
                         line.SetPosition(boundaryCount, firstPosition);
