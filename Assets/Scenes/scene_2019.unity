@@ -3591,7 +3591,6 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
-  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3638,7 +3637,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -3677,33 +3676,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 193f2e7ee8214eb4eb0059b97ad38a16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &963194230
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46ac7f9e650321a4ba29645d5b793081, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_cuttingSizeBar: {fileID: 522362492}
-  m_bar: {fileID: 1639096534}
-  m_Posbar: {fileID: 500566393}
-  m_Extend: {fileID: 1403697845}
-  m_distance: {fileID: 1781588883}
-  patchWeight: 10
-  cutNum: 0
-  wholeTriangles: 
-  oldValue_curve: 0
-  oldValue_height: 0
-  patchCenterPos: {x: 0, y: 0, z: 0}
-  patchVertices: []
-  obj: {fileID: 1652839065}
-  outerBoundaryCutVertices: 
-  innerBoundaryCutVertices: 
 --- !u!4 &992487552 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: 4b05c72365ece9c4d83e78ce086b6946,
@@ -6306,12 +6278,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerObject: {fileID: 720739649}
---- !u!1 &1652839065 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2534866581884222612, guid: ce49cbfdf949d59409b62d4951d8714f,
-    type: 3}
-  m_PrefabInstance: {fileID: 188205959}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1711364260
 GameObject:
   m_ObjectHideFlags: 0
@@ -7093,7 +7059,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1870512007}
   - component: {fileID: 1870512006}
-  - component: {fileID: 1870512005}
   - component: {fileID: 1870512004}
   m_Layer: 0
   m_Name: Sub Camera
@@ -7114,14 +7079,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 193f2e7ee8214eb4eb0059b97ad38a16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!81 &1870512005
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1870512003}
-  m_Enabled: 1
 --- !u!20 &1870512006
 Camera:
   m_ObjectHideFlags: 0
@@ -7131,7 +7088,7 @@ Camera:
   m_GameObject: {fileID: 1870512003}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 3
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -7150,10 +7107,10 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: -1
+  m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 256
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

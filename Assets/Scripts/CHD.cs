@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEditor;
+//using UnityEditor;
 using System.Collections.Generic;
 
 public class CHD : MonoBehaviour
@@ -235,6 +235,7 @@ public class CHD : MonoBehaviour
                     Debug.Log("Incision 실행");
                     playerObject.SetActive(false);
                     lineRenderer = new GameObject("Incision Line", typeof(LineRenderer));
+                    lineRenderer.layer = 8;
                     //incisionCount++;
                     firstIncision = true;
                     IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref oldPosition);
@@ -361,7 +362,6 @@ public class CHD : MonoBehaviour
                     return;
                 }
 
-
                 if (Input.GetMouseButtonDown(0))
                 {
                     //test();
@@ -396,16 +396,12 @@ public class CHD : MonoBehaviour
                         {
                             var line = lineRenderer.GetComponent<LineRenderer>();
                             line.positionCount++;
-                            line.positionCount++;
-                            Vector3 curPos = firstPosition;
-                            Vector3 oldPos = oldPosition;
-                            curPos.z += 1f;
-                            oldPos.z += 1f;
+                            //line.positionCount++;
 
-                            line.SetPosition(boundaryCount, oldPos);
-                            line.SetPosition(boundaryCount + 1, curPos);
+                            line.SetPosition(boundaryCount-1, oldPosition);
+                            line.SetPosition(boundaryCount, firstPosition);
                             line.GetComponent<LineRenderer>().material.color = Color.blue;
-
+                            //EditorApplication.isPaused = true;
                             ChatManager.Instance.GenerateMessage(" 작업이 진행중입니다.");
                             isLastBoundaryCut = true;
                         }
@@ -414,38 +410,33 @@ public class CHD : MonoBehaviour
                             if (oldPosition == Vector3.zero)
                                 return;
                             var line = lineRenderer.GetComponent<LineRenderer>();
-                            Vector3 curPos = currentPosition;
-                            curPos.z += 1f;
-                            line.SetPosition(boundaryCount-1, curPos);
+                            
+                            line.SetPosition(boundaryCount-1, currentPosition);
                             return;
                         }
                         else if (boundaryCount == 1)
                         {
                             BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
                             BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
-
                             lineRenderer = new GameObject("Boundary Line", typeof(LineRenderer));
+                            lineRenderer.layer = 8;
                             var line = lineRenderer.GetComponent<LineRenderer>();
                             line.numCornerVertices = 45;
                             line.material.color = Color.black;
+                            //var line = lineRenderer.GetComponent<LineRenderer>();
 
-                            Vector3 curPos = currentPosition;
-                            Vector3 oldPos = oldPosition;
-                            curPos.z += 1f;
-                            oldPos.z += 1f;
-
-                            line.SetPosition(0, oldPos);
-                            line.SetPosition(boundaryCount++, curPos);
+                            line.SetPosition(0, oldPosition);
+                            line.SetPosition(boundaryCount++, currentPosition);
 
                             oldPosition = currentPosition;
                         }
                         else
                         {
+                            if (boundaryCount == 0)
+                                return;
                             var line = lineRenderer.GetComponent<LineRenderer>();
                             line.positionCount++;
-                            Vector3 curPos = currentPosition;
-                            curPos.z += 1f;
-                            line.SetPosition(boundaryCount++, curPos);
+                            line.SetPosition(boundaryCount++, currentPosition);
 
                             BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
                             BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
@@ -457,9 +448,7 @@ public class CHD : MonoBehaviour
                     else
                     {
                         if(boundaryCount==0)
-                        {
                             return;
-                        }
                         Destroy(lineRenderer);
                         BoundaryCutManager.Instance.BoundaryCutUpdate();
                         ChatManager.Instance.GenerateMessage(" 심장이 아닙니다.");
@@ -468,20 +457,17 @@ public class CHD : MonoBehaviour
                 }
                 else if (Input.GetMouseButtonUp(0))
                 {
+                    if (boundaryCount == 0)
+                        return;
                     if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
                     {
-                        EditorApplication.isPaused = true;
                         var line = lineRenderer.GetComponent<LineRenderer>();
                         line.positionCount++;
-                        line.positionCount++;
-                        Vector3 curPos = firstPosition;
-                        Vector3 oldPos = oldPosition;
-                        curPos.z += 1f;
-                        oldPos.z += 1f;
+                        //line.positionCount++;
                         line.material.color = Color.blue;
-                        line.SetPosition(boundaryCount, oldPos);
-                        line.SetPosition(boundaryCount+1, curPos);
-
+                        line.SetPosition(boundaryCount-1, oldPosition);
+                        line.SetPosition(boundaryCount, firstPosition);
+                        //EditorApplication.isPaused = true;
                         ChatManager.Instance.GenerateMessage(" 작업이 진행중입니다.");
 
                         isLastBoundaryCut = true;
@@ -529,11 +515,7 @@ public class CHD : MonoBehaviour
                     Vector3 oldPos = oldPosition;
                     oldPos.z += 1f;
 
-                    lineRenderer = new GameObject("Patch Line", typeof(LineRenderer));
-                    var line = lineRenderer.GetComponent<LineRenderer>();
-                    line.numCornerVertices = 45;
-                    line.material.color = Color.black;
-                    line.SetPosition(0, oldPos);
+                    
                 }
             }
             else if (Input.GetMouseButtonUp(0))
@@ -552,7 +534,7 @@ public class CHD : MonoBehaviour
                 if(vertexPosition!=Vector3.zero)
                 {
                     //first position이 저장되어 있어야함.
-                    if(Vector3.Distance(firstPosition, vertexPosition) < 2.0f * ObjManager.Instance.pivotTransform.lossyScale.z)
+                    if(patchCount > 3 && Vector3.Distance(firstPosition, vertexPosition) < 2.0f * ObjManager.Instance.pivotTransform.lossyScale.z)
                     {
                         Destroy(lineRenderer);
                         PatchManager.Instance.GenerateMesh();
@@ -560,15 +542,25 @@ public class CHD : MonoBehaviour
                         return;
                     }
                     PatchManager.Instance.AddVertex(vertexPosition);
+
+                    LineRenderer line;
+                    if (patchCount != 0)
+                    {
+                        line = lineRenderer.GetComponent<LineRenderer>();
+                        line.positionCount++;
+                    }
+                    else
+                    {
+                        lineRenderer = new GameObject("Patch Line", typeof(LineRenderer));
+                        lineRenderer.layer = 8;
+                        line = lineRenderer.GetComponent<LineRenderer>();
+                        line.numCornerVertices = 45;
+                        line.material.color = Color.black;
+                        line.SetPosition(0, oldPosition);
+                    }
                     
-                    var line = lineRenderer.GetComponent<LineRenderer>();
-                    line.positionCount++;
-                    Vector3 curPos = vertexPosition;
-                    curPos.z += 1f;
-                    
-                    line.SetPosition(patchCount+1, curPos );
+                    line.SetPosition(patchCount+1, vertexPosition);
                     patchCount++;
-                    
                     oldPosition = vertexPosition;
                     return;
                 }
