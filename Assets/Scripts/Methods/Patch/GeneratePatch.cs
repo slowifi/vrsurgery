@@ -83,7 +83,7 @@ public class GeneratePatch : MonoBehaviour
         GameObject patchObj = PatchManager.Instance.newPatch[PatchManager.Instance.newPatch.Count-1];
         Mesh mesh = new Mesh();
         patchObj.GetComponent<MeshFilter>().mesh = mesh;
-        patchObj.transform.parent = GameObject.Find("HumanHeart").transform;
+        patchObj.transform.parent = ObjManager.Instance.pivotTransform; //GameObject.Find("HumanHeart").transform;
 
         int patchVertexCount = _patchVertices.Count;
 

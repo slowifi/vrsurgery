@@ -66,7 +66,7 @@ public class ChatManager : Singleton<ChatManager>
             newColor.normalColor = newNormal;
             newText = newTextColor;
             messageList[messageIndex].GetComponent<Button>().colors = newColor;
-            messageList[messageIndex].transform.localPosition = new Vector3(messageList[messageIndex].transform.localPosition.x, (-40 - 25 * messageIndex), messageList[messageIndex].transform.localPosition.z);
+            messageList[messageIndex].transform.localPosition = new Vector3(messageList[messageIndex].transform.localPosition.x, (-66 - 25 * messageIndex), messageList[messageIndex].transform.localPosition.z);
             return false;
         }
     }

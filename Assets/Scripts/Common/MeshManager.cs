@@ -10,6 +10,7 @@ public class MeshManager : Singleton<MeshManager>
     public Mesh testMesh;
     public Mesh mesh;
     public Mesh oldMesh;
+    public Mesh firstMesh;
     public int vertexCount;
     public int[] triangles;
     public Vector3[] vertices;
@@ -47,11 +48,13 @@ public class MeshManager : Singleton<MeshManager>
 
     public void Reinitialize()
     {
+        Debug.Log(mesh.bounds.size);
         Renderer mat = heart.GetComponent<Renderer>();
         mat.material = material;
         mesh = heart.GetComponent<MeshFilter>().mesh;
         disableHeart = Instantiate(heart);
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
+        firstMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         Destroy(disableHeart);
 
         mesh.RecalculateNormals();
@@ -64,8 +67,14 @@ public class MeshManager : Singleton<MeshManager>
         Renderer mat = heart.GetComponent<Renderer>();
         mat.material = material;
         mesh = heart.GetComponent<MeshFilter>().mesh;
+        
+        //Debug.Log(mesh.bounds.size);
+        //y 기준으로 맞춰주면 되겠다.
+        ObjManager.Instance.pivotTransform.localScale = Vector3.one * (80 / mesh.bounds.size.y);
+
         disableHeart = Instantiate(heart);
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
+        firstMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         Destroy(disableHeart);
 
         mesh.RecalculateNormals();

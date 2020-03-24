@@ -10,6 +10,7 @@ public class ImportMesh : MonoBehaviour
 {
     public GameObject mainObject;
     public GameObject pivotObject;
+    public GameObject buttonPressScript;
 
     IEnumerator ShowLoadDialogCoroutine()
     {
@@ -37,17 +38,19 @@ public class ImportMesh : MonoBehaviour
         //    //new ExtensionFilter("All Files", "*" ),
         //};
 
+        Debug.Log("불러오는중");
         //var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
         ChatManager.Instance.GenerateMessage(path);
         // 여기에 추가 해야될 것은 새로 읽어드렸을 때, 리셋 기능.
 
         //ObjImporter asdf = new ObjImporter();
-        Debug.Log("ㅁㄴㅇㄹ");
+        
         if (mainObject.activeSelf)
         {
             pivotObject.transform.localPosition = Vector3.zero;
             pivotObject.transform.localScale = Vector3.one;
             pivotObject.transform.localEulerAngles = Vector3.zero;
+
             Destroy(GameObject.Find("PartialModel"));
             GameObject newLocalHeart = new OBJLoader().Load(path);
             newLocalHeart.name = "PartialModel";
@@ -56,11 +59,12 @@ public class ImportMesh : MonoBehaviour
             MeshManager.Instance.heart.transform.localPosition = Vector3.zero;
             ObjManager.Instance.objTransform = MeshManager.Instance.heart.transform;
             mainObject.SendMessage("ResetMain");
+            buttonPressScript.SendMessage("ResetButton");
             return;
         }
-        Debug.Log("ㅁㄴㅇㄹ");
+        
         GameObject newHeart = new OBJLoader().Load(path);
-        Debug.Log("ㅁㄴㅇㄹ");
+        
         newHeart.name = "PartialModel";
         ChatManager.Instance.GenerateMessage(newHeart.name);
         newHeart.transform.SetParent(GameObject.Find("HumanHeart").transform);

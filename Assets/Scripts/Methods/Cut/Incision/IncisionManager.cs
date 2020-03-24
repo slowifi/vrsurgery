@@ -92,8 +92,8 @@ public class IncisionManager : Singleton<IncisionManager>
             if (tempZ > zMax)
                 zMax = tempZ;
         }
-        zMax += (zMax - zMin)/ 3;
-        zMin -= (zMax - zMin) / 3;
+        zMax += (zMax - zMin) / 4;
+        zMin -= (zMax - zMin) / 4;
 
         BFS.Instance.BFS_Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, true, zMin, zMax);
         BFS.Instance.BFS_Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, false, zMin, zMax);

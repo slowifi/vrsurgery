@@ -43,6 +43,7 @@ public class PatchManager : Singleton<PatchManager>
 
     public void UpdateCurve(int patchIndex)
     {
+        newPatch[patchIndex].GetComponent<MeshFilter>().mesh.RecalculateNormals();
         float heightValue = UIManager.Instance.heightBar.value;
         float curveValue = UIManager.Instance.curveBar.value;
 
