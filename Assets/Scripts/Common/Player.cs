@@ -6,14 +6,19 @@ public class Player : MonoBehaviour
 {
     // 행동제어를 아예 player쪽에서 하기.
 
-
-
     private bool incision = false;
     private bool boundary = false;
+    private bool patch = false;
+
+    public void OneSecondOff()
+    {
+        patch = true;
+    }
 
     public void IncisionModeOn()
     {
         incision = true;
+        
     }
 
     public void IncisionModeOff()
@@ -80,18 +85,20 @@ public class Player : MonoBehaviour
 
         if (Input.touchCount == 1) // For Touch Input with a finger
         {
-            if(!boundary)
+            if(!boundary && !patch)
             {    
                 if (Input.GetTouch(0).phase == TouchPhase.Moved)
                 {
                     float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
                     float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
                     // select the axis by which you want to rotate the GameObject                               
-                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.up, XaxisRotation * 3f);
-                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.zero, Vector3.right, YaxisRotation * 3f);
+                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.up, XaxisRotation/20f);
+                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.right, YaxisRotation/20f);
                 }
                 AdjacencyList.Instance.WorldPositionUpdate();
+                return;
             }
+            patch = false;
             return;
         }
 

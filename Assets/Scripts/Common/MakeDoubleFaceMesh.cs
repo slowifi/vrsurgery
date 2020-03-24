@@ -14,8 +14,9 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
         GameObject innerPatch = new GameObject(patch.name + "_Inner", typeof(MeshFilter), typeof(MeshRenderer));
         //innerPatch.GetComponent<MeshFilter>().mesh;
         innerPatch.transform.SetParent(ObjManager.Instance.pivotTransform);
-        //innerPatch.transform.localPosition = Vector3.zero;
-        //innerPatch.transform.localScale = Vector3.one;
+        innerPatch.transform.localPosition = patch.transform.localPosition;
+        innerPatch.transform.localRotation = patch.transform.localRotation;
+        innerPatch.transform.localScale = patch.transform.localScale;
         Mesh innerMesh = innerPatch.GetComponent<MeshFilter>().mesh;
 
         int[] triangles = (int[])patch.GetComponent<MeshFilter>().mesh.triangles.Clone();
