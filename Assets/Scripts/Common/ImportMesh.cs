@@ -23,6 +23,7 @@ public class ImportMesh : MonoBehaviour
         if (FileBrowser.Success)
         {
             SetMesh(FileBrowser.Result);
+            playerObject.SetActive(true);
         }
     }
 
