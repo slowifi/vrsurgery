@@ -144,8 +144,12 @@ public class CHD : MonoBehaviour
         {
             MeshRenderer ren = patchObject.GetComponent<MeshRenderer>();
             if (ren.material.color != new Color32(115, 0, 0, 255))
+            {
+                patchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
                 MakeDoubleFaceMesh.Instance.MakePatchInnerFace(patchObject);
-            ren.material.color = new Color32(115, 0, 0, 255);
+                ren.material.color = new Color32(115, 0, 0, 255);
+            }
+            
             
         }
     }
@@ -155,6 +159,7 @@ public class CHD : MonoBehaviour
         for (int i = 0; i < PatchManager.Instance.newPatch.Count; i++)
         {
             Destroy(PatchManager.Instance.newPatch[i]);
+            Destroy(GameObject.Find("Patch" + i + "_Inner"));
         }
         ObjManager.Instance.ObjUpdate();
         MeshManager.Instance.Reinitialize();
@@ -516,8 +521,6 @@ public class CHD : MonoBehaviour
 
                     Vector3 oldPos = oldPosition;
                     oldPos.z += 1f;
-
-                    
                 }
             }
             else if (Input.GetMouseButtonUp(0))
@@ -536,7 +539,7 @@ public class CHD : MonoBehaviour
                 if(vertexPosition!=Vector3.zero)
                 {
                     //first position이 저장되어 있어야함.
-                    if(patchCount > 3 && Vector3.Distance(firstPosition, vertexPosition) < 2.0f * ObjManager.Instance.pivotTransform.lossyScale.z)
+                    if(patchCount > 8 && Vector3.Distance(firstPosition, vertexPosition) < 2.0f * ObjManager.Instance.pivotTransform.lossyScale.z)
                     {
                         Destroy(lineRenderer);
                         PatchManager.Instance.GenerateMesh();

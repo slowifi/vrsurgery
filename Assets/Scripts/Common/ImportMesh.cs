@@ -1,8 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
-using System.IO;
-using UnityEditor;
 using Dummiesman;
 using SimpleFileBrowser;
 
@@ -36,10 +33,6 @@ public class ImportMesh : MonoBehaviour
 
     public void SetMesh(string path)
     {
-        //var extensions = new[] {
-        //    new ExtensionFilter("3D Model Files", "stl", "obj", "fbx" ),
-        //    //new ExtensionFilter("All Files", "*" ),
-        //};
 
         Debug.Log("불러오는중");
         //var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);

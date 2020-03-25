@@ -22,8 +22,6 @@ public class MeshManager : Singleton<MeshManager>
         mesh.RecalculateNormals();
     }
 
-
-
     public void SaveCurrentMesh()
     {
         disableHeart = Instantiate(heart);

@@ -22,6 +22,7 @@ public class ResetMesh : MonoBehaviour
         for (int i = 0; i < PatchManager.Instance.newPatch.Count; i++)
         {
             Destroy(PatchManager.Instance.newPatch[i]);
+            Destroy(GameObject.Find("Patch" + i + "_Inner"));
         }
         PatchManager.Instance.Reinitialize();
 
