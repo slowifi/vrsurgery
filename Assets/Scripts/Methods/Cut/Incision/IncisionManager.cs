@@ -93,8 +93,8 @@ public class IncisionManager : Singleton<IncisionManager>
                 zMax = tempZ;
         }
           
-        zMax += 2f * ObjManager.Instance.pivotTransform.lossyScale.z;
-        zMin -= 2f * ObjManager.Instance.pivotTransform.lossyScale.z;
+        zMax += ObjManager.Instance.pivotTransform.lossyScale.z;
+        zMin -= ObjManager.Instance.pivotTransform.lossyScale.z;
 
         BFS.Instance.BFS_Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, true, zMin, zMax);
         BFS.Instance.BFS_Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, false, zMin, zMax);

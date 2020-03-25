@@ -17,7 +17,6 @@ public class BFS : Singleton<BFS>
         //List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
         temp.Enqueue(vertex);
         duplicateCheck.Add(vertex);
-        Debug.Log(MeshManager.Instance.mesh.triangles.Length);
         Dictionary<int, HashSet<int>> connectedVertices = AdjacencyList.Instance.connectedVertices;
         Dictionary<int, HashSet<int>> connectedTriangles = AdjacencyList.Instance.connectedTriangles;
         HashSet<int> removeTrianglesSet = new HashSet<int>();
@@ -59,7 +58,7 @@ public class BFS : Singleton<BFS>
                 temp.Enqueue(item);
             }
         }
-        Debug.Log("이게 실패여도 출력이 되나?");
+        
         List<int> removeTrianglesList = removeTrianglesSet.ToList();
         removeTrianglesList.Sort();
 
