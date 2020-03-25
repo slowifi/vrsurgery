@@ -35,29 +35,6 @@ public class CHD : MonoBehaviour
     public bool isTestMode = true;
     public bool isLastBoundaryCut = false;
 
-    private void IncisionInit()
-    {
-
-    }
-
-    private void BoundaryCutInit()
-    {
-
-    }
-
-    private void PatchInit()
-    {
-
-    }
-
-    private void MeasureInit()
-    {
-
-    }
-
-
-
-
     public void CutMode()
     {
         playerObject.SendMessage("BoundaryModeOn");
@@ -248,7 +225,7 @@ public class CHD : MonoBehaviour
                     AdjacencyList.Instance.ListUpdate();
                     IncisionManager.Instance.SetStartVerticesDF();
                 }
-                else if(Input.GetMouseButtonUp(0))
+                else if(Input.GetMouseButtonUp(0) && firstIncision)
                 {
                     Vector3 currentPosition = Vector3.zero;
                     bool checkInside = IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition);
@@ -256,6 +233,7 @@ public class CHD : MonoBehaviour
                     {
                         if (Vector3.Distance(oldPosition, currentPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
                         {
+                            Destroy(lineRenderer);
                             ChatManager.Instance.GenerateMessage(" incision 거리가 너무 짧습니다.");
                             IncisionManager.Instance.IncisionUpdate();
                             firstIncision = false;
@@ -272,7 +250,8 @@ public class CHD : MonoBehaviour
                         IncisionManager.Instance.rightSide.RemoveAt(IncisionManager.Instance.currentIndex);
                         //incisionCount--;
                         IncisionManager.Instance.IncisionUpdate();
-                        playerObject.SendMessage("IncisionModeOff");
+                        if (playerObject.activeSelf)
+                            playerObject.SendMessage("IncisionModeOff");
                         ButtonOff();
                         return;
                     }
@@ -546,9 +525,10 @@ public class CHD : MonoBehaviour
                         isPatchUpdate = true;
                         return;
                     }
-                    PatchManager.Instance.AddVertex(vertexPosition);
 
+                    PatchManager.Instance.AddVertex(vertexPosition);
                     LineRenderer line;
+
                     if (patchCount != 0)
                     {
                         line = lineRenderer.GetComponent<LineRenderer>();

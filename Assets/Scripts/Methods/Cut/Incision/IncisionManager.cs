@@ -92,8 +92,9 @@ public class IncisionManager : Singleton<IncisionManager>
             if (tempZ > zMax)
                 zMax = tempZ;
         }
-        zMax += Mathf.Abs((zMax - zMin) / 4);
-        zMin -= Mathf.Abs((zMax - zMin) / 4);
+          
+        zMax += 2f * ObjManager.Instance.pivotTransform.lossyScale.z;
+        zMin -= 2f * ObjManager.Instance.pivotTransform.lossyScale.z;
 
         BFS.Instance.BFS_Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, true, zMin, zMax);
         BFS.Instance.BFS_Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, false, zMin, zMax);

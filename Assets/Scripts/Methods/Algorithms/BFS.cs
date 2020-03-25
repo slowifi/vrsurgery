@@ -149,9 +149,17 @@ public class BFS : Singleton<BFS>
                     {
                         temp.Enqueue(item);
                         if (isLeft)
-                            IncisionManager.Instance.leftSide[currentIndex].Add(item);
+                        {
+                            //float sideTemp = Mathf.Sign((endPoint.x - startPoint.x) * (worldVertices[item].y - startPoint.y) - (endPoint.y - startPoint.y) * (worldVertices[item].x - startPoint.x));
+                            //if (sideTemp >= -0.001)
+                                IncisionManager.Instance.leftSide[currentIndex].Add(item);
+                        }
                         else
-                            IncisionManager.Instance.rightSide[currentIndex].Add(item);
+                        {
+                            //float sideTemp = Mathf.Sign((endPoint.x - startPoint.x) * (worldVertices[item].y - startPoint.y) - (endPoint.y - startPoint.y) * (worldVertices[item].x - startPoint.x));
+                            //if (sideTemp <= 0.001)
+                                IncisionManager.Instance.rightSide[currentIndex].Add(item);
+                        }
                     }
                 }
             }
