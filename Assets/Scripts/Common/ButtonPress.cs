@@ -109,7 +109,7 @@ public class ButtonPress : Singleton<ButtonPress>
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             incisionButton.colors = colorTemp;
             mainManager.SendMessage("Exit");
-            mainManager.SendMessage("IncisionMode");
+            mainManager.SendMessage("StartIncisionMode");
         }
     }
 
