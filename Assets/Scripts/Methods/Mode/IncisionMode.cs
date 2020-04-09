@@ -11,9 +11,15 @@ public class IncisionMode : Singleton<IncisionMode>
 
     private bool firstIncision = false;
     private Vector3 oldPosition = Vector3.zero;
-    public void SetOldExtendValue(float val)
+
+    public void Start()
     {
-        oldExtendValue = val;
+        oldExtendValue = 0;
+        firstIncision = false;
+        isExtend = false;
+        oldPosition = Vector3.zero;
+        UIManager.Instance.extendBar.value = 0;
+
     }
 
     public bool OnUpdate(GameObject playerObject)

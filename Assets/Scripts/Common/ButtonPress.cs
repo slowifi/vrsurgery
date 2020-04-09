@@ -65,7 +65,7 @@ public class ButtonPress : Singleton<ButtonPress>
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             patchButton.colors = colorTemp;
             mainManager.SendMessage("Exit");
-            mainManager.SendMessage("PatchMode");
+            mainManager.SendMessage("StartPatchMode");
         }
     }
 
@@ -87,7 +87,7 @@ public class ButtonPress : Singleton<ButtonPress>
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             measureButton.colors = colorTemp;
             mainManager.SendMessage("Exit");
-            mainManager.SendMessage("MeasureMode");
+            mainManager.SendMessage("StartMeasureMode");
         }
     }
 
