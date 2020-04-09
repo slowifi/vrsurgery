@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class IncisionMode : Singleton<IncisionMode>
+public class IncisionMode : Mode
 {
     private bool isExtend = false;
     private float oldExtendValue = 0;
     private GameObject lineRenderer;
-
+    public GameObject playerObject;
     private bool firstIncision = false;
     private Vector3 oldPosition = Vector3.zero;
 
-    public void Start()
+    void Awake()
     {
+        playerObject = gameObject;
         oldExtendValue = 0;
         firstIncision = false;
         isExtend = false;
         oldPosition = Vector3.zero;
-        UIManager.Instance.extendBar.value = 0;
 
     }
 
-    public bool OnUpdate(GameObject playerObject)
+    void Update()
     {
         if (isExtend)
         {
@@ -32,10 +32,10 @@ public class IncisionMode : Singleton<IncisionMode>
                 IncisionManager.Instance.Extending(IncisionManager.Instance.currentIndex - 1, UIManager.Instance.extendBar.value, oldExtendValue);
                 oldExtendValue = UIManager.Instance.extendBar.value;
                 MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
-                return false;
+                return;
             }
             else
-                return false;
+                return;
         }
         else if (Input.GetMouseButtonDown(0))
         {
@@ -62,7 +62,7 @@ public class IncisionMode : Singleton<IncisionMode>
                     ChatManager.Instance.GenerateMessage(" incision 거리가 너무 짧습니다.");
                     IncisionManager.Instance.IncisionUpdate();
                     firstIncision = false;
-                    return false;
+                    return;
                 }
             }
             Destroy(lineRenderer);
@@ -77,8 +77,8 @@ public class IncisionMode : Singleton<IncisionMode>
                 IncisionManager.Instance.IncisionUpdate();
                 if (playerObject.activeSelf)
                     playerObject.SendMessage("IncisionModeOff");
-                // ButtonOff();
-                return true;
+                playerObject.SendMessage("ButtonOff");
+                // return true;
             }
 
             // 위에서 잘못되면 끊어야됨.
@@ -101,7 +101,7 @@ public class IncisionMode : Singleton<IncisionMode>
                 if (playerObject.activeSelf)
                     playerObject.SendMessage("IncisionModeOff");
                 // 여기에다가 넣으면 여러개가 찍히는게 좀 에반데.
-                return false;
+                return;
             }
             var line = lineRenderer.GetComponent<LineRenderer>();
             Vector3 currentPosition = Vector3.zero;
@@ -111,9 +111,9 @@ public class IncisionMode : Singleton<IncisionMode>
                 Destroy(lineRenderer);
                 ChatManager.Instance.GenerateMessage(" 심장을 벗어났습니다.");
                 //incisionCount--;
-                // ButtonOff();
+                playerObject.SendMessage("ButtonOff");
                 playerObject.SendMessage("IncisionModeOff");
-                return true;
+                // return true;
             }
             Vector3 curPos = currentPosition;
             Vector3 oldPos = oldPosition;
@@ -123,6 +123,5 @@ public class IncisionMode : Singleton<IncisionMode>
             line.SetPositions(new Vector3[] { oldPos, curPos });
 
         }
-        return false;
     }
 }

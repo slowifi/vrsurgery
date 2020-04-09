@@ -3,19 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class BoundaryCutMode : Singleton<BoundaryCutMode>
+public class BoundaryCutMode : Mode
 {
     private bool isLastBoundaryCut = false;
     private int boundaryCount = 0;
     private bool isFirst = true;
     private GameObject lineRenderer;
-    public Vector3 firstPosition;
-    public Vector3 oldPosition;
-    public void SetIsLastBoundaryCut(bool flag)
+    private Vector3 firstPosition;
+    private Vector3 oldPosition;
+    public GameObject playerObject;
+
+    void Awake()
     {
-        isLastBoundaryCut = flag;
+        playerObject = gameObject;
     }
-    public bool OnUpdate()
+    public BoundaryCutMode()
+    {
+        isLastBoundaryCut = false;
+    }
+    void Update()
     {
         // 조건을 잘 짜야됨.
         if (isFirst)
@@ -26,7 +32,7 @@ public class BoundaryCutMode : Singleton<BoundaryCutMode>
             AdjacencyList.Instance.ListUpdate();
             isFirst = false;
             boundaryCount = 0;
-            return false;
+            return;
         }
 
         if (isLastBoundaryCut)
@@ -37,8 +43,8 @@ public class BoundaryCutMode : Singleton<BoundaryCutMode>
             if (!checkError)
             {
                 Destroy(lineRenderer);
-                // ButtonOff();
-                return true;
+                playerObject.SendMessage("ButtonOff");
+                // return true;
             }
             MeshManager.Instance.mesh.RecalculateNormals();
 
@@ -54,8 +60,8 @@ public class BoundaryCutMode : Singleton<BoundaryCutMode>
             AdjacencyList.Instance.ListUpdate();
             MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
             BoundaryCutManager.Instance.BoundaryCutUpdate();
-            // ButtonOff();
-            return true;
+            playerObject.SendMessage("ButtonOff");
+            // return true;
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -107,14 +113,14 @@ public class BoundaryCutMode : Singleton<BoundaryCutMode>
                 else if (Vector3.Distance(currentPosition, oldPosition) < 1.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
                 {
                     if (oldPosition == Vector3.zero)
-                        return false;
+                        return;
                     if (lineRenderer)
                     {
                         var line = lineRenderer.GetComponent<LineRenderer>();
                         line.SetPosition(boundaryCount - 1, currentPosition);
                     }
 
-                    return false;
+                    return;
                 }
                 else if (boundaryCount == 1)
                 {
@@ -135,7 +141,7 @@ public class BoundaryCutMode : Singleton<BoundaryCutMode>
                 else
                 {
                     if (boundaryCount == 0)
-                        return false;
+                        return;
                     var line = lineRenderer.GetComponent<LineRenderer>();
                     line.positionCount++;
                     line.SetPosition(boundaryCount++, currentPosition);
@@ -150,18 +156,18 @@ public class BoundaryCutMode : Singleton<BoundaryCutMode>
             else
             {
                 if (boundaryCount == 0)
-                    return false;
+                    return;
                 Destroy(lineRenderer);
                 BoundaryCutManager.Instance.BoundaryCutUpdate();
                 ChatManager.Instance.GenerateMessage(" 심장이 아닙니다.");
-                // ButtonOff();
-                return true;
+                playerObject.SendMessage("ButtonOff");
+                // return true;
             }
         }
         else if (Input.GetMouseButtonUp(0))
         {
             if (boundaryCount == 0)
-                return false;
+                return;
             if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
             {
                 var line = lineRenderer.GetComponent<LineRenderer>();
@@ -175,6 +181,5 @@ public class BoundaryCutMode : Singleton<BoundaryCutMode>
                 isLastBoundaryCut = true;
             }
         }
-        return false;
     }
 }

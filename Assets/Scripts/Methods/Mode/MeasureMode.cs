@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class MeasureMode : Singleton<MeasureMode>
+public class MeasureMode : Mode
 {
-    public void OnUpdate()
+    void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {

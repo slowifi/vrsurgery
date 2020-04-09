@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class PatchMode : Singleton<PatchMode>
+public class PatchMode : Mode
 {
     private bool isFirstPatch;
     private bool isExtend;
@@ -12,23 +12,25 @@ public class PatchMode : Singleton<PatchMode>
     private Vector3 oldPosition;
     private Vector3 firstPosition;
     private GameObject lineRenderer;
+    public GameObject playerObject;
 
-    public void Start()
+    void Awake()
     {
+        playerObject = gameObject;
         isFirstPatch = true;
         isExtend = false;
         isPatchUpdate = false;
         oldPosition = Vector3.zero;
         patchCount = 0;
     }
-    public bool OnUpdate(GameObject playerObject)
+    void Update()
     {
         // 처음에 실행되어야함.
         if (isFirstPatch)
         {
             Debug.Log("Patch 실행");
             isFirstPatch = false;
-            return false;
+            return;
         }
         else if (isPatchUpdate)
         {
@@ -55,7 +57,7 @@ public class PatchMode : Singleton<PatchMode>
         else if (Input.GetMouseButtonUp(0))
         {
             if (oldPosition == Vector3.zero)
-                return false;
+                return;
             Destroy(lineRenderer);
             PatchManager.Instance.GenerateMesh();
             isPatchUpdate = true;
@@ -63,7 +65,7 @@ public class PatchMode : Singleton<PatchMode>
         else if (Input.GetMouseButton(0))
         {
             if (oldPosition == Vector3.zero)
-                return false;
+                return;
             Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
             if (vertexPosition != Vector3.zero)
             {
@@ -73,7 +75,7 @@ public class PatchMode : Singleton<PatchMode>
                     Destroy(lineRenderer);
                     PatchManager.Instance.GenerateMesh();
                     isPatchUpdate = true;
-                    return false;
+                    return;
                 }
 
                 PatchManager.Instance.AddVertex(vertexPosition);
@@ -97,20 +99,20 @@ public class PatchMode : Singleton<PatchMode>
                 line.SetPosition(patchCount + 1, vertexPosition);
                 patchCount++;
                 oldPosition = vertexPosition;
-                return false;
+                return;
             }
             else
             {
                 if (patchCount == 0)
-                    return false;
+                    return;
                 Destroy(lineRenderer);
                 PatchManager.Instance.RemovePatchVariables();
                 ChatManager.Instance.GenerateMessage(" 패치 라인이 심장을 벗어났습니다.");
                 // 이게 또 겹쳐부렀네
-                // ButtonOff();
-                return true;
+                playerObject.SendMessage("ButtonOff");
+                // return true;
             }
         }
-        return false;
+        return;
     }
 }

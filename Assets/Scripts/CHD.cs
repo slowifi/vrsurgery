@@ -4,55 +4,51 @@ using System.Collections.Generic;
 
 public class CHD : MonoBehaviour
 {
-    // main
-    public bool isExtend = false;
-    private float oldExtendValue;
-    private int incisionCount;
-
     public GameObject playerObject;
+    private Mode mode;
 
-
-
-    // test
-    public bool isFirstPatch = true;
-    public bool isPatchUpdate = false;
-
-    private string _mode = "none";
-    private string mode
-    {
-        get
-        {
-            return _mode;
-        }
-        set
-        {
-            _mode = value;
-        }
-    }
+    // private void UpdateByMode()
+    // {
+    //     if (mode == "Incision")
+    //     {
+    //         if (IncisionMode.Instance.OnUpdate(playerObject)) { ButtonOff(); }
+    //     }
+    //     else if (mode == "Boundary")
+    //     {
+    //         if (BoundaryCutMode.Instance.OnUpdate()) { ButtonOff(); }
+    //     }
+    //     else if (mode == "Measure")
+    //     {
+    //         MeasureMode.Instance.OnUpdate();
+    //     }
+    //     else if (mode == "Patch")
+    //     {
+    //         if (PatchMode.Instance.OnUpdate(playerObject)) { ButtonOff(); }
+    //     }
+    // }
 
     public void CutMode()
     {
+        mode = playerObject.AddComponent<BoundaryCutMode>();
         playerObject.SendMessage("BoundaryModeOn");
-        mode = "boundaryCut";
-
     }
 
     public void StartPatchMode()
     {
-        mode = "patch";
-        PatchMode.Instance.Start();
+        mode = playerObject.AddComponent<PatchMode>();
+
     }
 
     public void StartMeasureMode()
     {
-        mode = "measure";
+        mode = playerObject.AddComponent<MeasureMode>();
     }
 
     public void StartIncisionMode()
     {
-        mode = "incision";
-        IncisionMode.Instance.Start();
+        mode = playerObject.AddComponent<IncisionMode>();
         playerObject.SendMessage("IncisionModeOn");
+        UIManager.Instance.extendBar.value = 0;
     }
 
     public void ButtonOff()
@@ -73,9 +69,9 @@ public class CHD : MonoBehaviour
         playerObject.SendMessage("IncisionModeOff");
         MeshManager.Instance.SaveCurrentMesh();
 
-        mode = "none";
+        Destroy(mode);
 
-        BoundaryCutMode.Instance.SetIsLastBoundaryCut(false);
+
 
         Destroy(GameObject.Find("MeasureLine"));
         ObjManager.Instance.startMeasurePoint.SetActive(false);
@@ -118,9 +114,7 @@ public class CHD : MonoBehaviour
         ObjManager.Instance.startMeasurePoint.SetActive(false);
         ObjManager.Instance.endMeasurePoint.SetActive(false);
 
-        mode = "none";
-
-        BoundaryCutMode.Instance.SetIsLastBoundaryCut(false);
+        Destroy(mode);
 
     }
 
@@ -135,8 +129,6 @@ public class CHD : MonoBehaviour
         IncisionManager.Instance.Initialize();
         BoundaryCutManager.Instance.Initialize();
         MakeDoubleFaceMesh.Instance.Initialize();
-        IncisionMode.Instance.Initialize();
-        BoundaryCutMode.Instance.Initialize();
         playerObject.SetActive(true);
 
     }
@@ -148,23 +140,6 @@ public class CHD : MonoBehaviour
             AdjacencyList.Instance.WorldPositionUpdate();
             if (!IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
                 return;
-        }
-
-        if (mode == "incision")
-        {
-            if (IncisionMode.Instance.OnUpdate(playerObject)) { ButtonOff(); }
-        }
-        else if (mode == "boundaryCut")
-        {
-            if (BoundaryCutMode.Instance.OnUpdate()) { ButtonOff(); }
-        }
-        else if (mode == "measure")
-        {
-            MeasureMode.Instance.OnUpdate();
-        }
-        else if (mode == "patch")
-        {
-            if (PatchMode.Instance.OnUpdate(playerObject)) { ButtonOff(); }
         }
 
     }

@@ -281,8 +281,8 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         //}
         else
             side = IntersectionManager.Instance.TriangleEdgeIntersection(ref edgeIdx, ref edgePoint, startVertexPosition, endVertexPosition, ref triangleIndex, startScreenRay, endScreenRay);
-            // 시작이 문제인거같은데 어뒤지.
-            //side = IntersectionManager.Instance.PlaneEdgeIntersectionStart(ref edgeIdx, ref edgePoint, startVertexPosition, endVertexPosition, ref triangleIndex, startScreenRay, endScreenRay);
+        // 시작이 문제인거같은데 어뒤지.
+        //side = IntersectionManager.Instance.PlaneEdgeIntersectionStart(ref edgeIdx, ref edgePoint, startVertexPosition, endVertexPosition, ref triangleIndex, startScreenRay, endScreenRay);
 
 
         if (side == -1 || edgeIdx == -1)
@@ -292,10 +292,10 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             checkBool = true;
             return;
         }
-        
+
         triangleCount = MeshManager.Instance.mesh.triangles.Length;
 
-        
+
         if (isStartFromVtx)
         {
             Debug.Log(startVertexIndex);
@@ -377,13 +377,13 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         while (true)
         {
             asdf++;
-            if (asdf==2000)
+            if (asdf == 2000)
             {
                 ChatManager.Instance.GenerateMessage(" Boundary가 너무 깁니다.");
                 checkBool = true;
                 return;
             }
-            else if(triangleIndex == -1)
+            else if (triangleIndex == -1)
             {
                 ChatManager.Instance.GenerateMessage(" Boundary가 잘못 그려졌습니다.");
                 checkBool = true;
@@ -430,7 +430,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             }
         }
 
-        endVertexIndex = MeshManager.Instance.mesh.vertexCount + newVertices.Count -1;
+        endVertexIndex = MeshManager.Instance.mesh.vertexCount + newVertices.Count - 1;
 
     }
 
@@ -507,7 +507,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
         int[] triangles = MeshManager.Instance.mesh.triangles;
 
-        for (int i = 0; i < edgeList.Count; i+=3)
+        for (int i = 0; i < edgeList.Count; i += 3)
         {
             if ((edgeList[i].vtx1 == firstIndex && edgeList[i].vtx2 == secondIndex) || (edgeList[i].vtx2 == firstIndex && edgeList[i].vtx1 == secondIndex))
             {
@@ -515,16 +515,16 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                 tri2 = edgeList[i].tri2;
                 break;
             }
-            else if ((edgeList[i+1].vtx1 == firstIndex && edgeList[i+1].vtx2 == secondIndex) || (edgeList[i+1].vtx2 == firstIndex && edgeList[i+1].vtx1 == secondIndex))
+            else if ((edgeList[i + 1].vtx1 == firstIndex && edgeList[i + 1].vtx2 == secondIndex) || (edgeList[i + 1].vtx2 == firstIndex && edgeList[i + 1].vtx1 == secondIndex))
             {
-                tri1 = edgeList[i+1].tri1;
-                tri2 = edgeList[i+1].tri2;
+                tri1 = edgeList[i + 1].tri1;
+                tri2 = edgeList[i + 1].tri2;
                 break;
             }
-            else if ((edgeList[i+2].vtx1 == firstIndex && edgeList[i+2].vtx2 == secondIndex) || (edgeList[i+2].vtx2 == firstIndex && edgeList[i+2].vtx1 == secondIndex))
+            else if ((edgeList[i + 2].vtx1 == firstIndex && edgeList[i + 2].vtx2 == secondIndex) || (edgeList[i + 2].vtx2 == firstIndex && edgeList[i + 2].vtx1 == secondIndex))
             {
-                tri1 = edgeList[i+2].tri1;
-                tri2 = edgeList[i+2].tri2;
+                tri1 = edgeList[i + 2].tri1;
+                tri2 = edgeList[i + 2].tri2;
                 break;
             }
         }
@@ -548,9 +548,9 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             }
         }
 
-        
+
         Debug.Log(triangles.Length);
-        
+
         if (!BFS.Instance.BFS_Boundary(bfsVtx1, removeBoundaryVertices))
             if (!BFS.Instance.BFS_Boundary(bfsVtx2, removeBoundaryVertices))
                 return false;
@@ -576,7 +576,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             {
                 SetEndVertices(rays[i]);
                 SetDividingList(ref checkBool);
-                if(checkBool)
+                if (checkBool)
                 {
                     MeshManager.Instance.LoadOldMesh();
                     BoundaryCutUpdate();
@@ -590,7 +590,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
                 ResetIndex();
                 SetEndVertices(rays[i]);
                 SetDividingList(ref checkBool);
-                if(checkBool)
+                if (checkBool)
                 {
                     MeshManager.Instance.LoadOldMesh();
                     BoundaryCutUpdate();
@@ -611,7 +611,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
             return false;
         }
         ExecuteDividing();
-        
+
         return true;
     }
 
@@ -664,7 +664,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
 
         // 도대체 문제점이 뭘까 알 수가 없네.
-        
+
         // start
         // 여기서 이제 edge index랑 찾기를 해야됨.
         if (isStartFromVtx)
