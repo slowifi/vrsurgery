@@ -13,6 +13,7 @@ public class PatchMode : Mode
     private Vector3 firstPosition;
     private GameObject lineRenderer;
     public GameObject playerObject;
+    public GameObject mainObject;
 
     void Awake()
     {
@@ -109,7 +110,9 @@ public class PatchMode : Mode
                 PatchManager.Instance.RemovePatchVariables();
                 ChatManager.Instance.GenerateMessage(" 패치 라인이 심장을 벗어났습니다.");
                 // 이게 또 겹쳐부렀네
-                playerObject.SendMessage("ButtonOff");
+
+                mainObject.SendMessage("ButtonOff");
+
                 // return true;
             }
         }

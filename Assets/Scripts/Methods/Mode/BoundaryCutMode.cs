@@ -5,20 +5,20 @@ using UnityEditor;
 
 public class BoundaryCutMode : Mode
 {
-    private bool isLastBoundaryCut = false;
-    private int boundaryCount = 0;
-    private bool isFirst = true;
+    private bool isLastBoundaryCut;
+    private int boundaryCount;
+    private bool isFirst;
     private GameObject lineRenderer;
     private Vector3 firstPosition;
     private Vector3 oldPosition;
     public GameObject playerObject;
+    public GameObject mainObject;
 
     void Awake()
     {
+        boundaryCount = 0;
+        isFirst = true;
         playerObject = gameObject;
-    }
-    public BoundaryCutMode()
-    {
         isLastBoundaryCut = false;
     }
     void Update()
@@ -43,7 +43,7 @@ public class BoundaryCutMode : Mode
             if (!checkError)
             {
                 Destroy(lineRenderer);
-                playerObject.SendMessage("ButtonOff");
+                Destroy(this);
                 // return true;
             }
             MeshManager.Instance.mesh.RecalculateNormals();
@@ -60,7 +60,7 @@ public class BoundaryCutMode : Mode
             AdjacencyList.Instance.ListUpdate();
             MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
             BoundaryCutManager.Instance.BoundaryCutUpdate();
-            playerObject.SendMessage("ButtonOff");
+            Destroy(this);
             // return true;
         }
 
@@ -160,7 +160,7 @@ public class BoundaryCutMode : Mode
                 Destroy(lineRenderer);
                 BoundaryCutManager.Instance.BoundaryCutUpdate();
                 ChatManager.Instance.GenerateMessage(" 심장이 아닙니다.");
-                playerObject.SendMessage("ButtonOff");
+                Destroy(this);
                 // return true;
             }
         }

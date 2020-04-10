@@ -9,6 +9,7 @@ public class IncisionMode : Mode
     private float oldExtendValue = 0;
     private GameObject lineRenderer;
     public GameObject playerObject;
+    public GameObject mainObject;
     private bool firstIncision = false;
     private Vector3 oldPosition = Vector3.zero;
 
@@ -77,7 +78,7 @@ public class IncisionMode : Mode
                 IncisionManager.Instance.IncisionUpdate();
                 if (playerObject.activeSelf)
                     playerObject.SendMessage("IncisionModeOff");
-                playerObject.SendMessage("ButtonOff");
+                mainObject.SendMessage("ButtonOff");
                 // return true;
             }
 
@@ -111,8 +112,9 @@ public class IncisionMode : Mode
                 Destroy(lineRenderer);
                 ChatManager.Instance.GenerateMessage(" 심장을 벗어났습니다.");
                 //incisionCount--;
-                playerObject.SendMessage("ButtonOff");
+
                 playerObject.SendMessage("IncisionModeOff");
+                mainObject.SendMessage("ButtonOff");
                 // return true;
             }
             Vector3 curPos = currentPosition;

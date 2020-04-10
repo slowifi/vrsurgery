@@ -71,8 +71,6 @@ public class CHD : MonoBehaviour
 
         Destroy(mode);
 
-
-
         Destroy(GameObject.Find("MeasureLine"));
         ObjManager.Instance.startMeasurePoint.SetActive(false);
         ObjManager.Instance.endMeasurePoint.SetActive(false);
@@ -140,6 +138,11 @@ public class CHD : MonoBehaviour
             AdjacencyList.Instance.WorldPositionUpdate();
             if (!IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
                 return;
+        }
+
+        if (mode == null)
+        {
+            ButtonOff();
         }
 
     }
