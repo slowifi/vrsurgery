@@ -5,6 +5,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
 {
     public int GetIntersectedValues(Ray cameraRay)
     {
+
         float dst_min = 10000000;
         int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
@@ -23,6 +24,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
             }
         }
         return vertexIndex;
+
     }
 
     public void GetIntersectedValues(Ray cameraRay, ref int triangleIndex)

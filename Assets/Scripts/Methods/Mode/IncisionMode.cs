@@ -5,22 +5,22 @@ using UnityEditor;
 
 public class IncisionMode : Mode
 {
+    public GameObject PlayerObject;
+    public GameObject MainObject;
+
+    private bool firstIncision;
     private bool isExtend;
     private float oldExtendValue;
     private GameObject lineRenderer;
-    public GameObject playerObject;
-    public GameObject mainObject;
-    private bool firstIncision;
     private Vector3 oldPosition;
 
     void Awake()
     {
-        playerObject = gameObject;
+        PlayerObject = gameObject;
         oldExtendValue = 0;
         firstIncision = false;
         isExtend = false;
         oldPosition = Vector3.zero;
-
     }
 
     void Update()
@@ -33,15 +33,11 @@ public class IncisionMode : Mode
                 IncisionManager.Instance.Extending(IncisionManager.Instance.currentIndex - 1, UIManager.Instance.extendBar.value, oldExtendValue);
                 oldExtendValue = UIManager.Instance.extendBar.value;
                 MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
-                return;
             }
-            else
-                return;
         }
         else if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Incision 실행");
-            playerObject.SetActive(false);
+            //PlayerObject.SetActive(false);
             lineRenderer = new GameObject("Incision Line", typeof(LineRenderer));
             lineRenderer.layer = 8;
             //incisionCount++;
@@ -76,8 +72,8 @@ public class IncisionMode : Mode
                 IncisionManager.Instance.rightSide.RemoveAt(IncisionManager.Instance.currentIndex);
                 //incisionCount--;
                 IncisionManager.Instance.IncisionUpdate();
-                if (playerObject.activeSelf)
-                    playerObject.SendMessage("IncisionModeOff");
+                if (PlayerObject.activeSelf)
+                    PlayerObject.SendMessage("IncisionModeOff");
 
                 Destroy(this);
                 // return true;
@@ -92,7 +88,7 @@ public class IncisionMode : Mode
             IncisionManager.Instance.currentIndex++;
             MeshManager.Instance.mesh.RecalculateNormals();
             ChatManager.Instance.GenerateMessage(" 절개하였습니다. 확장이 가능합니다.");
-            playerObject.SetActive(true);
+            PlayerObject.SetActive(true);
             isExtend = true;
         }
         else if (Input.GetMouseButton(0))
@@ -100,9 +96,8 @@ public class IncisionMode : Mode
             // 이걸 수정을 좀 해야되는데
             if (!firstIncision)
             {
-                if (playerObject.activeSelf)
-                    playerObject.SendMessage("IncisionModeOff");
-                // 여기에다가 넣으면 여러개가 찍히는게 좀 에반데.
+                if (PlayerObject.activeSelf)
+                    PlayerObject.SendMessage("IncisionModeOff");
                 return;
             }
             var line = lineRenderer.GetComponent<LineRenderer>();
@@ -114,7 +109,7 @@ public class IncisionMode : Mode
                 ChatManager.Instance.GenerateMessage(" 심장을 벗어났습니다.");
                 //incisionCount--;
 
-                playerObject.SendMessage("IncisionModeOff");
+                PlayerObject.SendMessage("IncisionModeOff");
                 Destroy(this);
                 // return true;
             }
