@@ -43,7 +43,7 @@ public class PatchMode : Mode
             if (vertexPosition != Vector3.zero)
             {
                 firstPosition = vertexPosition;
-                playerObject.SetActive(false);
+                //playerObject.SetActive(false);
                 AdjacencyList.Instance.ListUpdate();
                 PatchManager.Instance.Generate();
                 PatchManager.Instance.AddVertex(vertexPosition);
