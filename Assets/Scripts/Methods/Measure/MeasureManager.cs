@@ -26,7 +26,7 @@ public class MeasureManager : Singleton<MeasureManager>
                 measureEnd = cameraRay.direction;
                 // Debug.DrawLine(startPoint.transform.position, endPoint.transform.position, Color.yellow, 2, false);
                 GameObject lineRenderer = new GameObject("MeasureLine");
-                
+
                 var line = lineRenderer.AddComponent<LineRenderer>();
                 line.useWorldSpace = false;
                 line.material.color = Color.white;
@@ -58,7 +58,7 @@ public class MeasureManager : Singleton<MeasureManager>
         // Debug.Log(worldPositionVertices.Length);
         for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (IntersectionManager.Instance.RayTriangleIntersection(worldPositionVertices[triangles[i]], worldPositionVertices[triangles[i + 1]], worldPositionVertices[triangles[i + 2]], cameraRay, ref intersectionTemp))
+            if (Intersections.RayTriangleIntersection(worldPositionVertices[triangles[i]], worldPositionVertices[triangles[i + 1]], worldPositionVertices[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)

@@ -22,17 +22,17 @@ public class IncisionManager : Singleton<IncisionManager>
     private Ray endScreenRay;
 
     private Vector3 startOuterVertexPosition;
-    
+
     private Vector3 endOuterVertexPosition;
-    
+
 
     public int firstOuterVertexIndex;
     public int lastOuterVertexIndex;
-    
+
     private int startOuterTriangleIndex;
-    
+
     private int endOuterTriangleIndex;
-    
+
 
     private List<GameObject> leftVectorObject;
     private List<GameObject> rightVectorObject;
@@ -92,7 +92,7 @@ public class IncisionManager : Singleton<IncisionManager>
             if (tempZ > zMax)
                 zMax = tempZ;
         }
-          
+
         zMax += ObjManager.Instance.pivotTransform.lossyScale.z;
         zMin -= ObjManager.Instance.pivotTransform.lossyScale.z;
 
@@ -101,7 +101,7 @@ public class IncisionManager : Singleton<IncisionManager>
 
         startPointIndices.Add(newTriangles.Values.First());
         endPointIndices.Add(vertices.Length - 1);
-        
+
         //Vector3 normalVector = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[newTriangles.Values.First()];
 
         Transform objTransform = ObjManager.Instance.pivotTransform;
@@ -120,11 +120,11 @@ public class IncisionManager : Singleton<IncisionManager>
             rightVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
             leftVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
         }
-        
 
-        leftVectorObject.Add(new GameObject("Left Vector"+currentIndex+1));
-        rightVectorObject.Add(new GameObject("Right Vector"+currentIndex+1));
-        
+
+        leftVectorObject.Add(new GameObject("Left Vector" + currentIndex + 1));
+        rightVectorObject.Add(new GameObject("Right Vector" + currentIndex + 1));
+
         leftVectorObject[currentIndex].transform.position = new Vector3(leftVector.x + worldPosition[startPointIndices[currentIndex]].x, leftVector.y + worldPosition[startPointIndices[currentIndex]].y, worldPosition[startPointIndices[currentIndex]].z);
         rightVectorObject[currentIndex].transform.position = new Vector3(rightVector.x + worldPosition[startPointIndices[currentIndex]].x, rightVector.y + worldPosition[startPointIndices[currentIndex]].y, worldPosition[startPointIndices[currentIndex]].z);
 
@@ -135,13 +135,13 @@ public class IncisionManager : Singleton<IncisionManager>
         double radius = Vector2.Distance(center, worldPosition[endPointIndices[currentIndex]]);
         foreach (int item in leftSide[currentIndex])
         {
-            double t = AlgorithmsManager.Instance.QuadraticEquation(worldPosition[item].x - center.x, worldPosition[item].y - center.y, leftVector.x, leftVector.y, radius);
+            double t = Algorithms.QuadraticEquation(worldPosition[item].x - center.x, worldPosition[item].y - center.y, leftVector.x, leftVector.y, radius);
             float temp = Convert.ToSingle(t);
             leftSideWeight[currentIndex].Add(temp);
         }
         foreach (int item in rightSide[currentIndex])
         {
-            double t = AlgorithmsManager.Instance.QuadraticEquation(worldPosition[item].x - center.x, worldPosition[item].y - center.y, rightVector.x, rightVector.y, radius);
+            double t = Algorithms.QuadraticEquation(worldPosition[item].x - center.x, worldPosition[item].y - center.y, rightVector.x, rightVector.y, radius);
             float temp = Convert.ToSingle(t);
             rightSideWeight[currentIndex].Add(temp);
         }
@@ -154,9 +154,9 @@ public class IncisionManager : Singleton<IncisionManager>
 
         int[] triangles = MeshManager.Instance.mesh.triangles;
         Vector3[] vertices = MeshManager.Instance.mesh.vertices;
-        
+
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        
+
         Transform objTransform = ObjManager.Instance.objTransform;
         Transform pivotTransform = ObjManager.Instance.pivotTransform;
 
@@ -182,14 +182,20 @@ public class IncisionManager : Singleton<IncisionManager>
     // 양면메쉬 전용 알고리즘
     public void SetStartVerticesDF()
     {
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+
         startScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        IntersectionManager.Instance.GetIntersectedValues(startScreenRay, ref startOuterVertexPosition, ref startOuterTriangleIndex);
+        Intersections.GetIntersectedValues(startScreenRay, ref startOuterVertexPosition, ref startOuterTriangleIndex, triangles, worldPosition);
     }
 
     public void SetEndVerticesDF()
     {
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+
         endScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        IntersectionManager.Instance.GetIntersectedValues(endScreenRay, ref endOuterVertexPosition, ref endOuterTriangleIndex);
+        Intersections.GetIntersectedValues(endScreenRay, ref endOuterVertexPosition, ref endOuterTriangleIndex, triangles, worldPosition);
     }
 
     public void SetDividingListDF(ref bool edgeCheck)
@@ -203,8 +209,10 @@ public class IncisionManager : Singleton<IncisionManager>
         leftSide.Add(new List<int>());
         rightSide.Add(new List<int>());
 
+        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
         // start
-        outerSide = IntersectionManager.Instance.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startOuterVertexPosition, endOuterVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay);
+        outerSide = Intersections.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startOuterVertexPosition, endOuterVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay, edgeList, worldVertices);
 
         if (outerSide == -1)
         {
@@ -213,8 +221,7 @@ public class IncisionManager : Singleton<IncisionManager>
             Debug.Log("error");
             return;
         }
-        
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+
 
         // outer 부터 
         int outerTriangleCount = MeshManager.Instance.mesh.triangles.Length;
@@ -239,7 +246,7 @@ public class IncisionManager : Singleton<IncisionManager>
         while (true)
         {
             Debug.Log("얼마나 ㅁ낳이");
-            if(outerTriangleIndex == -1)
+            if (outerTriangleIndex == -1)
             {
                 ChatManager.Instance.GenerateMessage(" 자를 수 없는 Edge 입니다.");
                 edgeCheck = true;
@@ -256,7 +263,7 @@ public class IncisionManager : Singleton<IncisionManager>
                 break;
             }
 
-            outerSide = IntersectionManager.Instance.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startOuterVertexPosition, endOuterVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay);
+            outerSide = Intersections.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startOuterVertexPosition, endOuterVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay, edgeList, worldVertices);
 
             if (outerSide == 2)
                 _dividingMethods.DivideTrianglesClockWiseIncision(outerEdgePoint, edgeList[outerEdgeIdx].tri1, ref outerTriangleCount, outerEdgeIdx, false);
@@ -276,14 +283,14 @@ public class IncisionManager : Singleton<IncisionManager>
     public void IncisionUpdate()
     {
         startOuterVertexPosition = Vector3.zero;
-        
+
         endOuterVertexPosition = Vector3.zero;
-        
+
 
         startOuterTriangleIndex = -1;
-        
+
         endOuterTriangleIndex = -1;
-        
+
         trianglesCount = 0;
 
         startScreenRay = new Ray();

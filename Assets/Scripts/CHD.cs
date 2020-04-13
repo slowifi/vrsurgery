@@ -140,10 +140,16 @@ public class CHD : MonoBehaviour
 
     void Update()
     {
+        Ray cameraRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+
         if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
         {
             AdjacencyList.Instance.WorldPositionUpdate();
-            if (!IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
+
+            bool checkInside = Intersections.RayObjectIntersection(cameraRay, triangles, worldPosition);
+            if (!checkInside)
                 return;
         }
 

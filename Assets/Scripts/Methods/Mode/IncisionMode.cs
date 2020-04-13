@@ -25,6 +25,10 @@ public class IncisionMode : Mode
 
     void Update()
     {
+        Ray cameraRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+
         if (isExtend)
         {
             //추후 incision된 파트들 indexing 해서 관리를 해줘야됨 + undo를 위한 작업도 미리미리 해놓는게 좋음.
@@ -42,7 +46,7 @@ public class IncisionMode : Mode
             lineRenderer.layer = 8;
             //incisionCount++;
             firstIncision = true;
-            IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref oldPosition);
+            Intersections.RayObjectIntersection(cameraRay, ref oldPosition, triangles, worldPosition);
             IncisionManager.Instance.IncisionUpdate();
             AdjacencyList.Instance.ListUpdate();
             IncisionManager.Instance.SetStartVerticesDF();
@@ -50,7 +54,7 @@ public class IncisionMode : Mode
         else if (Input.GetMouseButtonUp(0) && firstIncision)
         {
             Vector3 currentPosition = Vector3.zero;
-            bool checkInside = IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition);
+            bool checkInside = Intersections.RayObjectIntersection(cameraRay, ref currentPosition, triangles, worldPosition);
             if (checkInside)
             {
                 if (Vector3.Distance(oldPosition, currentPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
@@ -101,8 +105,9 @@ public class IncisionMode : Mode
                 return;
             }
             var line = lineRenderer.GetComponent<LineRenderer>();
+
             Vector3 currentPosition = Vector3.zero;
-            bool checkInside = IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition);
+            bool checkInside = Intersections.RayObjectIntersection(cameraRay, ref currentPosition, triangles, worldPosition);
             if (!checkInside)
             {
                 Destroy(lineRenderer);

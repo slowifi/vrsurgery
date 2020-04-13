@@ -23,6 +23,10 @@ public class BoundaryCutMode : Mode
     }
     void Update()
     {
+        Ray cameraRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+
         // 조건을 잘 짜야됨.
         if (isFirst)
         {
@@ -75,7 +79,9 @@ public class BoundaryCutMode : Mode
 
             Vector3 startVertexPosition = Vector3.zero;
             int startTriangleIndex = -1;
-            if (IntersectionManager.Instance.RayObjectIntersection(ray, ref startVertexPosition, ref startTriangleIndex))
+
+            bool checkInside = Intersections.RayObjectIntersection(ray, ref startVertexPosition, ref startTriangleIndex, triangles, worldPosition);
+            if (checkInside)
             {
                 BoundaryCutManager.Instance.rays.Add(ray);
                 BoundaryCutManager.Instance.intersectedPosition.Add(startVertexPosition);
@@ -93,7 +99,8 @@ public class BoundaryCutMode : Mode
         else if (Input.GetMouseButton(0))
         {
             Vector3 currentPosition = Vector3.zero;
-            if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition), ref currentPosition))
+            bool checkInside = Intersections.RayObjectIntersection(cameraRay, ref currentPosition, triangles, worldPosition);
+            if (checkInside)
             {
                 Debug.Log(boundaryCount);
                 if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 2f * ObjManager.Instance.pivotTransform.lossyScale.z)
@@ -168,7 +175,9 @@ public class BoundaryCutMode : Mode
         {
             if (boundaryCount == 0)
                 return;
-            if (IntersectionManager.Instance.RayObjectIntersection(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition)))
+
+            bool checkInside = Intersections.RayObjectIntersection(cameraRay, triangles, worldPosition);
+            if (checkInside)
             {
                 var line = lineRenderer.GetComponent<LineRenderer>();
                 line.positionCount++;
