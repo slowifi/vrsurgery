@@ -5,13 +5,13 @@ using UnityEditor;
 
 public class IncisionMode : Mode
 {
-    private bool isExtend = false;
-    private float oldExtendValue = 0;
+    private bool isExtend;
+    private float oldExtendValue;
     private GameObject lineRenderer;
     public GameObject playerObject;
     public GameObject mainObject;
-    private bool firstIncision = false;
-    private Vector3 oldPosition = Vector3.zero;
+    private bool firstIncision;
+    private Vector3 oldPosition;
 
     void Awake()
     {
@@ -78,7 +78,8 @@ public class IncisionMode : Mode
                 IncisionManager.Instance.IncisionUpdate();
                 if (playerObject.activeSelf)
                     playerObject.SendMessage("IncisionModeOff");
-                mainObject.SendMessage("ButtonOff");
+
+                Destroy(this);
                 // return true;
             }
 
@@ -114,7 +115,7 @@ public class IncisionMode : Mode
                 //incisionCount--;
 
                 playerObject.SendMessage("IncisionModeOff");
-                mainObject.SendMessage("ButtonOff");
+                Destroy(this);
                 // return true;
             }
             Vector3 curPos = currentPosition;
