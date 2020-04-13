@@ -6,6 +6,7 @@ public class CHD : MonoBehaviour
 {
     public GameObject playerObject;
     private Mode mode;
+    private bool isOn = false;
 
     // private void UpdateByMode()
     // {
@@ -29,23 +30,26 @@ public class CHD : MonoBehaviour
 
     public void CutMode()
     {
+        isOn = true;
         mode = playerObject.AddComponent<BoundaryCutMode>();
         playerObject.SendMessage("BoundaryModeOn");
     }
 
     public void StartPatchMode()
     {
+        isOn = true;
         mode = playerObject.AddComponent<PatchMode>();
-
     }
 
     public void StartMeasureMode()
     {
+        isOn = true;
         mode = playerObject.AddComponent<MeasureMode>();
     }
 
     public void StartIncisionMode()
     {
+        isOn = true;
         mode = playerObject.AddComponent<IncisionMode>();
         playerObject.SendMessage("IncisionModeOn");
         UIManager.Instance.extendBar.value = 0;
@@ -53,6 +57,7 @@ public class CHD : MonoBehaviour
 
     public void ButtonOff()
     {
+        isOn = false;
         playerObject.SetActive(true);
         playerObject.SendMessage("BoundaryModeOff");
         playerObject.SendMessage("IncisionModeOff");
@@ -63,6 +68,7 @@ public class CHD : MonoBehaviour
 
     public void Exit()
     {
+
         Debug.Log("Exit");
         playerObject.SetActive(true);
         playerObject.SendMessage("BoundaryModeOff");
@@ -102,6 +108,7 @@ public class CHD : MonoBehaviour
         AdjacencyList.Instance.ListUpdate();
         PatchManager.Instance.Reinitialize();
         IncisionManager.Instance.Reinitialize();
+        Debug.Log("reined");
         BoundaryCutManager.Instance.Reinitialize();
         MakeDoubleFaceMesh.Instance.Reinitialize();
         playerObject.SetActive(true);
@@ -140,7 +147,7 @@ public class CHD : MonoBehaviour
                 return;
         }
 
-        if (mode == null)
+        if (mode == null && isOn)
         {
             ButtonOff();
         }

@@ -6,7 +6,6 @@ using UnityEditor;
 public class PatchMode : Mode
 {
     private bool isFirstPatch;
-    private bool isExtend;
     private bool isPatchUpdate;
     private int patchCount;
     private Vector3 oldPosition;
@@ -19,7 +18,6 @@ public class PatchMode : Mode
     {
         playerObject = gameObject;
         isFirstPatch = true;
-        isExtend = false;
         isPatchUpdate = false;
         oldPosition = Vector3.zero;
         patchCount = 0;
@@ -111,8 +109,8 @@ public class PatchMode : Mode
                 ChatManager.Instance.GenerateMessage(" 패치 라인이 심장을 벗어났습니다.");
                 // 이게 또 겹쳐부렀네
 
-                mainObject.SendMessage("ButtonOff");
 
+                Destroy(this);
                 // return true;
             }
         }
