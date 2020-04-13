@@ -123,7 +123,6 @@ public class IncisionMode : Mode
             oldPos.z += 1f;
             line.material.color = Color.black;
             line.SetPositions(new Vector3[] { oldPos, curPos });
-
         }
     }
 }
