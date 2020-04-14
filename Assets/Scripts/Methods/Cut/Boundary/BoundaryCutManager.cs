@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class BoundaryCutManager : Singleton<BoundaryCutManager>
+public class BoundaryCutManager : MonoBehaviour
 {
     public Dictionary<int, Vector3> newVertices;
     public Dictionary<int, int> newTriangles;
@@ -38,6 +38,40 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
     private DivideTriangle _dividingMethods;
 
+    void Awake()
+    {
+        initialize();
+    }
+
+    void OnDestroy()
+    {
+        Debug.Log("ddd");
+    }
+    private void initialize()
+    {
+        startVertexPosition = Vector3.zero;
+        endVertexPosition = Vector3.zero;
+
+        startTriangleIndex = -1;
+        endTriangleIndex = -1;
+        triangleCount = 0;
+
+        isStartFromVtx = false;
+        isEndToVtx = false;
+
+        startScreenRay = new Ray();
+        endScreenRay = new Ray();
+        rays = new List<Ray>();
+        intersectedPosition = new List<Vector3>();
+
+        removeBoundaryVertices = new List<int>();
+
+        newVertices = new Dictionary<int, Vector3>();
+        newTriangles = new Dictionary<int, int>();
+
+        _dividingMethods = gameObject.AddComponent<DivideTriangle>();
+        _dividingMethods.SetBoundaryCutManager(this);
+    }
     public void ResetIndex()
     {
         isStartFromVtx = true;
@@ -799,54 +833,5 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
     }
 
     // elements가 10만개 넘으면 reinitializing이 효과적이고 밑이면 그냥 clear 쓰는게 이득.
-    public void Reinitialize()
-    {
-        startVertexPosition = Vector3.zero;
-        endVertexPosition = Vector3.zero;
-
-        startTriangleIndex = -1;
-        endTriangleIndex = -1;
-        triangleCount = 0;
-
-        isStartFromVtx = false;
-        isEndToVtx = false;
-
-        startScreenRay = new Ray();
-        endScreenRay = new Ray();
-        rays = new List<Ray>();
-        intersectedPosition = new List<Vector3>();
-
-        removeBoundaryVertices = new List<int>();
-
-        newVertices = new Dictionary<int, Vector3>();
-        newTriangles = new Dictionary<int, int>();
-
-        _dividingMethods = gameObject.AddComponent<DivideTriangle>();
-    }
-
-    protected override void InitializeChild()
-    {
-        startVertexPosition = Vector3.zero;
-        endVertexPosition = Vector3.zero;
-
-        startTriangleIndex = -1;
-        endTriangleIndex = -1;
-        triangleCount = 0;
-
-        isStartFromVtx = false;
-        isEndToVtx = false;
-
-        startScreenRay = new Ray();
-        endScreenRay = new Ray();
-        rays = new List<Ray>();
-        intersectedPosition = new List<Vector3>();
-
-        removeBoundaryVertices = new List<int>();
-
-        newVertices = new Dictionary<int, Vector3>();
-        newTriangles = new Dictionary<int, int>();
-
-        _dividingMethods = gameObject.AddComponent<DivideTriangle>();
-    }
 
 }

@@ -15,7 +15,7 @@ public class PatchMode : Mode
     public GameObject mainObject;
     MeasureManager MeasureManager;
 
-    void Start()
+    void Awake()
     {
         MeasureManager = new MeasureManager();
         playerObject = gameObject;

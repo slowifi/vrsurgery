@@ -11,26 +11,26 @@ public class CHD : MonoBehaviour
     public void CutMode()
     {
         isOn = true;
-        mode = playerObject.AddComponent<BoundaryCutMode>();
+        mode = new GameObject("CutMode").AddComponent<BoundaryCutMode>();
         playerObject.SendMessage("BoundaryModeOn");
     }
 
     public void StartPatchMode()
     {
         isOn = true;
-        mode = playerObject.AddComponent<PatchMode>();
+        mode = new GameObject("PatchMode").AddComponent<PatchMode>();
     }
 
     public void StartMeasureMode()
     {
         isOn = true;
-        mode = playerObject.AddComponent<MeasureMode>();
+        mode = new GameObject("MeasureMode").AddComponent<MeasureMode>();
     }
 
     public void StartIncisionMode()
     {
         isOn = true;
-        mode = playerObject.AddComponent<IncisionMode>();
+        mode = new GameObject("IncisionMode").AddComponent<IncisionMode>();
         playerObject.SendMessage("IncisionModeOn");
         UIManager.Instance.extendBar.value = 0;
     }
@@ -57,7 +57,6 @@ public class CHD : MonoBehaviour
 
         Destroy(mode);
 
-        Destroy(GameObject.Find("MeasureLine"));
         ObjManager.Instance.startMeasurePoint.SetActive(false);
         ObjManager.Instance.endMeasurePoint.SetActive(false);
 
@@ -71,8 +70,6 @@ public class CHD : MonoBehaviour
                 MakeDoubleFaceMesh.Instance.MakePatchInnerFace(patchObject);
                 ren.material.color = new Color32(115, 0, 0, 255);
             }
-
-
         }
     }
 
@@ -89,13 +86,11 @@ public class CHD : MonoBehaviour
         PatchManager.Instance.Reinitialize();
         IncisionManager.Instance.Reinitialize();
         Debug.Log("reined");
-        BoundaryCutManager.Instance.Reinitialize();
         MakeDoubleFaceMesh.Instance.Reinitialize();
         playerObject.SetActive(true);
         playerObject.SendMessage("IncisionModeOff");
         playerObject.SendMessage("BoundaryModeOff");
         //lineRenderer = new GameObject>();
-        Destroy(GameObject.Find("MeasureLine"));
         ObjManager.Instance.startMeasurePoint.SetActive(false);
         ObjManager.Instance.endMeasurePoint.SetActive(false);
 
@@ -112,7 +107,6 @@ public class CHD : MonoBehaviour
         AdjacencyList.Instance.Initialize();
         PatchManager.Instance.Initialize();
         IncisionManager.Instance.Initialize();
-        BoundaryCutManager.Instance.Initialize();
         MakeDoubleFaceMesh.Instance.Initialize();
         playerObject.SetActive(true);
 

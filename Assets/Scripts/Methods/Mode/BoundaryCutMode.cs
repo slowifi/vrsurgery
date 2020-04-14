@@ -13,9 +13,40 @@ public class BoundaryCutMode : Mode
     private Vector3 oldPosition;
     public GameObject playerObject;
     public GameObject mainObject;
+    private BoundaryCutManager BoundaryCutManager;
 
+
+    private void Cut()
+    {
+        bool checkError = true;
+        // 이걸 뒤에 넣어서 한프레임 늦게 실행 되도록 하기.
+        checkError = BoundaryCutManager.PostProcess();
+        if (!checkError)
+        {
+            Destroy(lineRenderer);
+            Destroy(this);
+            // return true;
+        }
+        MeshManager.Instance.mesh.RecalculateNormals();
+
+        Destroy(lineRenderer);
+        AdjacencyList.Instance.ListUpdate();
+        if (!BoundaryCutManager.AutomaticallyRemoveTriangles())
+        {
+            ChatManager.Instance.GenerateMessage(" 영역이 잘못 지정되었습니다.");
+            MeshManager.Instance.LoadOldMesh();
+        }
+        else
+            MeshManager.Instance.SaveCurrentMesh();
+        AdjacencyList.Instance.ListUpdate();
+        MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+        BoundaryCutManager.BoundaryCutUpdate();
+        Destroy(this);
+        // return true;
+    }
     void Awake()
     {
+        BoundaryCutManager = gameObject.AddComponent<BoundaryCutManager>();
         boundaryCount = 0;
         isFirst = true;
         playerObject = gameObject;
@@ -41,31 +72,7 @@ public class BoundaryCutMode : Mode
 
         if (isLastBoundaryCut)
         {
-            bool checkError = true;
-            // 이걸 뒤에 넣어서 한프레임 늦게 실행 되도록 하기.
-            checkError = BoundaryCutManager.Instance.PostProcess();
-            if (!checkError)
-            {
-                Destroy(lineRenderer);
-                Destroy(this);
-                // return true;
-            }
-            MeshManager.Instance.mesh.RecalculateNormals();
-
-            Destroy(lineRenderer);
-            AdjacencyList.Instance.ListUpdate();
-            if (!BoundaryCutManager.Instance.AutomaticallyRemoveTriangles())
-            {
-                ChatManager.Instance.GenerateMessage(" 영역이 잘못 지정되었습니다.");
-                MeshManager.Instance.LoadOldMesh();
-            }
-            else
-                MeshManager.Instance.SaveCurrentMesh();
-            AdjacencyList.Instance.ListUpdate();
-            MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
-            BoundaryCutManager.Instance.BoundaryCutUpdate();
-            Destroy(this);
-            // return true;
+            Cut();
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -86,9 +93,9 @@ public class BoundaryCutMode : Mode
             bool checkInside = intersectedValues.Intersected;
             if (checkInside)
             {
-                BoundaryCutManager.Instance.rays.Add(ray);
-                BoundaryCutManager.Instance.intersectedPosition.Add(startVertexPosition);
-                BoundaryCutManager.Instance.startTriangleIndex = startTriangleIndex;
+                BoundaryCutManager.rays.Add(ray);
+                BoundaryCutManager.intersectedPosition.Add(startVertexPosition);
+                BoundaryCutManager.startTriangleIndex = startTriangleIndex;
 
                 oldPosition = startVertexPosition;
                 firstPosition = oldPosition;
@@ -136,8 +143,8 @@ public class BoundaryCutMode : Mode
                 }
                 else if (boundaryCount == 1)
                 {
-                    BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                    BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
+                    BoundaryCutManager.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                    BoundaryCutManager.intersectedPosition.Add(currentPosition);
                     lineRenderer = new GameObject("Boundary Line", typeof(LineRenderer));
                     lineRenderer.layer = 8;
                     var line = lineRenderer.GetComponent<LineRenderer>();
@@ -158,8 +165,8 @@ public class BoundaryCutMode : Mode
                     line.positionCount++;
                     line.SetPosition(boundaryCount++, currentPosition);
 
-                    BoundaryCutManager.Instance.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
-                    BoundaryCutManager.Instance.intersectedPosition.Add(currentPosition);
+                    BoundaryCutManager.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                    BoundaryCutManager.intersectedPosition.Add(currentPosition);
 
                     oldPosition = currentPosition;
                     //boundaryCount++;
@@ -170,7 +177,7 @@ public class BoundaryCutMode : Mode
                 if (boundaryCount == 0)
                     return;
                 Destroy(lineRenderer);
-                BoundaryCutManager.Instance.BoundaryCutUpdate();
+                BoundaryCutManager.BoundaryCutUpdate();
                 ChatManager.Instance.GenerateMessage(" 심장이 아닙니다.");
                 Destroy(this);
                 // return true;

@@ -7,7 +7,7 @@ public class MeasureMode : Mode
 {
     MeasureManager MeasureManager;
 
-    void Start()
+    void Awake()
     {
         MeasureManager = new MeasureManager();
     }
@@ -24,6 +24,7 @@ public class MeasureMode : Mode
     }
     void OnDestroy()
     {
-        MeasureManager = null;
+        Destroy(MeasureManager);
+        Destroy(GameObject.Find("MeasureLine"));
     }
 }
