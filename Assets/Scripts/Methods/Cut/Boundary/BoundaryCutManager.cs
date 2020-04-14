@@ -69,7 +69,7 @@ public class BoundaryCutManager : MonoBehaviour
         newVertices = new Dictionary<int, Vector3>();
         newTriangles = new Dictionary<int, int>();
 
-        _dividingMethods = gameObject.AddComponent<DivideTriangle>();
+        _dividingMethods = new DivideTriangle();
         _dividingMethods.SetBoundaryCutManager(this);
     }
     public void ResetIndex()

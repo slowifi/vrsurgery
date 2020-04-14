@@ -332,7 +332,7 @@ public class IncisionManager : Singleton<IncisionManager>
         newVertices = new Dictionary<int, Vector3>();
         newTriangles = new Dictionary<int, int>();
 
-        _dividingMethods = gameObject.AddComponent<DivideTriangle>();
+        _dividingMethods = new DivideTriangle();
     }
 
     // elements가 10만개 넘으면 reinitializing이 효과적이고 밑이면 그냥 clear 쓰는게 이득.
@@ -368,6 +368,6 @@ public class IncisionManager : Singleton<IncisionManager>
         newVertices = new Dictionary<int, Vector3>();
         newTriangles = new Dictionary<int, int>();
 
-        _dividingMethods = gameObject.AddComponent<DivideTriangle>();
+        _dividingMethods = new DivideTriangle();
     }
 }
