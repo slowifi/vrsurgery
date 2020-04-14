@@ -46,15 +46,19 @@ public class IncisionMode : Mode
             lineRenderer.layer = 8;
             //incisionCount++;
             firstIncision = true;
-            Intersections.RayObjectIntersection(cameraRay, ref oldPosition, triangles, worldPosition);
+
+            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
+            oldPosition = intersectedValues.IntersectedPosition;
+
             IncisionManager.Instance.IncisionUpdate();
             AdjacencyList.Instance.ListUpdate();
             IncisionManager.Instance.SetStartVerticesDF();
         }
         else if (Input.GetMouseButtonUp(0) && firstIncision)
         {
-            Vector3 currentPosition = Vector3.zero;
-            bool checkInside = Intersections.RayObjectIntersection(cameraRay, ref currentPosition, triangles, worldPosition);
+            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
+            Vector3 currentPosition = intersectedValues.IntersectedPosition;
+            bool checkInside = intersectedValues.Intersected;
             if (checkInside)
             {
                 if (Vector3.Distance(oldPosition, currentPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
@@ -106,8 +110,9 @@ public class IncisionMode : Mode
             }
             var line = lineRenderer.GetComponent<LineRenderer>();
 
-            Vector3 currentPosition = Vector3.zero;
-            bool checkInside = Intersections.RayObjectIntersection(cameraRay, ref currentPosition, triangles, worldPosition);
+            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
+            Vector3 currentPosition = intersectedValues.IntersectedPosition;
+            bool checkInside = intersectedValues.Intersected;
             if (!checkInside)
             {
                 Destroy(lineRenderer);

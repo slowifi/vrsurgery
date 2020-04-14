@@ -79,18 +79,6 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         firstTriangleIndex = startTriangleIndex;
     }
 
-    public void SetEndVertices()
-    {
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-
-        // 여기에 라인렌더러 넣는걸
-        // 두번 중복되어있음...
-        endScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        Intersections.GetIntersectedValues(endScreenRay, ref endVertexPosition, ref endTriangleIndex, triangles, worldPosition);
-        isEndToVtx = false;
-    }
-
     public void SetEndVertices(Ray endRay)
     {
         int[] triangles = MeshManager.Instance.mesh.triangles;
@@ -98,7 +86,11 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         // 여기에 라인렌더러 넣는걸
         // 두번 중복되어있음...
         endScreenRay = endRay;
-        Intersections.GetIntersectedValues(endScreenRay, ref endVertexPosition, ref endTriangleIndex, triangles, worldPosition);
+
+        IntersectedValues intersectedValues = Intersections.GetIntersectedValues(endScreenRay, triangles, worldPosition);
+        endVertexPosition = intersectedValues.IntersectedPosition;
+        endTriangleIndex = intersectedValues.TriangleIndex;
+
         isEndToVtx = false;
     }
 
@@ -562,14 +554,6 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         return true;
     }
 
-    public void RemoveBoundaryTriangles()
-    {
-
-    }
-
-
-
-
     public bool PostProcess()
     {
         // 여기에 문제가 있을 가능성이 농후
@@ -648,7 +632,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         startScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         firstScreenRay = startScreenRay;
 
-        Intersections.GetIntersectedValues(endScreenRay, ref endVertexPosition, ref endTriangleIndex, triangles, worldPosition);
+        Intersections.GetIntersectedValues(endScreenRay, triangles, worldPosition);
         firstVertexPosition = startVertexPosition;
         firstTriangleIndex = startTriangleIndex;
     }
@@ -659,7 +643,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         // 여기에 라인렌더러 넣는걸
         endScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        Intersections.GetIntersectedValues(endScreenRay, ref endVertexPosition, ref endTriangleIndex, triangles, worldPosition);
+        Intersections.GetIntersectedValues(endScreenRay, triangles, worldPosition);
         isEndToVtx = false;
     }
 

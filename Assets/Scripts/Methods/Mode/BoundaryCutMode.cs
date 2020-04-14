@@ -80,7 +80,10 @@ public class BoundaryCutMode : Mode
             Vector3 startVertexPosition = Vector3.zero;
             int startTriangleIndex = -1;
 
-            bool checkInside = Intersections.RayObjectIntersection(ray, ref startVertexPosition, ref startTriangleIndex, triangles, worldPosition);
+            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(ray, triangles, worldPosition);
+            startVertexPosition = intersectedValues.IntersectedPosition;
+            startTriangleIndex = intersectedValues.TriangleIndex;
+            bool checkInside = intersectedValues.Intersected;
             if (checkInside)
             {
                 BoundaryCutManager.Instance.rays.Add(ray);
@@ -99,7 +102,9 @@ public class BoundaryCutMode : Mode
         else if (Input.GetMouseButton(0))
         {
             Vector3 currentPosition = Vector3.zero;
-            bool checkInside = Intersections.RayObjectIntersection(cameraRay, ref currentPosition, triangles, worldPosition);
+            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
+            currentPosition = intersectedValues.IntersectedPosition;
+            bool checkInside = intersectedValues.Intersected;
             if (checkInside)
             {
                 Debug.Log(boundaryCount);
@@ -176,7 +181,9 @@ public class BoundaryCutMode : Mode
             if (boundaryCount == 0)
                 return;
 
-            bool checkInside = Intersections.RayObjectIntersection(cameraRay, triangles, worldPosition);
+
+            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
+            bool checkInside = intersectedValues.Intersected;
             if (checkInside)
             {
                 var line = lineRenderer.GetComponent<LineRenderer>();

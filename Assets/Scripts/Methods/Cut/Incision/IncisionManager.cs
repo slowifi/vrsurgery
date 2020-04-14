@@ -185,16 +185,21 @@ public class IncisionManager : Singleton<IncisionManager>
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
 
         startScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        Intersections.GetIntersectedValues(startScreenRay, ref startOuterVertexPosition, ref startOuterTriangleIndex, triangles, worldPosition);
+
+        IntersectedValues intersectedValues = Intersections.GetIntersectedValues(startScreenRay, triangles, worldPosition);
+        startOuterVertexPosition = intersectedValues.IntersectedPosition;
+        startOuterTriangleIndex = intersectedValues.TriangleIndex;
     }
 
     public void SetEndVerticesDF()
     {
         int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-
         endScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        Intersections.GetIntersectedValues(endScreenRay, ref endOuterVertexPosition, ref endOuterTriangleIndex, triangles, worldPosition);
+
+        IntersectedValues intersectedValues = Intersections.GetIntersectedValues(endScreenRay, triangles, worldPosition);
+        endOuterVertexPosition = intersectedValues.IntersectedPosition;
+        endOuterTriangleIndex = intersectedValues.TriangleIndex;
     }
 
     public void SetDividingListDF(ref bool edgeCheck)

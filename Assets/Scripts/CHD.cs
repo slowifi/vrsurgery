@@ -148,7 +148,8 @@ public class CHD : MonoBehaviour
         {
             AdjacencyList.Instance.WorldPositionUpdate();
 
-            bool checkInside = Intersections.RayObjectIntersection(cameraRay, triangles, worldPosition);
+            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
+            bool checkInside = intersectedValues.Intersected;
             if (!checkInside)
                 return;
         }
