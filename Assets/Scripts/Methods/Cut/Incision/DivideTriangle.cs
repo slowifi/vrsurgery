@@ -68,7 +68,7 @@ public class DivideTriangle : MonoBehaviour
         int newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
         
         Transform objTransform = ObjManager.Instance.objTransform;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength);
 
         Dictionary<int, Vector3> newVertices = BoundaryCutManager.Instance.newVertices;
@@ -98,7 +98,7 @@ public class DivideTriangle : MonoBehaviour
         int newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
 
         Transform objTransform = ObjManager.Instance.objTransform;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
 
         Dictionary<int, Vector3> newVertices = BoundaryCutManager.Instance.newVertices;
         Dictionary<int, int> newTriangles = BoundaryCutManager.Instance.newTriangles;
@@ -128,7 +128,7 @@ public class DivideTriangle : MonoBehaviour
         newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
        
         Transform objTransform = ObjManager.Instance.objTransform;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         Dictionary<int, Vector3> newVertices = BoundaryCutManager.Instance.newVertices;
         Dictionary<int, int> newTriangles = BoundaryCutManager.Instance.newTriangles;
         BoundaryCutManager.Instance.startVertexIndex = newVertexLength;
@@ -165,7 +165,7 @@ public class DivideTriangle : MonoBehaviour
         newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
 
         Transform objTransform = ObjManager.Instance.objTransform;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength);
         int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)
@@ -218,7 +218,7 @@ public class DivideTriangle : MonoBehaviour
         int newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
         
         Transform objTransform = ObjManager.Instance.objTransform;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength);
         int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)
@@ -267,7 +267,7 @@ public class DivideTriangle : MonoBehaviour
         newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.Instance.newTriangles.Count;
         newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.Instance.newVertices.Count;
 
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         Transform objTransform = ObjManager.Instance.objTransform;
         BoundaryCutManager.Instance.removeBoundaryVertices.Add(newVertexLength);
         int notEdgeVertex = -1;
@@ -317,7 +317,7 @@ public class DivideTriangle : MonoBehaviour
         int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
         int newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
         int currentIncisionIndex = IncisionManager.Instance.currentIndex;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
 
         if (!isInner)
         {
@@ -361,7 +361,7 @@ public class DivideTriangle : MonoBehaviour
         newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
         newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
 
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
 
         int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)
@@ -409,7 +409,7 @@ public class DivideTriangle : MonoBehaviour
         int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + IncisionManager.Instance.newTriangles.Count;
         int newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
         int currentIncisionIndex = IncisionManager.Instance.currentIndex;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
 
         int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)
@@ -458,7 +458,7 @@ public class DivideTriangle : MonoBehaviour
         int newVertexLength = MeshManager.Instance.mesh.vertexCount + IncisionManager.Instance.newVertices.Count;
         int currentIncisionIndex = IncisionManager.Instance.currentIndex;
 
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
 
         int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)

@@ -25,7 +25,6 @@ public class IncisionManager : Singleton<IncisionManager>
 
     private Vector3 endOuterVertexPosition;
 
-
     public int firstOuterVertexIndex;
     public int lastOuterVertexIndex;
 
@@ -209,7 +208,7 @@ public class IncisionManager : Singleton<IncisionManager>
         leftSide.Add(new List<int>());
         rightSide.Add(new List<int>());
 
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
         // start
         outerSide = Intersections.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startOuterVertexPosition, endOuterVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay, edgeList, worldVertices);

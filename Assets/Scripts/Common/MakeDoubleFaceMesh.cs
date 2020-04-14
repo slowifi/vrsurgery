@@ -51,7 +51,6 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
             newTriangles[i + 2] = triangles[i + 1];
         }
         oppositeMesh.triangles = newTriangles;
-        
     }
 
     public void MeshUpdateInnerFaceVertices()

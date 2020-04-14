@@ -108,7 +108,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         int edgeIdx = -1;
         Vector3 edgePoint = Vector3.zero;
         int triangleIndex = startTriangleIndex;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
 
         // start
@@ -508,7 +508,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
         int secondIndex = removeBoundaryVertices[4];
         int tri1 = 0, tri2 = 0;
         AdjacencyList.Instance.ListUpdate();
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
         int[] triangles = MeshManager.Instance.mesh.triangles;
 
@@ -670,7 +670,7 @@ public class BoundaryCutManager : Singleton<BoundaryCutManager>
 
         Vector3 edgePoint = Vector3.zero;
         int triangleIndex = startTriangleIndex;
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
 
 
