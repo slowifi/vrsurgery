@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class MeasureManager : Singleton<MeasureManager>
+public class MeasureManager : MonoBehaviour
 {
     public float distanceStartToEnd = 0f;
     public Vector3 measureStart;
     public Vector3 measureEnd;
+
+
     public float MeasureDistance(Vector3 vertexPosition, Ray cameraRay)
     {
         if (vertexPosition != Vector3.zero)

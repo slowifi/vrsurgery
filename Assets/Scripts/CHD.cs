@@ -8,26 +8,6 @@ public class CHD : MonoBehaviour
     private Mode mode;
     private bool isOn = false;
 
-    // private void UpdateByMode()
-    // {
-    //     if (mode == "Incision")
-    //     {
-    //         if (IncisionMode.Instance.OnUpdate(playerObject)) { ButtonOff(); }
-    //     }
-    //     else if (mode == "Boundary")
-    //     {
-    //         if (BoundaryCutMode.Instance.OnUpdate()) { ButtonOff(); }
-    //     }
-    //     else if (mode == "Measure")
-    //     {
-    //         MeasureMode.Instance.OnUpdate();
-    //     }
-    //     else if (mode == "Patch")
-    //     {
-    //         if (PatchMode.Instance.OnUpdate(playerObject)) { ButtonOff(); }
-    //     }
-    // }
-
     public void CutMode()
     {
         isOn = true;

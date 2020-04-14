@@ -13,9 +13,11 @@ public class PatchMode : Mode
     private GameObject lineRenderer;
     public GameObject playerObject;
     public GameObject mainObject;
+    MeasureManager MeasureManager;
 
-    void Awake()
+    void Start()
     {
+        MeasureManager = new MeasureManager();
         playerObject = gameObject;
         isFirstPatch = true;
         isPatchUpdate = false;
@@ -24,6 +26,7 @@ public class PatchMode : Mode
     }
     void Update()
     {
+        Ray cameraRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         // 처음에 실행되어야함.
         if (isFirstPatch)
         {
@@ -39,7 +42,7 @@ public class PatchMode : Mode
         }
         else if (Input.GetMouseButtonDown(0))
         {
-            Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+            Vector3 vertexPosition = MeasureManager.vertexPosition(cameraRay);
             if (vertexPosition != Vector3.zero)
             {
                 firstPosition = vertexPosition;
@@ -65,7 +68,7 @@ public class PatchMode : Mode
         {
             if (oldPosition == Vector3.zero)
                 return;
-            Vector3 vertexPosition = MeasureManager.Instance.vertexPosition(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+            Vector3 vertexPosition = MeasureManager.vertexPosition(cameraRay);
             if (vertexPosition != Vector3.zero)
             {
                 //first position이 저장되어 있어야함.
