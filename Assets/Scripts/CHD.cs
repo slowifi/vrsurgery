@@ -48,7 +48,6 @@ public class CHD : MonoBehaviour
 
     public void Exit()
     {
-
         Debug.Log("Exit");
         playerObject.SetActive(true);
         playerObject.SendMessage("BoundaryModeOff");
