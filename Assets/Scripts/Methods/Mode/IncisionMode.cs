@@ -25,9 +25,8 @@ public class IncisionMode : Mode
 
     void Update()
     {
-        Ray cameraRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
+        bool checkInside = intersectedValues.Intersected;
 
         if (isExtend)
         {
@@ -47,7 +46,6 @@ public class IncisionMode : Mode
             //incisionCount++;
             firstIncision = true;
 
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
             oldPosition = intersectedValues.IntersectedPosition;
 
             IncisionManager.Instance.IncisionUpdate();
@@ -56,11 +54,9 @@ public class IncisionMode : Mode
         }
         else if (Input.GetMouseButtonUp(0) && firstIncision)
         {
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
-            Vector3 currentPosition = intersectedValues.IntersectedPosition;
-            bool checkInside = intersectedValues.Intersected;
             if (checkInside)
             {
+                Vector3 currentPosition = intersectedValues.IntersectedPosition;
                 if (Vector3.Distance(oldPosition, currentPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
                 {
                     Destroy(lineRenderer);
@@ -110,9 +106,6 @@ public class IncisionMode : Mode
             }
             var line = lineRenderer.GetComponent<LineRenderer>();
 
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
-            Vector3 currentPosition = intersectedValues.IntersectedPosition;
-            bool checkInside = intersectedValues.Intersected;
             if (!checkInside)
             {
                 Destroy(lineRenderer);
@@ -123,6 +116,7 @@ public class IncisionMode : Mode
                 Destroy(this);
                 // return true;
             }
+            Vector3 currentPosition = intersectedValues.IntersectedPosition;
             Vector3 curPos = currentPosition;
             Vector3 oldPos = oldPosition;
             curPos.z += 1f;

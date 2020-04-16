@@ -115,13 +115,11 @@ public class BoundaryCutManager : MonoBehaviour
 
     public void SetEndVertices(Ray endRay)
     {
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         // 여기에 라인렌더러 넣는걸
         // 두번 중복되어있음...
         endScreenRay = endRay;
 
-        IntersectedValues intersectedValues = Intersections.GetIntersectedValues(endScreenRay, triangles, worldPosition);
+        IntersectedValues intersectedValues = Intersections.GetIntersectedValues(endScreenRay);
         endVertexPosition = intersectedValues.IntersectedPosition;
         endTriangleIndex = intersectedValues.TriangleIndex;
 
@@ -658,26 +656,21 @@ public class BoundaryCutManager : MonoBehaviour
 
     public void SetStartVerticesDF()
     {
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-
         // screen point도 저장해야됨.
         isStartFromVtx = false;
         startScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         firstScreenRay = startScreenRay;
 
-        Intersections.GetIntersectedValues(endScreenRay, triangles, worldPosition);
+        Intersections.GetIntersectedValues(endScreenRay);
         firstVertexPosition = startVertexPosition;
         firstTriangleIndex = startTriangleIndex;
     }
 
     public void SetEndVerticesDF()
     {
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         // 여기에 라인렌더러 넣는걸
         endScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        Intersections.GetIntersectedValues(endScreenRay, triangles, worldPosition);
+        Intersections.GetIntersectedValues(endScreenRay);
         isEndToVtx = false;
     }
 
