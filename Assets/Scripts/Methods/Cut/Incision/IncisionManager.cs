@@ -181,23 +181,18 @@ public class IncisionManager : Singleton<IncisionManager>
     // 양면메쉬 전용 알고리즘
     public void SetStartVerticesDF()
     {
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-
         startScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
 
-        IntersectedValues intersectedValues = Intersections.GetIntersectedValues(startScreenRay, triangles, worldPosition);
+        IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
         startOuterVertexPosition = intersectedValues.IntersectedPosition;
         startOuterTriangleIndex = intersectedValues.TriangleIndex;
     }
 
     public void SetEndVerticesDF()
     {
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         endScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
 
-        IntersectedValues intersectedValues = Intersections.GetIntersectedValues(endScreenRay, triangles, worldPosition);
+        IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
         endOuterVertexPosition = intersectedValues.IntersectedPosition;
         endOuterTriangleIndex = intersectedValues.TriangleIndex;
     }
@@ -332,7 +327,7 @@ public class IncisionManager : Singleton<IncisionManager>
         newVertices = new Dictionary<int, Vector3>();
         newTriangles = new Dictionary<int, int>();
 
-        _dividingMethods = gameObject.AddComponent<DivideTriangle>();
+        _dividingMethods = new DivideTriangle();
     }
 
     // elements가 10만개 넘으면 reinitializing이 효과적이고 밑이면 그냥 clear 쓰는게 이득.
@@ -368,6 +363,6 @@ public class IncisionManager : Singleton<IncisionManager>
         newVertices = new Dictionary<int, Vector3>();
         newTriangles = new Dictionary<int, int>();
 
-        _dividingMethods = gameObject.AddComponent<DivideTriangle>();
+        _dividingMethods = new DivideTriangle();
     }
 }

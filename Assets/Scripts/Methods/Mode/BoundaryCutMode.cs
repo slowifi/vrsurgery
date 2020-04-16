@@ -54,9 +54,9 @@ public class BoundaryCutMode : Mode
     }
     void Update()
     {
-        Ray cameraRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
+        bool checkInside = intersectedValues.Intersected;
 
         // 조건을 잘 짜야됨.
         if (isFirst)
@@ -82,15 +82,12 @@ public class BoundaryCutMode : Mode
             //AdjacencyList.Instance.ListUpdate();
             boundaryCount = 0;
             oldPosition = Vector3.zero;
-            Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-
             Vector3 startVertexPosition = Vector3.zero;
             int startTriangleIndex = -1;
 
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(ray, triangles, worldPosition);
             startVertexPosition = intersectedValues.IntersectedPosition;
             startTriangleIndex = intersectedValues.TriangleIndex;
-            bool checkInside = intersectedValues.Intersected;
+
             if (checkInside)
             {
                 BoundaryCutManager.rays.Add(ray);
@@ -109,12 +106,10 @@ public class BoundaryCutMode : Mode
         else if (Input.GetMouseButton(0))
         {
             Vector3 currentPosition = Vector3.zero;
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
-            currentPosition = intersectedValues.IntersectedPosition;
-            bool checkInside = intersectedValues.Intersected;
             if (checkInside)
             {
                 Debug.Log(boundaryCount);
+                currentPosition = intersectedValues.IntersectedPosition;
                 if (boundaryCount > 3 && Vector3.Distance(currentPosition, firstPosition) < 2f * ObjManager.Instance.pivotTransform.lossyScale.z)
                 {
 
@@ -143,7 +138,7 @@ public class BoundaryCutMode : Mode
                 }
                 else if (boundaryCount == 1)
                 {
-                    BoundaryCutManager.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                    BoundaryCutManager.rays.Add(ray);
                     BoundaryCutManager.intersectedPosition.Add(currentPosition);
                     lineRenderer = new GameObject("Boundary Line", typeof(LineRenderer));
                     lineRenderer.layer = 8;
@@ -165,7 +160,7 @@ public class BoundaryCutMode : Mode
                     line.positionCount++;
                     line.SetPosition(boundaryCount++, currentPosition);
 
-                    BoundaryCutManager.rays.Add(ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition));
+                    BoundaryCutManager.rays.Add(ray);
                     BoundaryCutManager.intersectedPosition.Add(currentPosition);
 
                     oldPosition = currentPosition;
@@ -188,9 +183,6 @@ public class BoundaryCutMode : Mode
             if (boundaryCount == 0)
                 return;
 
-
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues(cameraRay, triangles, worldPosition);
-            bool checkInside = intersectedValues.Intersected;
             if (checkInside)
             {
                 var line = lineRenderer.GetComponent<LineRenderer>();

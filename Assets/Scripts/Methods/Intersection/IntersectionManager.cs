@@ -13,8 +13,24 @@ public class IntersectedValues
 
 public class Intersections
 {
-    public static IntersectedValues GetIntersectedValues(Ray cameraRay, int[] triangles, List<Vector3> worldPosition)
+    public static IntersectedValues GetIntersectedValues()
     {
+        Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        return GetIntersectedValues(ray, triangles, worldPosition);
+    }
+
+    public static IntersectedValues GetIntersectedValues(Ray ray)
+    {
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        return GetIntersectedValues(ray, triangles, worldPosition);
+    }
+
+    private static IntersectedValues GetIntersectedValues(Ray cameraRay, int[] triangles, List<Vector3> worldPosition)
+    {
+
         IntersectedValues temp = new IntersectedValues();
         float dst_min = 10000000;
         Vector3 intersectionTemp = Vector3.zero;
@@ -39,16 +55,8 @@ public class Intersections
                 }
             }
         }
-        if (dst_min != 10000000)
-        {
-            temp.Intersected = true;
-            return temp;
-        }
-        else
-        {
-            temp.Intersected = false;
-            return temp;
-        }
+        temp.Intersected = dst_min != 10000000;
+        return temp;
     }
 
     public static bool RayTriangleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, Ray ray, ref Vector3 intersectionTemp)
@@ -172,7 +180,7 @@ public class Intersections
                 continue;
 
             // 이거 자체를 바꿔야하나?
-            
+
             if (RayTriangleIntersection(
                 screenMiddlePoint,
                 incisionStartPoint + screenStartRay.direction * 10,
@@ -265,7 +273,7 @@ public class Intersections
             //처음에 방향 설정 관련
             if (LinePlaneIntersection(ref intersectionTemp,
                 worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
-                worldVertices[edgeList[incisionTriangleIndex + i].vtx2]- worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
+                worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
                 planeNormal,
                 incisionStartPoint))
             {
@@ -361,7 +369,7 @@ public class Intersections
             if (checkIntersection)
             {
                 float curDistance = Vector3.Distance(intersectionPoint, incisionEndPoint);
-                if(curDistance<distance)
+                if (curDistance < distance)
                 {
                     distance = curDistance;
                     edgeIdx = incisionTriangleIndex + i;
@@ -472,18 +480,18 @@ public class Intersections
         float denom = Vector3.Dot(planeNormal, lineVec);
         if (Mathf.Abs(denom) > 0.0001f) // your favorite epsilon
         {
-            float t = Vector3.Dot( (planePoint - linePoint), planeNormal) / denom;
+            float t = Vector3.Dot((planePoint - linePoint), planeNormal) / denom;
             if (t >= 0)
             {
                 intersectionPoint = linePoint + t * lineVec;
-                if(intersectionPoint.x < linePoint.x)
+                if (intersectionPoint.x < linePoint.x)
                 {
                     if (intersectionPoint.x > (linePoint + lineVec).x)
                         return true;
                     else
                         return false;
                 }
-                else if(intersectionPoint.x > linePoint.x)
+                else if (intersectionPoint.x > linePoint.x)
                 {
                     if (intersectionPoint.x < (linePoint + lineVec).x)
                         return true;
