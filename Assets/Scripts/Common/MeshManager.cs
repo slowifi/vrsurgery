@@ -14,8 +14,6 @@ public class MeshManager : Singleton<MeshManager>
     public int vertexCount;
     public int[] triangles;
     public Vector3[] vertices;
-    public MeshInfo MeshInformation;
-
 
     public void MeshUpdate()
     {
@@ -67,7 +65,7 @@ public class MeshManager : Singleton<MeshManager>
         Renderer mat = heart.GetComponent<Renderer>();
         mat.material = material;
         mesh = heart.GetComponent<MeshFilter>().mesh;
-
+        
         //Debug.Log(mesh.bounds.size);
         //y 기준으로 맞춰주면 되겠다.
         ObjManager.Instance.pivotTransform.localScale = Vector3.one * (80 / mesh.bounds.size.y);
@@ -81,20 +79,5 @@ public class MeshManager : Singleton<MeshManager>
         ChatManager.Instance.GenerateMessage(" " + mesh.normals.Length);
         Debug.Log(mesh.normals.Length);
         Debug.Log(mesh.vertexCount);
-
-        MeshInformation = new MeshInfo();
     }
-
-    public void SetMeshInfo()
-    {
-        MeshInformation.ConnectedTriangles = AdjacencyList.Instance.connectedTriangles;
-        MeshInformation.ConnectedVertices = AdjacencyList.Instance.connectedVertices;
-        MeshInformation.EdgeList = AdjacencyList.Instance.edgeList;
-        MeshInformation.ObjectMesh = heart.GetComponent<MeshFilter>().mesh;
-        MeshInformation.WorldPosition = AdjacencyList.Instance.worldPositionVertices;
-    }
-
-
-
-
 }

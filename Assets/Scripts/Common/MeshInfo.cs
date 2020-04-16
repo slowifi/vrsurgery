@@ -27,4 +27,3 @@ public class MeshInfo
     public Dictionary<int, HashSet<int>> ConnectedVertices;
     public Dictionary<int, HashSet<int>> ConnectedTriangles;
 }
-

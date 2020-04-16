@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class DivideTriangle
+public class DivideTriangle : MonoBehaviour
 {
     
     /// <summary>
