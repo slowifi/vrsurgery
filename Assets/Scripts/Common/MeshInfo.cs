@@ -17,13 +17,3 @@ public class Edge
         tri2 = t2;
     }
 }
-
-public class MeshInfo
-{
-    // 무언가의 입력값으로 넣어준다.
-    public Mesh ObjectMesh;
-    public List<Edge> EdgeList;
-    public List<Vector3> WorldPosition;
-    public Dictionary<int, HashSet<int>> ConnectedVertices;
-    public Dictionary<int, HashSet<int>> ConnectedTriangles;
-}

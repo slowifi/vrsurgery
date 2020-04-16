@@ -2,8 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class MeshInformation
+{
+    public Mesh ObjectMesh;
+    public List<Edge> EdgeList;
+    public List<Vector3> WorldPosition;
+    public Dictionary<int, HashSet<int>> ConnectedVertices;
+    public Dictionary<int, HashSet<int>> ConnectedTriangles;
+}
+
 public class MeshManager : Singleton<MeshManager>
 {
+    public MeshInformation MeshInfo;
+
     public GameObject heart;
     private GameObject disableHeart;
     public Material material;
@@ -14,6 +25,24 @@ public class MeshManager : Singleton<MeshManager>
     public int vertexCount;
     public int[] triangles;
     public Vector3[] vertices;
+
+    public void Awake()
+    {
+        
+    }
+
+    public void SetMeshInfo()
+    {
+        // 주소값 전달해서 추후에는 같이 변환되게 해야됨.
+        MeshInfo = new MeshInformation();
+        MeshInfo.ConnectedTriangles = AdjacencyList.Instance.connectedTriangles;
+        MeshInfo.ConnectedVertices = AdjacencyList.Instance.connectedVertices;
+        MeshInfo.EdgeList = AdjacencyList.Instance.edgeList;
+        MeshInfo.WorldPosition = AdjacencyList.Instance.worldPositionVertices;
+        MeshInfo.ObjectMesh = mesh;
+    }
+
+
 
     public void MeshUpdate()
     {
