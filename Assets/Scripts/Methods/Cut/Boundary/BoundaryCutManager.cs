@@ -70,6 +70,7 @@ public class BoundaryCutManager : MonoBehaviour
         newTriangles = new Dictionary<int, int>();
 
         _dividingMethods = new DivideTriangle();
+        // divide에 넣고싶으면 계속 업데이트를 해야 dividetriangle이 작동.
         _dividingMethods.SetBoundaryCutManager(this);
     }
     public void ResetIndex()
@@ -580,8 +581,8 @@ public class BoundaryCutManager : MonoBehaviour
 
         Debug.Log(triangles.Length);
 
-        if (!BFS.Instance.BFS_Boundary(bfsVtx1, removeBoundaryVertices))
-            if (!BFS.Instance.BFS_Boundary(bfsVtx2, removeBoundaryVertices))
+        if (!BFS.Boundary(bfsVtx1, removeBoundaryVertices))
+            if (!BFS.Boundary(bfsVtx2, removeBoundaryVertices))
                 return false;
         return true;
     }

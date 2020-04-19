@@ -100,7 +100,7 @@ public class CGAL
         // 새롭게 mesh instance 만들어내는 과정이 필요함. 
         // 그리고 기존것 지우고 뭔가 또 해야됨.
         GameObject newObject = new GameObject("Heart_", typeof(MeshFilter), typeof(MeshRenderer));
-        newObject.GetComponent<MeshRenderer>().material = MeshManager.Instance.heart.GetComponent<MeshRenderer>().material;
+        newObject.GetComponent<MeshRenderer>().material = MeshManager.Instance.Heart.GetComponent<MeshRenderer>().material;
 
         newObject.transform.SetParent(GameObject.Find("PartialModel").transform);
         newObject.transform.localPosition = Vector3.zero;
@@ -166,7 +166,7 @@ public class CGAL
         //int[] newTriangles = Commonthings.ConvertToTriangle(GetFaces(heart), GetNumberOfFaces(heart));
 
         GameObject newObject = new GameObject("Heart_", typeof(MeshFilter), typeof(MeshRenderer));
-        newObject.GetComponent<MeshRenderer>().material = MeshManager.Instance.heart.GetComponent<MeshRenderer>().material;
+        newObject.GetComponent<MeshRenderer>().material = MeshManager.Instance.Heart.GetComponent<MeshRenderer>().material;
 
         newObject.transform.SetParent(GameObject.Find("PartialModel").transform);
         newObject.transform.localPosition = Vector3.zero;
@@ -254,14 +254,16 @@ public class CGAL
 
     public static float[] GetFloatArray(IntPtr heart, int length)
     {
-        float[] newHeart = new float[length];
+        //VERTICES 변환
+        float[] newHeart = new float[length * 3];
         Marshal.Copy(heart, newHeart, 0, length);
         return newHeart;
     }
 
     public static int[] GetIntArray(IntPtr heart, int length)
     {
-        int[] newHeart = new int[length];
+        //FACES 변환
+        int[] newHeart = new int[length * 3];
         Marshal.Copy(heart, newHeart, 0, length);
         return newHeart;
     }
@@ -335,9 +337,9 @@ public class CGAL
         return plane;
     }
 
-    public static void GenerateNewObject(IntPtr heart, Material material)
+    public static GameObject GenerateNewObject(IntPtr heart, Material material)
     {
-        Vector3[] newVertices = ConvertToVector(GetVertices(heart), GetNumberOfVertices(heart));//, GameObject.Find("PartialModel").transform);
+        Vector3[] newVertices = ConvertToVector(GetVertices(heart), GetNumberOfVertices(heart), GameObject.Find("PartialModel").transform);
         int[] newTriangles = ConvertToTriangle(GetFaces(heart), GetNumberOfFaces(heart));
 
         // 새롭게 mesh instance 만들어내는 과정이 필요함. 
@@ -353,6 +355,7 @@ public class CGAL
         newMesh.vertices = newVertices;
         newMesh.triangles = newTriangles;
         newMesh.RecalculateNormals();
+        return newObject;
     }
 
 

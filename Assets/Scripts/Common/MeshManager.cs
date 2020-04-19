@@ -15,19 +15,20 @@ public class MeshInformation
 public class MeshManager : Singleton<MeshManager>
 {
     public MeshInformation MeshInfo;
+
+    public GameObject Heart;
     public GameObject LeftHeart;
     public GameObject RightHeart;
 
-    public GameObject heart;
+    
     private GameObject disableHeart;
     public Material material;
-    public Mesh testMesh;
+
     public Mesh mesh;
     public Mesh oldMesh;
     public Mesh firstMesh;
-    public int vertexCount;
-    public int[] triangles;
-    public Vector3[] vertices;
+
+
 
     public void Awake()
     {
@@ -50,18 +51,18 @@ public class MeshManager : Singleton<MeshManager>
     public void MeshUpdate()
     {
         // heart = GameObject.Find("heart_2");
-        mesh = heart.GetComponent<MeshFilter>().mesh;
+        mesh = Heart.GetComponent<MeshFilter>().mesh;
         mesh.RecalculateNormals();
     }
 
     public void SaveCurrentMesh()
     {
-        disableHeart = Instantiate(heart);
+        disableHeart = Instantiate(Heart);
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         Destroy(disableHeart);
 
-        int[] triangles = (int[])heart.GetComponent<MeshFilter>().mesh.triangles.Clone();
-        Vector3[] vertices = (Vector3[])heart.GetComponent<MeshFilter>().mesh.vertices.Clone();
+        int[] triangles = (int[])Heart.GetComponent<MeshFilter>().mesh.triangles.Clone();
+        Vector3[] vertices = (Vector3[])Heart.GetComponent<MeshFilter>().mesh.vertices.Clone();
 
         oldMesh.triangles = triangles;
         oldMesh.vertices = vertices;
@@ -79,10 +80,10 @@ public class MeshManager : Singleton<MeshManager>
     public void Reinitialize()
     {
         Debug.Log(mesh.bounds.size);
-        Renderer mat = heart.GetComponent<Renderer>();
+        Renderer mat = Heart.GetComponent<Renderer>();
         mat.material = material;
-        mesh = heart.GetComponent<MeshFilter>().mesh;
-        disableHeart = Instantiate(heart);
+        mesh = Heart.GetComponent<MeshFilter>().mesh;
+        disableHeart = Instantiate(Heart);
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         firstMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         Destroy(disableHeart);
@@ -94,15 +95,15 @@ public class MeshManager : Singleton<MeshManager>
 
     protected override void InitializeChild()
     {
-        Renderer mat = heart.GetComponent<Renderer>();
+        Renderer mat = Heart.GetComponent<Renderer>();
         mat.material = material;
-        mesh = heart.GetComponent<MeshFilter>().mesh;
+        mesh = Heart.GetComponent<MeshFilter>().mesh;
         
         //Debug.Log(mesh.bounds.size);
         //y 기준으로 맞춰주면 되겠다.
         ObjManager.Instance.pivotTransform.localScale = Vector3.one * (80 / mesh.bounds.size.y);
 
-        disableHeart = Instantiate(heart);
+        disableHeart = Instantiate(Heart);
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         firstMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         Destroy(disableHeart);

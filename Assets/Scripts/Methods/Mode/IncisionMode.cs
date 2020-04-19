@@ -97,7 +97,7 @@ public class IncisionMode : Mode
         }
         else if (Input.GetMouseButton(0))
         {
-            // 이걸 수정을 좀 해야되는데
+            // 여기안에 지속적으로 거리계산되는 txt넣는게 좋을듯.
             if (!firstIncision)
             {
                 if (PlayerObject.activeSelf)

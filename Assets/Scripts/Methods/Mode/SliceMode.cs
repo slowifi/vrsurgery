@@ -16,7 +16,14 @@ public class SliceMode : Mode
     private Material rightMaterial;
 
     private bool isSlice;
+    private bool isSelect;
     private bool isDrawingCut;
+
+    private GameObject leftHeart;
+    private GameObject rightHeart;
+
+    private List<Vector3> leftWorldPos;
+    private List<Vector3> rightWorldPos;
 
     private void Awake()
     {
@@ -25,15 +32,48 @@ public class SliceMode : Mode
         leftMaterial = Resources.Load("Materials/LeftMaterial", typeof(Material)) as Material;
         rightMaterial = Resources.Load("Materials/RightMaterial", typeof(Material)) as Material;
         rayList = new List<Ray>();
-        isDrawingCut = true;
-        isSlice = false;
+        isDrawingCut = false;
+        isSlice = true;
+        isSelect = false;
     }
 
     private void Update()
     {
-        
         if (isSlice)
         {
+            if(isSelect)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+                    IntersectedValues valuesLeft = Intersections.GetIntersectedValues(ray, leftHeart.GetComponent<MeshFilter>().mesh.triangles, leftWorldPos);
+                    IntersectedValues valuesRight = Intersections.GetIntersectedValues(ray, rightHeart.GetComponent<MeshFilter>().mesh.triangles, rightWorldPos);
+                    if (valuesLeft.Intersected)
+                    {
+                        //중복이니까 함수 하나 만드는게 좋을듯.
+                        Destroy(rightHeart);
+                        MeshManager.Instance.Heart = leftHeart;
+                        MeshManager.Instance.mesh = leftHeart.GetComponent<MeshFilter>().mesh;
+                        MakeDoubleFaceMesh.Instance.Reinitialize();
+                    }
+                    else if(valuesRight.Intersected)
+                    {
+                        Destroy(leftHeart);
+                        MeshManager.Instance.Heart = rightHeart;
+                        MeshManager.Instance.mesh = rightHeart.GetComponent<MeshFilter>().mesh;
+                        MakeDoubleFaceMesh.Instance.Reinitialize();
+                    }
+                    else
+                    {
+                        Destroy(rightHeart);
+                        Destroy(leftHeart);
+                        MeshManager.Instance.Heart.SetActive(true);
+                    }
+                    isSelect = false;
+                    isSlice = false;
+                }
+                return;
+            }
             if (Input.GetMouseButtonDown(0))
             {
                 IntersectedValues values = Intersections.GetIntersectedValues();
@@ -51,6 +91,7 @@ public class SliceMode : Mode
                     secondIntersectedValues = values;
                     middlePosition = Vector3.Lerp(firstIntersectedValues.ray.origin, secondIntersectedValues.ray.origin, 0.5f);
                     Slicing();
+                    isSelect = true;
                 }
             }
         }
@@ -68,6 +109,7 @@ public class SliceMode : Mode
             {
                 Debug.Log("upbutton on");
                 DrawingCut();
+                isDrawingCut = false;
             }
             else if (Input.GetMouseButton(0))
             {
@@ -129,6 +171,15 @@ public class SliceMode : Mode
             Debug.Log(" 만들어지지 않음");
         }
         CGAL.FillHole(stamp);
+        //CGAL.ClipPolyhedron(
+        //    left,
+        //    CGAL.GetFloatArray(CGAL.GetVertices(stamp), CGAL.GetNumberOfVertices(stamp)),
+        //    CGAL.GetNumberOfVertices(stamp),
+        //    CGAL.GetIntArray(CGAL.GetFaces(stamp), CGAL.GetNumberOfFaces(stamp)),
+        //    CGAL.GetNumberOfFaces(stamp));
+
+
+
         CGAL.GenerateNewObject(stamp, leftMaterial);
 
 
@@ -153,13 +204,11 @@ public class SliceMode : Mode
         //    );
         //CGAL.GenerateNewObject(left, leftMaterial);
         //CGAL.GenerateNewObject(right, rightMaterial);
-        MeshManager.Instance.heart.SetActive(false);
+        MeshManager.Instance.Heart.SetActive(false);
 
 
 
     }
-
-
 
     private void Slicing()
     {
@@ -203,9 +252,14 @@ public class SliceMode : Mode
                 secondIntersectedValues.IntersectedPosition,
                 firstIntersectedValues.IntersectedPosition));
 
-        CGAL.GenerateNewObject(left, leftMaterial);
-        CGAL.GenerateNewObject(right, rightMaterial);
-        MeshManager.Instance.heart.SetActive(false);
+        leftHeart = CGAL.GenerateNewObject(left, leftMaterial);
+        rightHeart = CGAL.GenerateNewObject(right, rightMaterial);
+        leftWorldPos = new List<Vector3>();
+        rightWorldPos = new List<Vector3>();
+        leftWorldPos = AdjacencyList.Instance.LocalToWorldPosition(leftHeart.GetComponent<MeshFilter>().mesh);
+        rightWorldPos = AdjacencyList.Instance.LocalToWorldPosition(rightHeart.GetComponent<MeshFilter>().mesh);
+
+        MeshManager.Instance.Heart.SetActive(false);
         // 여기까지 했고 선택하면 하나 잘리도록 하기.
     }
 

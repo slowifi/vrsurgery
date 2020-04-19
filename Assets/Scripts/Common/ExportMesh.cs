@@ -129,7 +129,7 @@ public class ExportMesh : MonoBehaviour
         Debug.Log(path);
         //여기에 현재 모델 집어 넣으면됨.
         //이름도 지정해서 index줘서 집어넣을까.
-        MeshFilter obj = MeshManager.Instance.heart.GetComponent<MeshFilter>();
+        MeshFilter obj = MeshManager.Instance.Heart.GetComponent<MeshFilter>();
         MeshToFile(obj, path, "ModifiedHeart"+exportCount);
         exportCount++;
     }

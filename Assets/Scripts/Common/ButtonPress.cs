@@ -7,6 +7,12 @@ using UnityEngine;
 
 public class ButtonPress : Singleton<ButtonPress>
 {
+    /// <summary>
+    /// 여기도 대규모 수정 필요함.
+    /// </summary>
+    /// 
+
+
     public GameObject MainManager;
     public Button CutButton;
     public Button SliceButton;

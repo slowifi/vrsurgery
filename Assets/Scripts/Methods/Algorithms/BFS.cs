@@ -3,9 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class BFS : Singleton<BFS>
+public class BFS
 {
-    public bool BFS_Boundary(int vertex, List<int> boundaryList)
+
+    /// <summary>
+    /// 여기도 수정을 해야됨.
+    /// 
+    /// </summary>
+    /// <param name="vertex"></param>
+    /// <param name="boundaryList"></param>
+    /// <returns></returns>
+
+
+    public static bool Boundary(int vertex, List<int> boundaryList)
     {
         // start point부터 end point까지 겹치는 point들 전부가 boundary list에 들어가야됨.
         // 일단 incision에서 사용한 기능부터 만들어 보고
@@ -98,7 +108,7 @@ public class BFS : Singleton<BFS>
     /// <param name="startPoint"></param>
     /// <param name="endPoint"></param>
     /// <param name="isLeft"></param>
-    public void BFS_Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, bool isLeft, float zMin, float zMax)
+    public static void Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, bool isLeft, float zMin, float zMax)
     {
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
         float dst = Vector2.Distance(startPoint, endPoint) / 2;

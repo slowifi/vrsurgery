@@ -37,7 +37,7 @@ public class Intersections
         return GetIntersectedValues(ray, triangles, worldPosition);
     }
 
-    private static IntersectedValues GetIntersectedValues(Ray cameraRay, int[] triangles, List<Vector3> worldPosition)
+    public static IntersectedValues GetIntersectedValues(Ray cameraRay, int[] triangles, List<Vector3> worldPosition)
     {
 
         IntersectedValues temp = new IntersectedValues();
