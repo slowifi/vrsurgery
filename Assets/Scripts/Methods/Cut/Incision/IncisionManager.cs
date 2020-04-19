@@ -91,7 +91,7 @@ public class IncisionManager : Singleton<IncisionManager>
             if (tempZ > zMax)
                 zMax = tempZ;
         }
-
+        
         zMax += ObjManager.Instance.pivotTransform.lossyScale.z;
         zMin -= ObjManager.Instance.pivotTransform.lossyScale.z;
 

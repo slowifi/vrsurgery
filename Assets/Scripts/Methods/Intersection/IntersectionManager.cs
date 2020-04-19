@@ -3,6 +3,15 @@ using System.Collections.Generic;
 
 public class IntersectedValues
 {
+    public IntersectedValues()
+    {
+        Intersected = false;
+        TriangleIndex = -1;
+        VertexIndex = -1;
+        Disance = 0.0f;
+        IntersectedPosition = Vector3.zero;
+    }
+    public Ray ray;
     public bool Intersected;
     public int TriangleIndex;
     //VertexIndex : 트라이앵글의 세 버텍스중 아무거나 하나.
@@ -51,6 +60,7 @@ public class Intersections
                     temp.VertexIndex = triangles[i];
                     temp.TriangleIndex = i;
                     temp.IntersectedPosition = intersectionTemp;
+                    temp.ray = cameraRay;
                     dst_min = dst_temp;
                 }
             }

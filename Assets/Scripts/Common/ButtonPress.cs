@@ -7,109 +7,134 @@ using UnityEngine;
 
 public class ButtonPress : Singleton<ButtonPress>
 {
-    public GameObject mainManager;
-    public Button cutButton;
-    public Button patchButton;
-    public Button measureButton;
-    public Button incisionButton;
+    public GameObject MainManager;
+    public Button CutButton;
+    public Button SliceButton;
+    public Button PatchButton;
+    public Button MeasureButton;
+    public Button IncisionButton;
 
     public void ResetButton()
     {
-        ColorBlock colorTemp = cutButton.colors;
+        ColorBlock colorTemp = CutButton.colors;
         colorTemp.normalColor = new Color32(137, 96, 96, 255);
-        cutButton.colors = colorTemp;
-        patchButton.colors = colorTemp;
-        incisionButton.colors = colorTemp;
-        measureButton.colors = colorTemp;
+        CutButton.colors = colorTemp;
+        PatchButton.colors = colorTemp;
+        IncisionButton.colors = colorTemp;
+        MeasureButton.colors = colorTemp;
     }
+
+    public void Slicing()
+    {
+        if (SliceButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        {
+            ColorBlock colorTemp = SliceButton.colors;
+            colorTemp.normalColor = new Color32(137, 96, 96, 255);
+            SliceButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
+        }
+        else
+        {
+            ColorBlock colorTemp = SliceButton.colors;
+            PatchButton.colors = colorTemp;
+            MeasureButton.colors = colorTemp;
+            IncisionButton.colors = colorTemp;
+            CutButton.colors = colorTemp;
+            colorTemp.normalColor = new Color32(176, 48, 48, 255);
+            SliceButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
+            MainManager.SendMessage("SliceMode");
+        }
+    }
+
 
     public void Cutting()
     {
         // selected Color32(176, 48, 48, 255);
         // unselected Color32(137, 96, 96, 255);
-        if (cutButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (CutButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = cutButton.colors;
+            ColorBlock colorTemp = CutButton.colors;
             colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            cutButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
+            CutButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
         }
         else
         {
-            ColorBlock colorTemp = cutButton.colors;
-            patchButton.colors = colorTemp;
-            measureButton.colors = colorTemp;
-            incisionButton.colors = colorTemp;
+            ColorBlock colorTemp = CutButton.colors;
+            PatchButton.colors = colorTemp;
+            MeasureButton.colors = colorTemp;
+            IncisionButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
-            cutButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
-            mainManager.SendMessage("CutMode");
+            CutButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
+            MainManager.SendMessage("CutMode");
         }
     }
 
     public void Patching()
     {
-        if (patchButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (PatchButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = patchButton.colors;
+            ColorBlock colorTemp = PatchButton.colors;
             colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            patchButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
+            PatchButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
         }
         else
         {
-            ColorBlock colorTemp = patchButton.colors;
-            cutButton.colors = colorTemp;
-            measureButton.colors = colorTemp;
-            incisionButton.colors = colorTemp;
+            ColorBlock colorTemp = PatchButton.colors;
+            CutButton.colors = colorTemp;
+            MeasureButton.colors = colorTemp;
+            IncisionButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
-            patchButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
-            mainManager.SendMessage("StartPatchMode");
+            PatchButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
+            MainManager.SendMessage("StartPatchMode");
         }
     }
 
     public void Measuring()
     {
-        if (measureButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (MeasureButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = measureButton.colors;
+            ColorBlock colorTemp = MeasureButton.colors;
             colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            measureButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
+            MeasureButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
         }
         else
         {
-            ColorBlock colorTemp = measureButton.colors;
-            patchButton.colors = colorTemp;
-            cutButton.colors = colorTemp;
-            incisionButton.colors = colorTemp;
+            ColorBlock colorTemp = MeasureButton.colors;
+            PatchButton.colors = colorTemp;
+            CutButton.colors = colorTemp;
+            IncisionButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
-            measureButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
-            mainManager.SendMessage("StartMeasureMode");
+            MeasureButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
+            MainManager.SendMessage("StartMeasureMode");
         }
     }
 
     public void Incisioning()
     {
-        if (incisionButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (IncisionButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = incisionButton.colors;
+            ColorBlock colorTemp = IncisionButton.colors;
             colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            incisionButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
+            IncisionButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
         }
         else
         {
-            ColorBlock colorTemp = incisionButton.colors;
-            patchButton.colors = colorTemp;
-            measureButton.colors = colorTemp;
-            cutButton.colors = colorTemp;
+            ColorBlock colorTemp = IncisionButton.colors;
+            PatchButton.colors = colorTemp;
+            MeasureButton.colors = colorTemp;
+            CutButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
-            incisionButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
-            mainManager.SendMessage("StartIncisionMode");
+            IncisionButton.colors = colorTemp;
+            MainManager.SendMessage("Exit");
+            MainManager.SendMessage("StartIncisionMode");
         }
     }
 

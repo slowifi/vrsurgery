@@ -11,9 +11,12 @@ public class MeshInformation
     public Dictionary<int, HashSet<int>> ConnectedTriangles;
 }
 
+// 이 instance같은 경우는 이제 import하면 인스턴스가 생성되도록 해야됨.
 public class MeshManager : Singleton<MeshManager>
 {
     public MeshInformation MeshInfo;
+    public GameObject LeftHeart;
+    public GameObject RightHeart;
 
     public GameObject heart;
     private GameObject disableHeart;

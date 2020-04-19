@@ -8,6 +8,12 @@ public class CHD : MonoBehaviour
     private Mode mode;
     private bool isOn = false;
 
+    public void SliceMode()
+    {
+        isOn = true;
+        mode = new GameObject("SliceMode").AddComponent<SliceMode>();
+    }
+
     public void CutMode()
     {
         isOn = true;
