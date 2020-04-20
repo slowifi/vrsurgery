@@ -18,7 +18,6 @@ public class Player : MonoBehaviour
     public void IncisionModeOn()
     {
         incision = true;
-        
     }
 
     public void IncisionModeOff()

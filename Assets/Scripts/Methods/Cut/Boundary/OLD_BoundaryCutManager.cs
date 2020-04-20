@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class BoundaryCutManager : MonoBehaviour
+public class OLD_BoundaryCutManager
 {
     public Dictionary<int, Vector3> newVertices;
     public Dictionary<int, int> newTriangles;
@@ -71,7 +71,7 @@ public class BoundaryCutManager : MonoBehaviour
 
         _dividingMethods = new DivideTriangle();
         // divide에 넣고싶으면 계속 업데이트를 해야 dividetriangle이 작동.
-        _dividingMethods.SetBoundaryCutManager(this);
+        //_dividingMethods.SetBoundaryCutManager(this);
     }
     public void ResetIndex()
     {
