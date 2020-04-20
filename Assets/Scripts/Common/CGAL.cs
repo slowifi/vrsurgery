@@ -9,7 +9,6 @@ public class CGAL
     [DllImport("CGALtest_dll.dll", EntryPoint = "CreateMeshObject", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr CreateMeshObject();
 
-
     [DllImport("CGALtest_dll.dll", EntryPoint = "BuildPolyhedron", CallingConvention = CallingConvention.Cdecl)]
     public static extern int BuildPolyhedron(IntPtr value, float[] _vertices, int verticesLength, int[] _indices, int indicesLength);
 
@@ -68,6 +67,9 @@ public class CGAL
     [DllImport("CGALtest_dll.dll", EntryPoint = "Intersection", CallingConvention = CallingConvention.Cdecl)]
     public static extern void Intersection(IntPtr value, float[] plane);
 
+    [DllImport("CGALtest_dll.dll", EntryPoint = "CorefineByMesh", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int CorefineByMesh(IntPtr clippee, IntPtr clipper);
+
     public void Slicer(Vector3 firstPoint, Vector3 lastPoint, Vector3 rayOrigin)
     {
         IntPtr heart = CreateMeshObject();
@@ -90,7 +92,7 @@ public class CGAL
             verticesCoordinate,
             verticesCoordinate.Length / 3,
             MeshManager.Instance.mesh.triangles,
-            MeshManager.Instance.mesh.triangles.Length / 3) == 0)
+            MeshManager.Instance.mesh.triangles.Length / 3) == -1)
         {
             Debug.Log("polyhedron 형성이 안됨.");
             return;
