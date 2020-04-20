@@ -114,9 +114,7 @@ public class SliceMode : Mode
             else if (Input.GetMouseButton(0))
             {
                 Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-                oldPosition = ray.origin;
-                rayList.Add(ray);
-                if (Vector3.Distance(oldPosition, ray.origin) > 0.001f)
+                if (Vector3.Distance(oldPosition, ray.origin) > 0.01f)
                 {
                     Debug.Log("intersect됨");
                     oldPosition = ray.origin;
@@ -171,39 +169,14 @@ public class SliceMode : Mode
             Debug.Log(" 만들어지지 않음");
         }
         CGAL.FillHole(stamp);
-        //CGAL.ClipPolyhedron(
-        //    left,
-        //    CGAL.GetFloatArray(CGAL.GetVertices(stamp), CGAL.GetNumberOfVertices(stamp)),
-        //    CGAL.GetNumberOfVertices(stamp),
-        //    CGAL.GetIntArray(CGAL.GetFaces(stamp), CGAL.GetNumberOfFaces(stamp)),
-        //    CGAL.GetNumberOfFaces(stamp));
+
+        CGAL.ClipPolyhedronByMesh(left, stamp);
+
+        CGAL.GenerateNewObject(left, leftMaterial);
+        // 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
+        // 라인렌더러 넣어줘야함.
 
 
-
-        CGAL.GenerateNewObject(stamp, leftMaterial);
-
-
-
-
-        //CGAL.ClipPolyhedron(
-        //    left,
-
-
-
-
-
-        //    );
-
-        //CGAL.ClipPolyhedron(
-        //    right,
-
-
-
-
-
-        //    );
-        //CGAL.GenerateNewObject(left, leftMaterial);
-        //CGAL.GenerateNewObject(right, rightMaterial);
         MeshManager.Instance.Heart.SetActive(false);
 
 

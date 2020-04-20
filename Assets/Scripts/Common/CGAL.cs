@@ -9,11 +9,15 @@ public class CGAL
     [DllImport("CGALtest_dll.dll", EntryPoint = "CreateMeshObject", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr CreateMeshObject();
 
+
     [DllImport("CGALtest_dll.dll", EntryPoint = "BuildPolyhedron", CallingConvention = CallingConvention.Cdecl)]
     public static extern int BuildPolyhedron(IntPtr value, float[] _vertices, int verticesLength, int[] _indices, int indicesLength);
 
     [DllImport("CGALtest_dll.dll", EntryPoint = "SavePolyhedron", CallingConvention = CallingConvention.Cdecl)]
     public static extern int SavePolyhedron(IntPtr value, string path);
+
+    [DllImport("CGALtest_dll.dll", EntryPoint = "ClipPolyhedronByMesh", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int ClipPolyhedronByMesh(IntPtr clippee, IntPtr clipper);
 
     [DllImport("CGALtest_dll.dll", EntryPoint = "ClipPolyhedron", CallingConvention = CallingConvention.Cdecl)]
     public static extern int ClipPolyhedron(IntPtr value, float[] _vertices, int verticesLength, int[] _indices, int indicesLength);
@@ -179,7 +183,6 @@ public class CGAL
 
     }
 
-
     public static Vector3[] ConvertToVector(IntPtr verticesPtr, int vertexCount, Transform parentTransform)
     {
         float[] verticesCoordinate = new float[vertexCount * 3];
@@ -274,10 +277,17 @@ public class CGAL
 
         int newCount = 0;
 
-        for (int i = vertexCount; i < rayList.Count * 2; i++)
+        for (int i = 0; i < rayList.Count * 2; i++)
         {
-            newVertices[i] = rayList[newCount].origin + rayList[newCount++].direction * 10000f;
-            Debug.Log(newVertices[i]);
+            if (i >= vertexCount)
+            {
+                newVertices[i] = rayList[newCount].origin + rayList[newCount++].direction * 5000f;
+                Debug.Log(newVertices[i]);
+            }
+            else
+            {
+                newVertices[i] = rayList[i].origin + rayList[i].direction * 1f;
+            }
         }
 
         newCount = 0;
@@ -321,6 +331,51 @@ public class CGAL
 
     }
 
+    public static void GenerateStampWithHeart(List<Vector3> verticesPos, List<Ray> rayList, ref Vector3[] newVertices, ref int[] newTriangles)
+    {
+        int vertexCount = rayList.Count;
+
+        int newCount = 0;
+
+        for (int i = 0; i < rayList.Count * 2; i++)
+        {
+            if (i >= vertexCount)
+            {
+                // vertex들 넣어줘야됨.
+                newVertices[i] = verticesPos[newCount] + (Vector3.Normalize(rayList[newCount++].direction) * ObjManager.Instance.objTransform.lossyScale.z * 10);
+                Debug.Log(newVertices[i]);
+            }
+            else
+            {
+                newVertices[i] = rayList[i].origin + rayList[i].direction * 1f;
+            }
+        }
+
+        newCount = 0;
+        int newVertexCount = vertexCount;
+        for (int i = 0; i < vertexCount; i++)
+        {
+            if (i == vertexCount - 1)
+            {
+                newTriangles[newCount++] = i;
+                newTriangles[newCount++] = newVertexCount;
+                newTriangles[newCount++] = 0;
+
+                newTriangles[newCount++] = 0;
+                newTriangles[newCount++] = newVertexCount;
+                newTriangles[newCount++] = vertexCount;
+                break;
+            }
+            newTriangles[newCount++] = i;
+            newTriangles[newCount++] = newVertexCount;
+            newTriangles[newCount++] = i + 1;
+
+            newTriangles[newCount++] = i + 1;
+            newTriangles[newCount++] = newVertexCount;
+            newTriangles[newCount++] = ++newVertexCount;
+        }
+    }
+
     public static float[] GeneratePlane(Vector3 v1, Vector3 v2, Vector3 v3)
     {
         float[] plane = new float[9];
@@ -349,6 +404,7 @@ public class CGAL
 
         newObject.transform.SetParent(GameObject.Find("PartialModel").transform);
         newObject.transform.localPosition = Vector3.zero;
+        newObject.transform.localRotation = Quaternion.identity;
         newObject.transform.localScale = Vector3.one;
         Mesh newMesh = newObject.GetComponent<MeshFilter>().mesh;
 
@@ -357,6 +413,4 @@ public class CGAL
         newMesh.RecalculateNormals();
         return newObject;
     }
-
-
 }
