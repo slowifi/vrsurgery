@@ -5,10 +5,11 @@ using System.Collections.Generic;
 
 public class SliceMode : Mode
 {
+    private Ray oldRay;
     private GameObject leftHeart;
     private GameObject rightHeart;
 
-
+    private LineRendererManipulate lineRenderer;
     private string mode;
     private SliceMethods SliceMethods;
 
@@ -16,6 +17,7 @@ public class SliceMode : Mode
     {
         mode = "slice";
         SliceMethods = new SliceMethods();
+        lineRenderer = new LineRendererManipulate();
     }
 
     private void Update()
@@ -35,25 +37,25 @@ public class SliceMode : Mode
     {
         if (Input.GetMouseButtonDown(0))
         {
-            IntersectedValues values = Intersections.GetIntersectedValues();
-            if (values.Intersected)
-            {
-                SliceMethods.SetIntersectedValues("first", values);
-            }
-
+            Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            oldRay = ray;
+            SliceMethods.SetIntersectedValues("first", ray);
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            IntersectedValues values = Intersections.GetIntersectedValues();
-            if (values.Intersected)
-            {
-                SliceMethods.SetIntersectedValues("second", values);
+            Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            SliceMethods.SetIntersectedValues("second", ray);
 
-                GameObject[] SliceResult = SliceMethods.Slicing();
-                leftHeart = SliceResult[0];
-                rightHeart = SliceResult[1];
-                mode = "select";
-            }
+            GameObject[] SliceResult = SliceMethods.Slicing();
+            leftHeart = SliceResult[0];
+            rightHeart = SliceResult[1];
+            mode = "select";
+            Destroy(lineRenderer.lineObject);
+        }
+        else if(Input.GetMouseButton(0))
+        {
+            Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            lineRenderer.SetFixedLineRenderer(oldRay.origin + oldRay.direction * 100f, ray.origin + ray.direction * 100f);
         }
     }
 
@@ -82,13 +84,13 @@ public class SliceMode : Mode
 
         if (select == "left")
         {
-            selectedHeart = leftHeart;
-            destoryHeart = rightHeart;
+            selectedHeart = rightHeart;
+            destoryHeart = leftHeart;
         }
         else if (select == "right")
         {
-            selectedHeart = rightHeart;
-            destoryHeart = leftHeart;
+            selectedHeart = leftHeart;
+            destoryHeart = rightHeart;
         }
 
         Destroy(destoryHeart);

@@ -6,8 +6,8 @@ using System.Collections.Generic;
 
 public class SliceMethods
 {
-    private IntersectedValues firstIntersectedValues = new IntersectedValues();
-    private IntersectedValues secondIntersectedValues = new IntersectedValues();
+    private Ray firstRay = new Ray();
+    private Ray secondRay = new Ray();
     private Material leftMaterial = Resources.Load("Materials/LeftMaterial", typeof(Material)) as Material;
     private Material rightMaterial = Resources.Load("Materials/RightMaterial", typeof(Material)) as Material;
 
@@ -15,15 +15,15 @@ public class SliceMethods
     private List<Vector3> rightWorldPos;
     private Vector3 middlePosition;
 
-    public void SetIntersectedValues(string type, IntersectedValues value)
+    public void SetIntersectedValues(string type, Ray value)
     {
         switch (type)
         {
             case "first":
-                firstIntersectedValues = value;
+                firstRay = value;
                 break;
             case "second":
-                secondIntersectedValues = value;
+                secondRay = value;
                 break;
         }
     }
@@ -55,7 +55,7 @@ public class SliceMethods
 
         float[] verticesCoordinate = CGAL.ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
 
-        middlePosition = Vector3.Lerp(firstIntersectedValues.ray.origin, secondIntersectedValues.ray.origin, 0.5f);
+        middlePosition = Vector3.Lerp(firstRay.origin, secondRay.origin, 0.5f);
 
 
         if (CGAL.BuildPolyhedron(left,
@@ -82,15 +82,15 @@ public class SliceMethods
             left,
             CGAL.GeneratePlane(
                 middlePosition,
-                firstIntersectedValues.IntersectedPosition,
-                secondIntersectedValues.IntersectedPosition));
+                firstRay.origin + firstRay.direction * 10f,
+                secondRay.origin + secondRay.direction * 10f));
 
         CGAL.ClipPolyhedronByPlane(
             right,
             CGAL.GeneratePlane(
                 middlePosition,
-                secondIntersectedValues.IntersectedPosition,
-                firstIntersectedValues.IntersectedPosition));
+                secondRay.origin + secondRay.direction * 10f,
+                firstRay.origin + firstRay.direction * 10f));
 
         GameObject leftHeart = CGAL.GenerateNewObject(left, leftMaterial);
         GameObject rightHeart = CGAL.GenerateNewObject(right, rightMaterial);
