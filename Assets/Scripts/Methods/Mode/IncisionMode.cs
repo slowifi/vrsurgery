@@ -11,8 +11,8 @@ public class IncisionMode : Mode
     private bool firstIncision;
     private bool isExtend;
     private float oldExtendValue;
-    private GameObject lineRenderer;
     private Vector3 oldPosition;
+    private LineRendererManipulate lineRenderer;
 
     void Awake()
     {
@@ -21,6 +21,7 @@ public class IncisionMode : Mode
         firstIncision = false;
         isExtend = false;
         oldPosition = Vector3.zero;
+        lineRenderer = new LineRendererManipulate();
     }
 
     void Update()
@@ -41,8 +42,10 @@ public class IncisionMode : Mode
         else if (Input.GetMouseButtonDown(0))
         {
             //PlayerObject.SetActive(false);
-            lineRenderer = new GameObject("Incision Line", typeof(LineRenderer));
-            lineRenderer.layer = 8;
+            //incision mode awake 될 때 마다 
+            //line.SetLineRenderer();
+            //lineRenderer = new GameObject("Incision Line", typeof(LineRenderer));
+            //lineRenderer.layer = 8;
             //incisionCount++;
             firstIncision = true;
 
@@ -59,14 +62,14 @@ public class IncisionMode : Mode
                 Vector3 currentPosition = intersectedValues.IntersectedPosition;
                 if (Vector3.Distance(oldPosition, currentPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
                 {
-                    Destroy(lineRenderer);
+                    Destroy(lineRenderer.lineObject);
                     ChatManager.Instance.GenerateMessage(" incision 거리가 너무 짧습니다.");
                     IncisionManager.Instance.IncisionUpdate();
                     firstIncision = false;
                     return;
                 }
             }
-            Destroy(lineRenderer);
+            Destroy(lineRenderer.lineObject);
             bool checkEdge = false;
             IncisionManager.Instance.SetEndVerticesDF();
             IncisionManager.Instance.SetDividingListDF(ref checkEdge);
@@ -104,11 +107,11 @@ public class IncisionMode : Mode
                     PlayerObject.SendMessage("IncisionModeOff");
                 return;
             }
-            var line = lineRenderer.GetComponent<LineRenderer>();
+            //var line = lineRenderer.GetComponent<LineRenderer>();
 
             if (!checkInside)
             {
-                Destroy(lineRenderer);
+                Destroy(lineRenderer.lineObject);
                 ChatManager.Instance.GenerateMessage(" 심장을 벗어났습니다.");
                 //incisionCount--;
 
@@ -119,10 +122,11 @@ public class IncisionMode : Mode
             Vector3 currentPosition = intersectedValues.IntersectedPosition;
             Vector3 curPos = currentPosition;
             Vector3 oldPos = oldPosition;
-            curPos.z += 1f;
-            oldPos.z += 1f;
-            line.material.color = Color.black;
-            line.SetPositions(new Vector3[] { oldPos, curPos });
+            //curPos.z += 1f;
+            //oldPos.z += 1f;
+            //line.material.color = Color.black;
+            //line.SetPositions(new Vector3[] { oldPos, curPos });
+            lineRenderer.SetFixedLineRenderer(oldPos, curPos);
         }
     }
 }

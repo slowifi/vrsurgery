@@ -10,14 +10,18 @@ public class BoundaryCutMode : Mode
     private int boundaryCount;
     private bool isFirst;
     private bool isIntersected;
-    private GameObject lineRenderer;
+    //private GameObject lineRenderer;
     private Vector3 firstPosition;
     private Vector3 oldPosition;
+    private Ray oldRay;
+    private Ray firstRay;
     public GameObject playerObject;
     public GameObject mainObject;
     //private BoundaryCutManager BoundaryCutManager;
     private List<Ray> rayList;
     private List<Vector3> intersectedVerticesPos;
+
+    private LineRendererManipulate lineRenderer;
 
     private Material leftMaterial;
     private Material rightMaterial;
@@ -56,6 +60,7 @@ public class BoundaryCutMode : Mode
         leftMaterial = Resources.Load("Materials/LeftMaterial", typeof(Material)) as Material;
         rightMaterial = Resources.Load("Materials/RightMaterial", typeof(Material)) as Material;
         //BoundaryCutManager = gameObject.AddComponent<BoundaryCutManager>();
+        lineRenderer = new LineRendererManipulate();
         rayList = new List<Ray>();
         intersectedVerticesPos = new List<Vector3>();
         boundaryCount = 0;
@@ -91,7 +96,8 @@ public class BoundaryCutMode : Mode
         if(Input.GetMouseButtonDown(0))
         {
             rayList.Add(ray);
-            oldPosition = ray.origin;
+            oldRay = ray;
+            firstRay = ray;
             if (intersectedValues.Intersected)
             {
                 intersectedVerticesPos.Add(intersectedValues.IntersectedPosition);
@@ -103,10 +109,13 @@ public class BoundaryCutMode : Mode
         }
         else if(Input.GetMouseButton(0))
         {
-            if (Vector3.Distance(oldPosition, ray.origin) > 0.005f)
+            lineRenderer.SetFixedLineRenderer(oldRay.origin + oldRay.direction * 100f, ray.origin + ray.direction * 100f);
+            if (Vector3.Distance(oldRay.origin, ray.origin) > 0.005f)
             {
                 Debug.Log("intersected");
-                oldPosition = ray.origin;
+                lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100f, ray.origin + ray.direction * 100f);
+                oldRay = ray;
+                //oldPosition = ray.origin;
                 rayList.Add(ray);
                 if (intersectedValues.Intersected)
                 {
@@ -121,7 +130,9 @@ public class BoundaryCutMode : Mode
         }
         else if(Input.GetMouseButtonUp(0))
         {
+            lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100f, firstRay.origin + firstRay.direction * 100f);
             CGALCut();
+            Destroy(lineRenderer.lineObject);
         }
 
         //if (Input.GetMouseButtonDown(0))
