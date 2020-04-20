@@ -71,7 +71,7 @@ public class OLD_BoundaryCutManager
 
         _dividingMethods = new DivideTriangle();
         // divide에 넣고싶으면 계속 업데이트를 해야 dividetriangle이 작동.
-        //_dividingMethods.SetBoundaryCutManager(this);
+        _dividingMethods.SetBoundaryCutManager(this);
     }
     public void ResetIndex()
     {

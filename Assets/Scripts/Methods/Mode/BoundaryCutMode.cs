@@ -15,47 +15,47 @@ public class BoundaryCutMode : Mode
     private Vector3 oldPosition;
     public GameObject playerObject;
     public GameObject mainObject;
-    private BoundaryCutManager BoundaryCutManager;
+    //private BoundaryCutManager BoundaryCutManager;
     private List<Ray> rayList;
     private List<Vector3> intersectedVerticesPos;
 
     private Material leftMaterial;
     private Material rightMaterial;
 
-    private void Cut()
-    {
-        bool checkError = true;
-        // 이걸 뒤에 넣어서 한프레임 늦게 실행 되도록 하기.
-        checkError = BoundaryCutManager.PostProcess();
-        if (!checkError)
-        {
-            Destroy(lineRenderer);
-            Destroy(this);
-            // return true;
-        }
-        MeshManager.Instance.mesh.RecalculateNormals();
+    //private void Cut()
+    //{
+    //    bool checkError = true;
+    //    // 이걸 뒤에 넣어서 한프레임 늦게 실행 되도록 하기.
+    //    checkError = BoundaryCutManager.PostProcess();
+    //    if (!checkError)
+    //    {
+    //        Destroy(lineRenderer);
+    //        Destroy(this);
+    //        // return true;
+    //    }
+    //    MeshManager.Instance.mesh.RecalculateNormals();
 
-        Destroy(lineRenderer);
-        AdjacencyList.Instance.ListUpdate();
-        if (!BoundaryCutManager.AutomaticallyRemoveTriangles())
-        {
-            ChatManager.Instance.GenerateMessage(" 영역이 잘못 지정되었습니다.");
-            MeshManager.Instance.LoadOldMesh();
-        }
-        else
-            MeshManager.Instance.SaveCurrentMesh();
-        AdjacencyList.Instance.ListUpdate();
-        MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
-        BoundaryCutManager.BoundaryCutUpdate();
-        Destroy(this);
-        // return true;
-    }
+    //    Destroy(lineRenderer);
+    //    AdjacencyList.Instance.ListUpdate();
+    //    if (!BoundaryCutManager.AutomaticallyRemoveTriangles())
+    //    {
+    //        ChatManager.Instance.GenerateMessage(" 영역이 잘못 지정되었습니다.");
+    //        MeshManager.Instance.LoadOldMesh();
+    //    }
+    //    else
+    //        MeshManager.Instance.SaveCurrentMesh();
+    //    AdjacencyList.Instance.ListUpdate();
+    //    MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+    //    BoundaryCutManager.BoundaryCutUpdate();
+    //    Destroy(this);
+    //    // return true;
+    //}
+
     void Awake()
     {
-
         leftMaterial = Resources.Load("Materials/LeftMaterial", typeof(Material)) as Material;
         rightMaterial = Resources.Load("Materials/RightMaterial", typeof(Material)) as Material;
-        BoundaryCutManager = gameObject.AddComponent<BoundaryCutManager>();
+        //BoundaryCutManager = gameObject.AddComponent<BoundaryCutManager>();
         rayList = new List<Ray>();
         intersectedVerticesPos = new List<Vector3>();
         boundaryCount = 0;
@@ -64,6 +64,7 @@ public class BoundaryCutMode : Mode
         isLastBoundaryCut = false;
         isIntersected = true;
     }
+
     void Update()
     {
         Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
