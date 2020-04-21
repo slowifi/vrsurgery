@@ -344,7 +344,7 @@ public class CGAL
             if (i >= vertexCount)
             {
                 // vertex들 넣어줘야됨.
-                newVertices[i] = verticesPos[newCount] + (Vector3.Normalize(rayList[newCount++].direction) * MeshManager.Instance.objTransform.lossyScale.z * 10);
+                newVertices[i] = verticesPos[newCount] + (Vector3.Normalize(rayList[newCount++].direction) * MeshManager.Instance.objTransform.lossyScale.z * 8);
                 Debug.Log(newVertices[i]);
             }
             else

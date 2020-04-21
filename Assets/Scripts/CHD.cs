@@ -20,7 +20,6 @@ public class CHD : MonoBehaviour
         isOn = true;
         mode = new GameObject("CutMode");
         mode.AddComponent<BoundaryCutMode>();
-        //playerObject.SendMessage("BoundaryModeOn");
     }
 
     public void StartPatchMode()
@@ -32,17 +31,16 @@ public class CHD : MonoBehaviour
 
     public void StartMeasureMode()
     {
-        Destroy(mode);
         isOn = true;
-        //mode = new GameObject("MeasureMode").AddComponent<MeasureMode>();
+        mode = new GameObject("MeasureMode");
+        mode.AddComponent<MeasureMode>();
     }
 
     public void StartIncisionMode()
     {
-        Destroy(mode);
         isOn = true;
-        //mode = new GameObject("IncisionMode").AddComponent<IncisionMode>();
-        playerObject.SendMessage("IncisionModeOn");
+        mode = new GameObject("IncisionMode");
+        mode.AddComponent<IncisionMode>();
         UIManager.Instance.extendBar.value = 0;
     }
 

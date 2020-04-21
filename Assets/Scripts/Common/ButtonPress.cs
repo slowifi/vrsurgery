@@ -72,6 +72,7 @@ public class ButtonPress : Singleton<ButtonPress>
             PatchButton.colors = colorTemp;
             MeasureButton.colors = colorTemp;
             IncisionButton.colors = colorTemp;
+            SliceButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             CutButton.colors = colorTemp;
             MainManager.SendMessage("Exit");
@@ -94,6 +95,7 @@ public class ButtonPress : Singleton<ButtonPress>
             CutButton.colors = colorTemp;
             MeasureButton.colors = colorTemp;
             IncisionButton.colors = colorTemp;
+            SliceButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             PatchButton.colors = colorTemp;
             MainManager.SendMessage("Exit");
@@ -116,6 +118,7 @@ public class ButtonPress : Singleton<ButtonPress>
             PatchButton.colors = colorTemp;
             CutButton.colors = colorTemp;
             IncisionButton.colors = colorTemp;
+            SliceButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             MeasureButton.colors = colorTemp;
             MainManager.SendMessage("Exit");
@@ -138,6 +141,7 @@ public class ButtonPress : Singleton<ButtonPress>
             PatchButton.colors = colorTemp;
             MeasureButton.colors = colorTemp;
             CutButton.colors = colorTemp;
+            SliceButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             IncisionButton.colors = colorTemp;
             MainManager.SendMessage("Exit");

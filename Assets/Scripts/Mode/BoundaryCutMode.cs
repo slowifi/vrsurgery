@@ -144,10 +144,11 @@ public class BoundaryCutMode : Mode
             
             CGAL.ClipPolyhedronByMesh(heart, stamp);
             MeshManager.Instance.SetNewObject(CGAL.GenerateNewObject(heart, heartMaterial));
+            MakeDoubleFaceMesh.Instance.Reinitialize();
             //CGAL.GenerateNewObject(stamp, leftMaterial);
             // 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
             //MeshManager.Instance.Heart.SetActive(false);
-            
+
         }
         else
         {
@@ -182,6 +183,7 @@ public class BoundaryCutMode : Mode
             CGAL.FillHole(stamp);
             CGAL.ClipPolyhedronByMesh(heart, stamp);
             MeshManager.Instance.SetNewObject(CGAL.GenerateNewObject(heart, heartMaterial));
+            MakeDoubleFaceMesh.Instance.Reinitialize();
             // 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
 
             //MeshManager.Instance.Heart.SetActive(false);
