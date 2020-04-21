@@ -6,7 +6,7 @@ using UnityEditor;
 
 public class BoundaryCutMode : Mode
 {
-    private bool isLastBoundaryCut;
+    private bool isLast;
     private int boundaryCount;
     private bool isFirst;
     private bool isIntersected;
@@ -28,7 +28,8 @@ public class BoundaryCutMode : Mode
         boundaryCount = 0;
 
         isFirst = true;
-        isLastBoundaryCut = false;
+        
+        isLast = false;
         isIntersected = true;
 
         heartMaterial = Resources.Load("Materials/Heart", typeof(Material)) as Material;
@@ -45,8 +46,13 @@ public class BoundaryCutMode : Mode
             boundaryCount = 0;
             return;
         }
-
-        if(Input.GetMouseButtonDown(0))
+        else if(isLast)
+        {
+            CGALCut();
+            Destroy(lineRenderer.lineObject);
+            Destroy(this);
+        }
+        else if(Input.GetMouseButtonDown(0))
         {
             Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
@@ -73,9 +79,7 @@ public class BoundaryCutMode : Mode
             if(boundaryCount>8 && Vector3.Distance(firstRay.origin, ray.origin)<0.01f)
             {
                 lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100f, firstRay.origin + firstRay.direction * 100f);
-                CGALCut();
-                Destroy(lineRenderer.lineObject);
-                Destroy(this);
+                isLast = true;
             }
             else if (Vector3.Distance(oldRay.origin, ray.origin) > 0.005f)
             {
@@ -98,9 +102,7 @@ public class BoundaryCutMode : Mode
         else if(Input.GetMouseButtonUp(0))
         {
             lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100f, firstRay.origin + firstRay.direction * 100f);
-            CGALCut();
-            Destroy(lineRenderer.lineObject);
-            Destroy(this);
+            isLast = true;
         }
     }
 

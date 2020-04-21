@@ -57,7 +57,6 @@ public class CHD : MonoBehaviour
 
     public void Exit()
     {
-
         Debug.Log("Exit");
         playerObject.SetActive(true);
         playerObject.SendMessage("BoundaryModeOff");
@@ -104,9 +103,7 @@ public class CHD : MonoBehaviour
         MeshManager.Instance.endMeasurePoint.SetActive(false);
 
         Destroy(mode);
-
     }
-
 
     void Start()
     {
@@ -118,7 +115,6 @@ public class CHD : MonoBehaviour
         IncisionManager.Instance.Initialize();
         MakeDoubleFaceMesh.Instance.Initialize();
         playerObject.SetActive(true);
-
     }
 
     void Update()
@@ -137,8 +133,5 @@ public class CHD : MonoBehaviour
         {
             ButtonOff();
         }
-
     }
-
-
 }

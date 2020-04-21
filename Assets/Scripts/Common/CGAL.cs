@@ -52,7 +52,7 @@ public class CGAL
     public static extern int DeformMesh(IntPtr value, float[] direction);
 
     [DllImport("CGALtest_dll.dll", EntryPoint = "FillHole", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int FillHole(IntPtr value);
+    public static extern int FillHole(IntPtr value, char option = 'd');
 
     [DllImport("CGALtest_dll.dll", EntryPoint = "Extrude", CallingConvention = CallingConvention.Cdecl)]
     public static extern int Extrude(IntPtr value, float[] direction);

@@ -86,7 +86,7 @@ public class ExportMesh : MonoBehaviour
             for (int i = 0; i < triangles.Length; i += 3)
             {
                 //Because we inverted the x-component, we also needed to alter the triangle winding.
-                sb.Append(string.Format("f {1}/{1}/{1} {0}/{0}/{0} {2}/{2}/{2}\n",
+                sb.Append(string.Format("f {0}/{0}/{0} {1}/{1}/{1} {2}/{2}/{2}\n",
                                        triangles[i] + 1 + vertexOffset, triangles[i + 1] + 1 + normalOffset, triangles[i + 2] + 1 + uvOffset));
             }
         }

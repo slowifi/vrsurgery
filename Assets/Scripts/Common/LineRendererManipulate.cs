@@ -28,23 +28,4 @@ public class LineRendererManipulate
     }
 
 
-    public GameObject ReturnObject()
-    {
-        return lineObject;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
