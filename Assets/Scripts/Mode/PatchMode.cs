@@ -26,7 +26,7 @@ public class PatchMode : Mode
     }
     void Update()
     {
-        Ray cameraRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        Ray cameraRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         // 처음에 실행되어야함.
         if (isFirstPatch)
         {
@@ -72,7 +72,7 @@ public class PatchMode : Mode
             if (vertexPosition != Vector3.zero)
             {
                 //first position이 저장되어 있어야함.
-                if (patchCount > 8 && Vector3.Distance(firstPosition, vertexPosition) < 2.0f * ObjManager.Instance.pivotTransform.lossyScale.z)
+                if (patchCount > 8 && Vector3.Distance(firstPosition, vertexPosition) < 2.0f * MeshManager.Instance.pivotTransform.lossyScale.z)
                 {
                     Destroy(lineRenderer);
                     PatchManager.Instance.GenerateMesh();

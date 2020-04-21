@@ -24,7 +24,7 @@ public class Intersections
 {
     public static IntersectedValues GetIntersectedValues()
     {
-        Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         return GetIntersectedValues(ray, triangles, worldPosition);

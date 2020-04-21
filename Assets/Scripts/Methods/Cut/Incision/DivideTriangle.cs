@@ -75,7 +75,7 @@ public class DivideTriangle
         int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.newTriangles.Count;
         int newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.newVertices.Count;
 
-        Transform objTransform = ObjManager.Instance.objTransform;
+        Transform objTransform = MeshManager.Instance.objTransform;
         List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         BoundaryCutManager.removeBoundaryVertices.Add(newVertexLength);
 
@@ -105,7 +105,7 @@ public class DivideTriangle
         int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.newTriangles.Count;
         int newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.newVertices.Count;
 
-        Transform objTransform = ObjManager.Instance.objTransform;
+        Transform objTransform = MeshManager.Instance.objTransform;
         List<Edge> edgeList = AdjacencyList.Instance.edgeList;
 
         Dictionary<int, Vector3> newVertices = BoundaryCutManager.newVertices;
@@ -136,7 +136,7 @@ public class DivideTriangle
         newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.newTriangles.Count;
         newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.newVertices.Count;
 
-        Transform objTransform = ObjManager.Instance.objTransform;
+        Transform objTransform = MeshManager.Instance.objTransform;
         List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         Dictionary<int, Vector3> newVertices = BoundaryCutManager.newVertices;
         Dictionary<int, int> newTriangles = BoundaryCutManager.newTriangles;
@@ -173,7 +173,7 @@ public class DivideTriangle
         newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.newTriangles.Count;
         newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.newVertices.Count;
 
-        Transform objTransform = ObjManager.Instance.objTransform;
+        Transform objTransform = MeshManager.Instance.objTransform;
         List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         BoundaryCutManager.removeBoundaryVertices.Add(newVertexLength);
         int notEdgeVertex = -1;
@@ -226,7 +226,7 @@ public class DivideTriangle
         int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + BoundaryCutManager.newTriangles.Count;
         int newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.newVertices.Count;
 
-        Transform objTransform = ObjManager.Instance.objTransform;
+        Transform objTransform = MeshManager.Instance.objTransform;
         List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         BoundaryCutManager.removeBoundaryVertices.Add(newVertexLength);
         int notEdgeVertex = -1;
@@ -277,7 +277,7 @@ public class DivideTriangle
         newVertexLength = MeshManager.Instance.mesh.vertexCount + BoundaryCutManager.newVertices.Count;
 
         List<Edge> edgeList = AdjacencyList.Instance.edgeList;
-        Transform objTransform = ObjManager.Instance.objTransform;
+        Transform objTransform = MeshManager.Instance.objTransform;
         BoundaryCutManager.removeBoundaryVertices.Add(newVertexLength);
         int notEdgeVertex = -1;
         for (int i = 0; i < 3; i++)

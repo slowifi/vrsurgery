@@ -16,7 +16,7 @@ public class GeneratePatch : MonoBehaviour
         PatchManager.Instance.patchCenterPos.Add(Vector3.zero);
         PatchManager.Instance.insidePatchVertices.Add(new List<Vector3>[5]);
         PatchManager.Instance.patchVerticesIntervalValue = 3.0f;
-        PatchManager.Instance.patchWeight = UIManager.Instance.curveBar.value * 20f * ObjManager.Instance.pivotTransform.lossyScale.z;
+        PatchManager.Instance.patchWeight = UIManager.Instance.curveBar.value * 20f * MeshManager.Instance.pivotTransform.lossyScale.z;
 
         _patchVertexPosition = Vector3.zero;
         _patchVertices = new List<Vector3>();
@@ -83,7 +83,7 @@ public class GeneratePatch : MonoBehaviour
         GameObject patchObj = PatchManager.Instance.newPatch[PatchManager.Instance.newPatch.Count-1];
         Mesh mesh = new Mesh();
         patchObj.GetComponent<MeshFilter>().mesh = mesh;
-        patchObj.transform.parent = ObjManager.Instance.pivotTransform; //GameObject.Find("HumanHeart").transform;
+        patchObj.transform.parent = MeshManager.Instance.pivotTransform; //GameObject.Find("HumanHeart").transform;
 
         int patchVertexCount = _patchVertices.Count;
 

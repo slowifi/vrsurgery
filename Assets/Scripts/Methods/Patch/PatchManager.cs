@@ -48,7 +48,7 @@ public class PatchManager : Singleton<PatchManager>
         float curveValue = UIManager.Instance.curveBar.value;
 
         patchCenterPos[patchIndex] = weightCenterPos[patchIndex] + ((heightValue - 0.5f) * 40) * avgNorm[patchIndex];
-        patchWeight = curveValue * 20.0f * ObjManager.Instance.pivotTransform.lossyScale.z;
+        patchWeight = curveValue * 20.0f * MeshManager.Instance.pivotTransform.lossyScale.z;
         _generatePatch.RecalculateNormal(patchIndex);
     }
     

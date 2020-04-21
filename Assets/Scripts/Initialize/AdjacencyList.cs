@@ -51,7 +51,7 @@ public class AdjacencyList : Singleton<AdjacencyList>
     public List<Vector3> LocalToWorldPosition(Mesh mesh)
     {
         List<Vector3> worldPosition = new List<Vector3>(mesh.vertices);
-        Transform objTransform = ObjManager.Instance.objTransform;
+        Transform objTransform = MeshManager.Instance.objTransform;
         for (int i = 0; i < worldPosition.Count; i++)
         {
             worldPosition[i] = objTransform.TransformPoint(worldPosition[i]);

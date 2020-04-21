@@ -5,38 +5,43 @@ using System.Collections.Generic;
 public class CHD : MonoBehaviour
 {
     public GameObject playerObject;
-    private Mode mode;
+    private GameObject mode;
     private bool isOn = false;
 
     public void SliceMode()
     {
         isOn = true;
-        mode = new GameObject("SliceMode").AddComponent<SliceMode>();
+        mode = new GameObject("SliceMode");
+        mode.AddComponent<SliceMode>();
     }
 
     public void CutMode()
     {
         isOn = true;
-        mode = new GameObject("CutMode").AddComponent<BoundaryCutMode>();
-        playerObject.SendMessage("BoundaryModeOn");
+        mode = new GameObject("CutMode");
+        mode.AddComponent<BoundaryCutMode>();
+        //playerObject.SendMessage("BoundaryModeOn");
     }
 
     public void StartPatchMode()
     {
         isOn = true;
-        mode = new GameObject("PatchMode").AddComponent<PatchMode>();
+        mode = new GameObject("PatchMode");
+        mode.AddComponent<PatchMode>();
     }
 
     public void StartMeasureMode()
     {
+        Destroy(mode);
         isOn = true;
-        mode = new GameObject("MeasureMode").AddComponent<MeasureMode>();
+        //mode = new GameObject("MeasureMode").AddComponent<MeasureMode>();
     }
 
     public void StartIncisionMode()
     {
+        Destroy(mode);
         isOn = true;
-        mode = new GameObject("IncisionMode").AddComponent<IncisionMode>();
+        //mode = new GameObject("IncisionMode").AddComponent<IncisionMode>();
         playerObject.SendMessage("IncisionModeOn");
         UIManager.Instance.extendBar.value = 0;
     }
@@ -63,8 +68,8 @@ public class CHD : MonoBehaviour
 
         Destroy(mode);
 
-        ObjManager.Instance.startMeasurePoint.SetActive(false);
-        ObjManager.Instance.endMeasurePoint.SetActive(false);
+        MeshManager.Instance.startMeasurePoint.SetActive(false);
+        MeshManager.Instance.endMeasurePoint.SetActive(false);
 
         GameObject patchObject = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1));
         if (patchObject)
@@ -86,7 +91,7 @@ public class CHD : MonoBehaviour
             Destroy(PatchManager.Instance.newPatch[i]);
             Destroy(GameObject.Find("Patch" + i + "_Inner"));
         }
-        ObjManager.Instance.ObjUpdate();
+        MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Reinitialize();
         AdjacencyList.Instance.ListUpdate();
         PatchManager.Instance.Reinitialize();
@@ -97,8 +102,8 @@ public class CHD : MonoBehaviour
         playerObject.SendMessage("IncisionModeOff");
         playerObject.SendMessage("BoundaryModeOff");
         //lineRenderer = new GameObject>();
-        ObjManager.Instance.startMeasurePoint.SetActive(false);
-        ObjManager.Instance.endMeasurePoint.SetActive(false);
+        MeshManager.Instance.startMeasurePoint.SetActive(false);
+        MeshManager.Instance.endMeasurePoint.SetActive(false);
 
         Destroy(mode);
 
@@ -108,7 +113,7 @@ public class CHD : MonoBehaviour
     void Start()
     {
         Debug.Log("Load되었습니다.");
-        ObjManager.Instance.ObjUpdate();
+        MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Initialize();
         AdjacencyList.Instance.Initialize();
         PatchManager.Instance.Initialize();

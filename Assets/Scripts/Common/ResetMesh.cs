@@ -26,9 +26,9 @@ public class ResetMesh : MonoBehaviour
         }
         PatchManager.Instance.Reinitialize();
 
-        ObjManager.Instance.pivotTransform.localPosition = Vector3.zero;
-        ObjManager.Instance.pivotTransform.localScale = Vector3.one;
-        ObjManager.Instance.pivotTransform.localEulerAngles = Vector3.zero;
+        MeshManager.Instance.pivotTransform.localPosition = Vector3.zero;
+        MeshManager.Instance.pivotTransform.localScale = Vector3.one;
+        MeshManager.Instance.pivotTransform.localEulerAngles = Vector3.zero;
 
         Destroy(MakeDoubleFaceMesh.Instance.oppositeObject);
         MakeDoubleFaceMesh.Instance.Reinitialize();

@@ -27,7 +27,7 @@ public class DrawingCutMode : Mode
         ///
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             oldPosition = ray.origin;
             rayList.Add(ray);
         }
@@ -38,7 +38,7 @@ public class DrawingCutMode : Mode
         }
         else if (Input.GetMouseButton(0))
         {
-            Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             if (Vector3.Distance(oldPosition, ray.origin) > 0.01f)
             {
                 Debug.Log("intersect됨");

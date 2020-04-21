@@ -818,54 +818,6 @@ Transform:
   m_Father: {fileID: 1981971011}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &303900390
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 303900391}
-  - component: {fileID: 303900392}
-  m_Layer: 0
-  m_Name: ObjManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &303900391
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 303900390}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1743653355}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &303900392
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 303900390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e505367d2d449644ab3102730a5d99ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cam: {fileID: 963194227}
-  objTransform: {fileID: 0}
-  pivotTransform: {fileID: 732360980}
-  startMeasurePoint: {fileID: 700696333}
-  endMeasurePoint: {fileID: 1035688306}
 --- !u!1 &312368821
 GameObject:
   m_ObjectHideFlags: 0
@@ -2229,7 +2181,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1743653355}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &720739651
 MonoBehaviour:
@@ -4398,7 +4350,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1743653355}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1344608386
 MonoBehaviour:
@@ -4464,6 +4416,11 @@ MonoBehaviour:
   Heart: {fileID: 0}
   LeftHeart: {fileID: 0}
   RightHeart: {fileID: 0}
+  cam: {fileID: 963194227}
+  objTransform: {fileID: 0}
+  pivotTransform: {fileID: 732360980}
+  startMeasurePoint: {fileID: 700696333}
+  endMeasurePoint: {fileID: 1035688306}
   material: {fileID: 2100000, guid: e6e302ec1f377b24ab7b8e8e41bb31b2, type: 2}
   mesh: {fileID: 0}
   oldMesh: {fileID: 0}
@@ -4957,7 +4914,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1743653355}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1453312186
 MonoBehaviour:
@@ -5551,7 +5508,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1743653355}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1719069586
 MonoBehaviour:
@@ -5600,7 +5557,6 @@ Transform:
   - {fileID: 725594260}
   - {fileID: 1363464000}
   - {fileID: 1766517980}
-  - {fileID: 303900391}
   - {fileID: 1453312185}
   - {fileID: 1719069585}
   - {fileID: 2077537491}
@@ -7002,7 +6958,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1743653355}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2077537492
 MonoBehaviour:

@@ -12,8 +12,8 @@ public class MeasureManager : MonoBehaviour
     {
         if (vertexPosition != Vector3.zero)
         {
-            GameObject startPoint = ObjManager.Instance.startMeasurePoint;
-            GameObject endPoint = ObjManager.Instance.endMeasurePoint;
+            GameObject startPoint = MeshManager.Instance.startMeasurePoint;
+            GameObject endPoint = MeshManager.Instance.endMeasurePoint;
             if (!startPoint.activeSelf)
             {
                 Destroy(GameObject.Find("MeasureLine"));
@@ -34,9 +34,9 @@ public class MeasureManager : MonoBehaviour
                 line.material.color = Color.white;
                 line.SetWidth(0.6f, 0.6f);
                 line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 0.5f * ObjManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 0.5f * ObjManager.Instance.objTransform.lossyScale.z });
+                line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 0.5f * MeshManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 0.5f * MeshManager.Instance.objTransform.lossyScale.z });
                 //line.SetPositions(new Vector3[] { startPoint.transform.position, endPoint.transform.position});
-                line.transform.SetParent(ObjManager.Instance.pivotTransform);
+                line.transform.SetParent(MeshManager.Instance.pivotTransform);
                 distanceStartToEnd = Vector3.Distance(endPoint.transform.position, startPoint.transform.position);
             }
             else

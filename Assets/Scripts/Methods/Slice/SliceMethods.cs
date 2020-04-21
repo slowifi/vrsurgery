@@ -31,7 +31,7 @@ public class SliceMethods
     public string CheckSelected(GameObject leftHeart, GameObject rightHeart)
     {
         string result = "none";
-        Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         IntersectedValues valuesLeft = Intersections.GetIntersectedValues(ray, leftHeart.GetComponent<MeshFilter>().mesh.triangles, leftWorldPos);
         IntersectedValues valuesRight = Intersections.GetIntersectedValues(ray, rightHeart.GetComponent<MeshFilter>().mesh.triangles, rightWorldPos);
 

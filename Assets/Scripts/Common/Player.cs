@@ -43,10 +43,10 @@ public class Player : MonoBehaviour
         if (wheel!=0)
         {
             // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
-            ObjManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
+            MeshManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
 
-            if (ObjManager.Instance.pivotTransform.localScale.x <= 0.2f)
-                ObjManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
+            if (MeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
+                MeshManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
 
             AdjacencyList.Instance.WorldPositionUpdate();
         }
@@ -55,8 +55,8 @@ public class Player : MonoBehaviour
             // 여기에 UI 추가.
             float x = Input.GetAxis("Mouse X");
             float y = Input.GetAxis("Mouse Y");
-            ObjManager.Instance.pivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
-            ObjManager.Instance.pivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
+            MeshManager.Instance.pivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
+            MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
             AdjacencyList.Instance.WorldPositionUpdate();
         }
         else if (Input.GetMouseButton(2))
@@ -66,8 +66,8 @@ public class Player : MonoBehaviour
             float xPos = Input.GetAxis("Mouse X");
             float yPos = Input.GetAxis("Mouse Y");
 
-            ObjManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
-            ObjManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
+            MeshManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
+            MeshManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
             AdjacencyList.Instance.WorldPositionUpdate();
         }
         // 특정 움직임이 있었을 때만 업데이트 하도록 해야됨.
@@ -91,8 +91,8 @@ public class Player : MonoBehaviour
                     float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
                     float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
                     // select the axis by which you want to rotate the GameObject                               
-                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.up, XaxisRotation/20f);
-                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.right, YaxisRotation/20f);
+                    MeshManager.Instance.pivotTransform.RotateAround(Vector3.up, XaxisRotation/20f);
+                    MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, YaxisRotation/20f);
                 }
                 AdjacencyList.Instance.WorldPositionUpdate();
                 return;
@@ -134,10 +134,10 @@ public class Player : MonoBehaviour
                     UIManager.Instance.extendBar.value = extendValue;
                 return;
             }
-            ObjManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/700;
+            MeshManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/700;
 
-            if (ObjManager.Instance.pivotTransform.localScale.x <= 0.2f)
-                ObjManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
+            if (MeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
+                MeshManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
             AdjacencyList.Instance.WorldPositionUpdate();
 
             return;
@@ -150,8 +150,8 @@ public class Player : MonoBehaviour
                 float xPos = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
                 float yPos = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
                 // select the axis by which you want to rotate the GameObject                               
-                ObjManager.Instance.pivotTransform.position += Vector3.left * -xPos;
-                ObjManager.Instance.pivotTransform.position += Vector3.up * -yPos;
+                MeshManager.Instance.pivotTransform.position += Vector3.left * -xPos;
+                MeshManager.Instance.pivotTransform.position += Vector3.up * -yPos;
             }
             AdjacencyList.Instance.WorldPositionUpdate();
         }

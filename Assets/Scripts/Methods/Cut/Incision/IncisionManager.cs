@@ -62,7 +62,7 @@ public class IncisionManager : Singleton<IncisionManager>
 
         // local 값이 지금 들어가있는 상태에서 
         foreach (var item in newVertices)
-            vertices[item.Key] = ObjManager.Instance.objTransform.InverseTransformPoint(item.Value);
+            vertices[item.Key] = MeshManager.Instance.objTransform.InverseTransformPoint(item.Value);
 
         foreach (var item in newTriangles)
             triangles[item.Key] = item.Value;
@@ -92,8 +92,8 @@ public class IncisionManager : Singleton<IncisionManager>
                 zMax = tempZ;
         }
         
-        zMax += ObjManager.Instance.pivotTransform.lossyScale.z;
-        zMin -= ObjManager.Instance.pivotTransform.lossyScale.z;
+        zMax += MeshManager.Instance.pivotTransform.lossyScale.z;
+        zMin -= MeshManager.Instance.pivotTransform.lossyScale.z;
 
         BFS.Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, true, zMin, zMax);
         BFS.Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, false, zMin, zMax);
@@ -103,13 +103,13 @@ public class IncisionManager : Singleton<IncisionManager>
 
         //Vector3 normalVector = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[newTriangles.Values.First()];
 
-        Transform objTransform = ObjManager.Instance.pivotTransform;
+        Transform objTransform = MeshManager.Instance.pivotTransform;
 
         //여기에다가 안쪽면인지 바깥면인지를 판단 필요.
         Vector2 rightVector = Vector2.zero;
         Vector2 leftVector = Vector2.zero;
 
-        if (worldPosition[endPointIndices[currentIndex]].z - ObjManager.Instance.objTransform.TransformPoint(MeshManager.Instance.mesh.normals[endPointIndices[currentIndex]] + MeshManager.Instance.mesh.vertices[endPointIndices[currentIndex]]).z < 0)
+        if (worldPosition[endPointIndices[currentIndex]].z - MeshManager.Instance.objTransform.TransformPoint(MeshManager.Instance.mesh.normals[endPointIndices[currentIndex]] + MeshManager.Instance.mesh.vertices[endPointIndices[currentIndex]]).z < 0)
         {
             leftVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
             rightVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
@@ -127,8 +127,8 @@ public class IncisionManager : Singleton<IncisionManager>
         leftVectorObject[currentIndex].transform.position = new Vector3(leftVector.x + worldPosition[startPointIndices[currentIndex]].x, leftVector.y + worldPosition[startPointIndices[currentIndex]].y, worldPosition[startPointIndices[currentIndex]].z);
         rightVectorObject[currentIndex].transform.position = new Vector3(rightVector.x + worldPosition[startPointIndices[currentIndex]].x, rightVector.y + worldPosition[startPointIndices[currentIndex]].y, worldPosition[startPointIndices[currentIndex]].z);
 
-        leftVectorObject[currentIndex].transform.SetParent(ObjManager.Instance.pivotTransform);
-        rightVectorObject[currentIndex].transform.SetParent(ObjManager.Instance.pivotTransform);
+        leftVectorObject[currentIndex].transform.SetParent(MeshManager.Instance.pivotTransform);
+        rightVectorObject[currentIndex].transform.SetParent(MeshManager.Instance.pivotTransform);
 
         Vector3 center = Vector3.Lerp(worldPosition[startPointIndices[currentIndex]], worldPosition[endPointIndices[currentIndex]], 0.5f);
         double radius = Vector2.Distance(center, worldPosition[endPointIndices[currentIndex]]);
@@ -156,8 +156,8 @@ public class IncisionManager : Singleton<IncisionManager>
 
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
 
-        Transform objTransform = ObjManager.Instance.objTransform;
-        Transform pivotTransform = ObjManager.Instance.pivotTransform;
+        Transform objTransform = MeshManager.Instance.objTransform;
+        Transform pivotTransform = MeshManager.Instance.pivotTransform;
 
         Vector3 leftVector = leftVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
         Vector3 rightVector = rightVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
@@ -181,7 +181,7 @@ public class IncisionManager : Singleton<IncisionManager>
     // 양면메쉬 전용 알고리즘
     public void SetStartVerticesDF()
     {
-        startScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        startScreenRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
 
         IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
         startOuterVertexPosition = intersectedValues.IntersectedPosition;
@@ -190,7 +190,7 @@ public class IncisionManager : Singleton<IncisionManager>
 
     public void SetEndVerticesDF()
     {
-        endScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        endScreenRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
 
         IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
         endOuterVertexPosition = intersectedValues.IntersectedPosition;

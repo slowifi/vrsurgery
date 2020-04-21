@@ -24,6 +24,7 @@ public class ButtonPress : Singleton<ButtonPress>
     {
         ColorBlock colorTemp = CutButton.colors;
         colorTemp.normalColor = new Color32(137, 96, 96, 255);
+        SliceButton.colors = colorTemp;
         CutButton.colors = colorTemp;
         PatchButton.colors = colorTemp;
         IncisionButton.colors = colorTemp;

@@ -15,10 +15,10 @@ public class MeasureMode : Mode
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Ray cameraRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            Ray cameraRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             Vector3 vertexPosition = MeasureManager.vertexPosition(cameraRay);
             float dst = MeasureManager.MeasureDistance(vertexPosition, cameraRay);
-            dst = dst / ObjManager.Instance.objTransform.lossyScale.z;
+            dst = dst / MeshManager.Instance.objTransform.lossyScale.z;
             UIManager.Instance.distance.text = dst + "mm";
         }
     }

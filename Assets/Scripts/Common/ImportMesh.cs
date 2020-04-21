@@ -52,7 +52,7 @@ public class ImportMesh : MonoBehaviour
             newLocalHeart.transform.SetParent(GameObject.Find("HumanHeart").transform);
             MeshManager.Instance.Heart = newLocalHeart.transform.GetChild(0).gameObject;
             MeshManager.Instance.Heart.transform.localPosition = Vector3.zero;
-            ObjManager.Instance.objTransform = MeshManager.Instance.Heart.transform;
+            MeshManager.Instance.objTransform = MeshManager.Instance.Heart.transform;
             mainObject.SendMessage("ResetMain");
             buttonPressScript.SendMessage("ResetButton");
             return;
@@ -66,7 +66,7 @@ public class ImportMesh : MonoBehaviour
         
         MeshManager.Instance.Heart = newHeart.transform.GetChild(0).gameObject;
         MeshManager.Instance.Heart.transform.localPosition = Vector3.zero;
-        ObjManager.Instance.objTransform = MeshManager.Instance.Heart.transform;
+        MeshManager.Instance.objTransform = MeshManager.Instance.Heart.transform;
         
         mainObject.SetActive(true);
     }

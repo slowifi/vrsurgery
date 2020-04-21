@@ -91,7 +91,7 @@ public class IncisionMode : Mode
             if (checkInside)
             {
                 Vector3 currentPosition = intersectedValues.IntersectedPosition;
-                if (Vector3.Distance(oldPosition, currentPosition) < 2.5f * ObjManager.Instance.pivotTransform.lossyScale.z)
+                if (Vector3.Distance(oldPosition, currentPosition) < 2.5f * MeshManager.Instance.pivotTransform.lossyScale.z)
                 {
                     Destroy(lineRenderer.lineObject);
                     ChatManager.Instance.GenerateMessage(" incision 거리가 너무 짧습니다.");

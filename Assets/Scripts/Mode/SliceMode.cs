@@ -17,7 +17,6 @@ public class SliceMode : Mode
     {
         mode = "slice";
         SliceMethods = new SliceMethods();
-        lineRenderer = new LineRendererManipulate();
     }
 
     private void Update()
@@ -37,13 +36,14 @@ public class SliceMode : Mode
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            lineRenderer = new LineRendererManipulate();
+            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             oldRay = ray;
             SliceMethods.SetIntersectedValues("first", ray);
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             SliceMethods.SetIntersectedValues("second", ray);
 
             GameObject[] SliceResult = SliceMethods.Slicing();
@@ -54,7 +54,7 @@ public class SliceMode : Mode
         }
         else if(Input.GetMouseButton(0))
         {
-            Ray ray = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             lineRenderer.SetFixedLineRenderer(oldRay.origin + oldRay.direction * 100f, ray.origin + ray.direction * 100f);
         }
     }
@@ -65,7 +65,8 @@ public class SliceMode : Mode
         {
             string selected = SliceMethods.CheckSelected(leftHeart, rightHeart);
             SelectHeart(selected);
-            // Destroy(gameObject);
+            mode = "slice";
+            Destroy(this);
         }
     }
 
@@ -92,10 +93,10 @@ public class SliceMode : Mode
             selectedHeart = leftHeart;
             destoryHeart = rightHeart;
         }
-
+        
         Destroy(destoryHeart);
-        MeshManager.Instance.Heart = selectedHeart;
-        MeshManager.Instance.mesh = selectedHeart.GetComponent<MeshFilter>().mesh;
+        MeshManager.Instance.SetNewObject(selectedHeart);
+        //MeshManager.Instance.mesh = selectedHeart.GetComponent<MeshFilter>().mesh;
         MakeDoubleFaceMesh.Instance.Reinitialize();
     }
 

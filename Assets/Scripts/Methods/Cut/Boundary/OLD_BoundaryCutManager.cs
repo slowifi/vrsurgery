@@ -483,7 +483,7 @@ public class OLD_BoundaryCutManager
 
         // local 값이 지금 들어가있는 상태에서 
         foreach (var item in newVertices)
-            vertices[item.Key] = ObjManager.Instance.objTransform.InverseTransformPoint(item.Value);
+            vertices[item.Key] = MeshManager.Instance.objTransform.InverseTransformPoint(item.Value);
 
         foreach (var item in newTriangles)
             triangles[item.Key] = item.Value;
@@ -659,7 +659,7 @@ public class OLD_BoundaryCutManager
     {
         // screen point도 저장해야됨.
         isStartFromVtx = false;
-        startScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        startScreenRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         firstScreenRay = startScreenRay;
 
         Intersections.GetIntersectedValues(endScreenRay);
@@ -670,7 +670,7 @@ public class OLD_BoundaryCutManager
     public void SetEndVerticesDF()
     {
         // 여기에 라인렌더러 넣는걸
-        endScreenRay = ObjManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        endScreenRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         Intersections.GetIntersectedValues(endScreenRay);
         isEndToVtx = false;
     }
@@ -815,7 +815,7 @@ public class OLD_BoundaryCutManager
 
         // local 값이 지금 들어가있는 상태에서 
         foreach (var item in newVertices)
-            vertices[item.Key] = ObjManager.Instance.objTransform.InverseTransformPoint(item.Value);
+            vertices[item.Key] = MeshManager.Instance.objTransform.InverseTransformPoint(item.Value);
 
         foreach (var item in newTriangles)
             triangles[item.Key] = item.Value;

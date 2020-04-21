@@ -16,7 +16,7 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
     {
         GameObject innerPatch = new GameObject(patch.name + "_Inner", typeof(MeshFilter), typeof(MeshRenderer));
         //innerPatch.GetComponent<MeshFilter>().mesh;
-        innerPatch.transform.SetParent(ObjManager.Instance.pivotTransform);
+        innerPatch.transform.SetParent(MeshManager.Instance.pivotTransform);
         innerPatch.transform.localPosition = patch.transform.localPosition;
         innerPatch.transform.localRotation = patch.transform.localRotation;
         innerPatch.transform.localScale = patch.transform.localScale;
@@ -79,7 +79,8 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
 
         oppositeObject = newHeart;
         oppositeObject.GetComponent<MeshRenderer>().material = MeshManager.Instance.Heart.GetComponent<MeshRenderer>().material;
-        oppositeObject.transform.SetParent(ObjManager.Instance.objTransform.parent);
+        oppositeObject.transform.SetParent(MeshManager.Instance.objTransform.parent);
+        oppositeObject.transform.localRotation = Quaternion.identity;
         oppositeObject.transform.localPosition = Vector3.zero;
         oppositeObject.transform.localScale = Vector3.one;
         
@@ -105,9 +106,10 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
         oppositeObject.GetComponent<MeshRenderer>().material = MeshManager.Instance.Heart.GetComponent<MeshRenderer>().material;
         
         oppositeObject.transform.SetParent(GameObject.Find("PartialModel").transform);
+        oppositeObject.transform.localRotation = Quaternion.identity;
         oppositeObject.transform.localPosition = Vector3.zero;
         oppositeObject.transform.localScale = Vector3.one;
-        //oppositeObject.transform.SetPositionAndRotation(ObjManager.Instance.objTransform.position, ObjManager.Instance.objTransform.rotation);
+        //oppositeObject.transform.SetPositionAndRotation(MeshManager.Instance.objTransform.position, MeshManager.Instance.objTransform.rotation);
         oppositeMesh = oppositeObject.GetComponent<MeshFilter>().mesh;
 
         int[] triangles = (int[])originalMesh.triangles.Clone();

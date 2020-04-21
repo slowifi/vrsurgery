@@ -20,7 +20,14 @@ public class MeshManager : Singleton<MeshManager>
     public GameObject LeftHeart;
     public GameObject RightHeart;
 
-    
+    public Camera cam;
+
+    public Transform objTransform;
+    public Transform pivotTransform;
+
+    public GameObject startMeasurePoint;
+    public GameObject endMeasurePoint;
+
     private GameObject disableHeart;
     public Material material;
 
@@ -34,7 +41,12 @@ public class MeshManager : Singleton<MeshManager>
     {
         
     }
-
+    public void ObjUpdate()
+    {
+        objTransform = objTransform.GetComponent<Transform>();
+        //objTransform = GameObject.Find("PartialModel").transform;
+        pivotTransform = pivotTransform.GetComponent<Transform>();
+    }
     public void SetMeshInfo()
     {
         // 주소값 전달해서 추후에는 같이 변환되게 해야됨.
@@ -46,7 +58,14 @@ public class MeshManager : Singleton<MeshManager>
         MeshInfo.ObjectMesh = mesh;
     }
 
-
+    public void SetNewObject(GameObject newGameObject)
+    {
+        Destroy(Heart);
+        Heart = newGameObject;
+        objTransform = Heart.transform;
+        mesh = Heart.GetComponent<MeshFilter>().mesh;
+        Heart.GetComponent<MeshRenderer>().material = material;
+    }
 
     public void MeshUpdate()
     {
@@ -101,7 +120,7 @@ public class MeshManager : Singleton<MeshManager>
         
         //Debug.Log(mesh.bounds.size);
         //y 기준으로 맞춰주면 되겠다.
-        ObjManager.Instance.pivotTransform.localScale = Vector3.one * (80 / mesh.bounds.size.y);
+        MeshManager.Instance.pivotTransform.localScale = Vector3.one * (80 / mesh.bounds.size.y);
 
         disableHeart = Instantiate(Heart);
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
