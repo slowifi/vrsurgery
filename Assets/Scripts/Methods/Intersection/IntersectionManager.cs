@@ -193,8 +193,8 @@ public class Intersections
 
             if (RayTriangleIntersection(
                 screenMiddlePoint,
-                incisionStartPoint + screenStartRay.direction * 10,
-                incisionEndPoint + screenEndRay.direction * 10,
+                incisionStartPoint + screenStartRay.direction * 20,
+                incisionEndPoint + screenEndRay.direction * 20,
                 worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
                 worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
                 ref intersectionTemp))

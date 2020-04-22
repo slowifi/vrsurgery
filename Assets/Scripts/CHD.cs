@@ -105,7 +105,7 @@ public class CHD : MonoBehaviour
         Destroy(mode);
     }
 
-    void Start()
+    void Awake()
     {
         Debug.Log("Load되었습니다.");
         MeshManager.Instance.ObjUpdate();

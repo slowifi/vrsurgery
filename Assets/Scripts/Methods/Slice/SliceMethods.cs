@@ -57,7 +57,6 @@ public class SliceMethods
 
         middlePosition = Vector3.Lerp(firstRay.origin, secondRay.origin, 0.5f);
 
-
         if (CGAL.BuildPolyhedron(left,
             verticesCoordinate,
             verticesCoordinate.Length / 3,

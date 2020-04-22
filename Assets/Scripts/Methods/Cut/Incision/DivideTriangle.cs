@@ -356,6 +356,7 @@ public class DivideTriangle
         newTriangles.Add(triangleCount++, vertexIndex);
         newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx1);
 
+        // 이걸 반환해줘야됨.
         newVertices.Add(newVertexLength++, centerPosition);
         newVertices.Add(newVertexLength++, newEdgeVertexPosition);
         newVertices.Add(newVertexLength++, newEdgeVertexPosition);

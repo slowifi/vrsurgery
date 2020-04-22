@@ -63,7 +63,7 @@ public class ImportMesh : MonoBehaviour
         newHeart.name = "PartialModel";
         ChatManager.Instance.GenerateMessage(newHeart.name);
         newHeart.transform.SetParent(GameObject.Find("HumanHeart").transform);
-        
+        newHeart.transform.localScale = Vector3.one;
         MeshManager.Instance.Heart = newHeart.transform.GetChild(0).gameObject;
         MeshManager.Instance.Heart.transform.localPosition = Vector3.zero;
         MeshManager.Instance.objTransform = MeshManager.Instance.Heart.transform;

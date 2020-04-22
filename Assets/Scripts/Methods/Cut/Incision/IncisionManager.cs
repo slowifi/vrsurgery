@@ -21,9 +21,9 @@ public class IncisionManager : Singleton<IncisionManager>
     private Ray startScreenRay;
     private Ray endScreenRay;
 
-    private Vector3 startOuterVertexPosition;
+    private Vector3 startVertexPosition;
 
-    private Vector3 endOuterVertexPosition;
+    private Vector3 endVertexPosition;
 
     public int firstOuterVertexIndex;
     public int lastOuterVertexIndex;
@@ -32,6 +32,8 @@ public class IncisionManager : Singleton<IncisionManager>
 
     private int endOuterTriangleIndex;
 
+    private int startVertexIndex;
+    private int endVertexIndex;
 
     private List<GameObject> leftVectorObject;
     private List<GameObject> rightVectorObject;
@@ -76,10 +78,10 @@ public class IncisionManager : Singleton<IncisionManager>
         AdjacencyList.Instance.WorldPositionUpdate();
         Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-
+        //MeshManager.Instance.mesh.vertices = AdjacencyList.Instance.worldPositionVertices.ToArray();
         leftSideWeight.Add(new List<float>());
         rightSideWeight.Add(new List<float>());
-
+        
         float zMin = 1000000;
         float zMax = -1000000;
 
@@ -94,9 +96,40 @@ public class IncisionManager : Singleton<IncisionManager>
         
         zMax += MeshManager.Instance.pivotTransform.lossyScale.z;
         zMin -= MeshManager.Instance.pivotTransform.lossyScale.z;
+        Debug.Log(startVertexIndex);
+        Debug.Log(endVertexIndex);
+        Debug.Log(leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
+        Debug.Log(rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
+        
+        int[] leftSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
+        int[] rightSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
 
-        BFS.Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, true, zMin, zMax);
-        BFS.Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startOuterVertexPosition, endOuterVertexPosition, false, zMin, zMax);
+        foreach (var item in rightSideTemptest)
+        {
+            GameObject v_test1 = new GameObject();
+            v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            v_test1.transform.position = worldPosition[item];
+        }
+
+        foreach (var item in leftSideTemptest)
+        {
+            GameObject v_test1 = new GameObject();
+            v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            v_test1.transform.position = worldPosition[item];
+        }
+
+        int[] leftSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
+        int[] rightSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
+
+        return;
+        leftSide[currentIndex].Clear();
+        rightSide[currentIndex].Clear();
+
+        leftSide[currentIndex] = leftSideTemptest.ToList();
+        rightSide[currentIndex] = rightSideTemptest.ToList();
+
+        //BFS.Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, true, zMin, zMax);
+        //BFS.Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, false, zMin, zMax);
 
         startPointIndices.Add(newTriangles.Values.First());
         endPointIndices.Add(vertices.Length - 1);
@@ -111,13 +144,13 @@ public class IncisionManager : Singleton<IncisionManager>
 
         if (worldPosition[endPointIndices[currentIndex]].z - MeshManager.Instance.objTransform.TransformPoint(MeshManager.Instance.mesh.normals[endPointIndices[currentIndex]] + MeshManager.Instance.mesh.vertices[endPointIndices[currentIndex]]).z < 0)
         {
-            leftVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
-            rightVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
+            rightVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
+            leftVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
         }
         else
         {
-            rightVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
-            leftVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
+            leftVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
+            rightVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
         }
 
 
@@ -184,7 +217,7 @@ public class IncisionManager : Singleton<IncisionManager>
         startScreenRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
 
         IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
-        startOuterVertexPosition = intersectedValues.IntersectedPosition;
+        startVertexPosition = intersectedValues.IntersectedPosition;
         startOuterTriangleIndex = intersectedValues.TriangleIndex;
     }
 
@@ -193,7 +226,7 @@ public class IncisionManager : Singleton<IncisionManager>
         endScreenRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
 
         IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
-        endOuterVertexPosition = intersectedValues.IntersectedPosition;
+        endVertexPosition = intersectedValues.IntersectedPosition;
         endOuterTriangleIndex = intersectedValues.TriangleIndex;
     }
 
@@ -210,8 +243,9 @@ public class IncisionManager : Singleton<IncisionManager>
 
         List<Edge> edgeList = AdjacencyList.Instance.edgeList;
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
+        startVertexIndex = worldVertices.Count;
         // start
-        outerSide = Intersections.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startOuterVertexPosition, endOuterVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay, edgeList, worldVertices);
+        outerSide = Intersections.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startVertexPosition, endVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay, edgeList, worldVertices);
 
         if (outerSide == -1)
         {
@@ -240,7 +274,7 @@ public class IncisionManager : Singleton<IncisionManager>
             }
         }
 
-        _dividingMethods.DivideTrianglesStartIncision(startOuterVertexPosition, outerEdgePoint, startOuterTriangleIndex, outerNotEdgeVertex, outerEdgeIdx, ref outerTriangleCount, false);
+        _dividingMethods.DivideTrianglesStartIncision(startVertexPosition, outerEdgePoint, startOuterTriangleIndex, outerNotEdgeVertex, outerEdgeIdx, ref outerTriangleCount, false);
 
         while (true)
         {
@@ -258,11 +292,12 @@ public class IncisionManager : Singleton<IncisionManager>
 
             if (outerTriangleIndex == endOuterTriangleIndex)
             {
-                _dividingMethods.DivideTrianglesEndIncision(endOuterVertexPosition, endOuterTriangleIndex, ref outerTriangleCount, outerEdgeIdx, false);
+                _dividingMethods.DivideTrianglesEndIncision(endVertexPosition, endOuterTriangleIndex, ref outerTriangleCount, outerEdgeIdx, false);
+                endVertexIndex = startVertexIndex + newVertices.Count - 1;
                 break;
             }
 
-            outerSide = Intersections.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startOuterVertexPosition, endOuterVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay, edgeList, worldVertices);
+            outerSide = Intersections.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startVertexPosition, endVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay, edgeList, worldVertices);
 
             if (outerSide == 2)
                 _dividingMethods.DivideTrianglesClockWiseIncision(outerEdgePoint, edgeList[outerEdgeIdx].tri1, ref outerTriangleCount, outerEdgeIdx, false);
@@ -281,10 +316,12 @@ public class IncisionManager : Singleton<IncisionManager>
 
     public void IncisionUpdate()
     {
-        startOuterVertexPosition = Vector3.zero;
+        startVertexPosition = Vector3.zero;
 
-        endOuterVertexPosition = Vector3.zero;
+        endVertexPosition = Vector3.zero;
 
+        startVertexIndex = -1;
+        endVertexIndex = -1;
 
         startOuterTriangleIndex = -1;
 
@@ -301,14 +338,15 @@ public class IncisionManager : Singleton<IncisionManager>
 
     public void Reinitialize()
     {
-        startOuterVertexPosition = Vector3.zero;
-        endOuterVertexPosition = Vector3.zero;
+        startVertexPosition = Vector3.zero;
+        endVertexPosition = Vector3.zero;
 
         startOuterTriangleIndex = -1;
         endOuterTriangleIndex = -1;
         trianglesCount = 0;
         currentIndex = 0;
-
+        startVertexIndex = -1;
+        endVertexIndex = -1;
         startScreenRay = new Ray();
         endScreenRay = new Ray();
 
@@ -333,9 +371,9 @@ public class IncisionManager : Singleton<IncisionManager>
     // elements가 10만개 넘으면 reinitializing이 효과적이고 밑이면 그냥 clear 쓰는게 이득.
     protected override void InitializeChild()
     {
-        startOuterVertexPosition = Vector3.zero;
+        startVertexPosition = Vector3.zero;
         //startInnerVertexPosition = Vector3.zero;
-        endOuterVertexPosition = Vector3.zero;
+        endVertexPosition = Vector3.zero;
         //endInnerVertexPosition = Vector3.zero;
 
         startOuterTriangleIndex = -1;
@@ -344,6 +382,9 @@ public class IncisionManager : Singleton<IncisionManager>
         //endInnerTriangleIndex = -1;
         trianglesCount = 0;
         currentIndex = 0;
+
+        startVertexIndex = -1;
+        endVertexIndex = -1;
 
         startScreenRay = new Ray();
         endScreenRay = new Ray();

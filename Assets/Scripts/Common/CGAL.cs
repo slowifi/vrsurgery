@@ -70,6 +70,23 @@ public class CGAL
     [DllImport("CGALtest_dll.dll", EntryPoint = "CorefineByMesh", CallingConvention = CallingConvention.Cdecl)]
     public static extern int CorefineByMesh(IntPtr clippee, IntPtr clipper);
 
+    [DllImport("CGALtest_dll.dll", EntryPoint = "ExtractCircle", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr ExtractCircle(IntPtr value, int v1, int v2, int v3);
+
+    [DllImport("CGALtest_dll.dll", EntryPoint = "ExtractCircleLength", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int ExtractCircleLength(IntPtr value);
+
+    [DllImport("CGALtest_dll.dll", EntryPoint = "ExtractCircleFixed", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr ExtractCircleFixed(IntPtr value, int v1, int v2, int v3);
+
+    [DllImport("CGALtest_dll.dll", EntryPoint = "ExtractCircleFixedLength", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int ExtractCircleFixedLength(IntPtr value);
+
+    [DllImport("CGALtest_dll.dll", EntryPoint = "VertexNormal", CallingConvention = CallingConvention.Cdecl)]
+    public static extern float vertexNormal(IntPtr value, int v);
+
+
+
     public void Slicer(Vector3 firstPoint, Vector3 lastPoint, Vector3 rayOrigin)
     {
         IntPtr heart = CreateMeshObject();
@@ -120,6 +137,48 @@ public class CGAL
         //MeshManager.Instance.mesh.vertices = newVertices;
         //MeshManager.Instance.mesh.triangles = newTriangles;
     }
+
+    public static int[] ExtractCircleByBFS_Test(int startVertexIndex, int endVertexIndex, int startBFSIndex)
+    {
+        IntPtr heart = CreateMeshObject();
+        float[] verticesCoordinate = ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
+        BuildPolyhedron(heart,
+            verticesCoordinate,
+            verticesCoordinate.Length / 3,
+            MeshManager.Instance.mesh.triangles,
+            MeshManager.Instance.mesh.triangles.Length / 3);
+
+        IntPtr circle = ExtractCircleFixed(heart, startVertexIndex, endVertexIndex, startBFSIndex);
+        int length = ExtractCircleFixedLength(heart);
+        int[] indexList = new int[length];
+        Debug.Log(length);
+        Marshal.Copy(circle, indexList, 0, length);
+
+        return indexList;
+    }
+
+    public static int[] ExtractCircleByBFS(int startVertexIndex, int endVertexIndex, int startBFSIndex)
+    {
+        IntPtr heart = CreateMeshObject();
+        float[] verticesCoordinate = ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
+        BuildPolyhedron(heart,
+            verticesCoordinate,
+            verticesCoordinate.Length / 3,
+            MeshManager.Instance.mesh.triangles,
+            MeshManager.Instance.mesh.triangles.Length / 3);
+
+        IntPtr circle = ExtractCircle(heart, startVertexIndex, endVertexIndex, startBFSIndex);
+        int length = ExtractCircleLength(heart);
+        int[] indexList = new int[length];
+        Debug.Log(length);
+        Marshal.Copy(circle, indexList, 0, length);
+
+        return indexList;
+    }
+
+
+
+
 
     public void NewversionOfBoundaryCut(List<Vector3> clipperVertices, List<Vector3> rayDirections, Vector3 rayDirection)
     {
@@ -240,7 +299,6 @@ public class CGAL
     {
         int[] triangles = new int[triangleCount * 3];
         Marshal.Copy(trianglesPtr, triangles, 0, triangleCount * 3);
-        Debug.Log(triangles.Length);
         return triangles;
     }
 
@@ -345,7 +403,6 @@ public class CGAL
             {
                 // vertex들 넣어줘야됨.
                 newVertices[i] = verticesPos[newCount] + (Vector3.Normalize(rayList[newCount++].direction) * MeshManager.Instance.objTransform.lossyScale.z * 8);
-                Debug.Log(newVertices[i]);
             }
             else
             {
