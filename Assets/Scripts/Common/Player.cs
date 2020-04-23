@@ -10,6 +10,34 @@ public class Player : MonoBehaviour
     private bool boundary = false;
     private bool patch = false;
 
+    private void Awake()
+    {
+        EventManager.Instance.Events.OnModeChanged += Events_OnChanged;
+    }
+
+    private void Events_OnChanged(string mode)
+    {
+        switch (mode)
+        {
+            case "Incision":
+                Debug.Log("incision 실행");
+                break;
+            case "Cut":
+                Debug.Log("cut 실행");
+                break;
+            case "Patch":
+                Debug.Log("patch 실행");
+                break;
+            case "Slice":
+                Debug.Log("slice 실행");
+                break;
+            case "Measure":
+                Debug.Log("measure 실행");
+                break;
+        }
+    }
+
+
     public void OneSecondOff()
     {
         patch = true;

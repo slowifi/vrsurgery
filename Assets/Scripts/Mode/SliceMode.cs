@@ -66,6 +66,7 @@ public class SliceMode : Mode
             string selected = SliceMethods.CheckSelected(leftHeart, rightHeart);
             SelectHeart(selected);
             mode = "slice";
+            EventManager.Instance.Events.InvokeModeChanged("ResetButton");
             Destroy(this);
         }
     }

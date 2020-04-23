@@ -49,6 +49,7 @@ public class BoundaryCutMode : Mode
         else if(isLast)
         {
             CGALCut();
+            EventManager.Instance.Events.InvokeModeChanged("ResetButton");
             Destroy(lineRenderer.lineObject);
             Destroy(this);
         }

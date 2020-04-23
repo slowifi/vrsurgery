@@ -4,10 +4,7 @@ using System.Collections.Generic;
 
 public class CHD : MonoBehaviour
 {
-    public static CHD Instance = null;
     public GameObject playerObject;
-
-    public ModeEvents Events;
 
     private GameObject mode;
     private bool isOn = false;
@@ -26,21 +23,21 @@ public class CHD : MonoBehaviour
         mode.AddComponent<BoundaryCutMode>();
     }
 
-    public void StartPatchMode()
+    public void PatchMode()
     {
         isOn = true;
         mode = new GameObject("PatchMode");
         mode.AddComponent<PatchMode>();
     }
 
-    public void StartMeasureMode()
+    public void MeasureMode()
     {
         isOn = true;
         mode = new GameObject("MeasureMode");
         mode.AddComponent<MeasureMode>();
     }
 
-    public void StartIncisionMode()
+    public void IncisionMode()
     {
         isOn = true;
         mode = new GameObject("IncisionMode");
@@ -109,16 +106,41 @@ public class CHD : MonoBehaviour
         Destroy(mode);
     }
 
-    private void Events_OnModeCompleted()
+    private void Events_OnModeChanged(string mode)
     {
-        Debug.Log("event 실행?");
+        switch (mode)
+        {
+            case "IncisionMode":
+                IncisionMode();
+                Debug.Log("incision 실행");
+                break;
+            case "CutMode":
+                CutMode();
+                Debug.Log("cut 실행");
+                break;
+            case "PatchMode":
+                PatchMode();
+                Debug.Log("patch 실행");
+                break;
+            case "SliceMode":
+                SliceMode();
+                Debug.Log("slice 실행");
+                break;
+            case "MeasureMode":
+                MeasureMode();
+                Debug.Log("measure 실행");
+                break;
+            case "Exit":
+                Exit();
+                Debug.Log("Exit");
+                break;
+        }
     }
 
     void Awake()
     {
-        Instance = this;
-        //Events.OnModeChanged += Events_OnModeCompleted;
-        Debug.Log("Load되었습니다.");
+        EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
+        
         MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Initialize();
         AdjacencyList.Instance.Initialize();
@@ -133,7 +155,6 @@ public class CHD : MonoBehaviour
         if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
         {
             AdjacencyList.Instance.WorldPositionUpdate();
-
             IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
             bool checkInside = intersectedValues.Intersected;
             if (!checkInside)

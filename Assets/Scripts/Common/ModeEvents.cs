@@ -4,10 +4,10 @@ using UnityEditor;
 public class ModeEvents : MonoBehaviour
 {
     public event ModeChangedHandler OnModeChanged;
-    public delegate void ModeChangedHandler();
+    public delegate void ModeChangedHandler(string mode);
     
-    public void InvokeModeChanged()
+    public void InvokeModeChanged(string mode)
     {
-        OnModeChanged?.Invoke();
+        OnModeChanged?.Invoke(mode);
     }
 }
