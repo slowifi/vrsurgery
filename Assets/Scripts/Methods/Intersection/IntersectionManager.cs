@@ -193,8 +193,8 @@ public class Intersections
 
             if (RayTriangleIntersection(
                 screenMiddlePoint,
-                incisionStartPoint + screenStartRay.direction * 20,
-                incisionEndPoint + screenEndRay.direction * 20,
+                incisionStartPoint + screenStartRay.direction * 10,
+                incisionEndPoint + screenEndRay.direction * 10,
                 worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
                 worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
                 ref intersectionTemp))
@@ -204,7 +204,7 @@ public class Intersections
                     !(intersectionTemp.x >= Mathf.Max(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)))
                 {
                     intersectionPoint = intersectionTemp;
-                    Debug.Log("ray triangle intersection");
+
                 }
                 else
                     checkIntersection = false;

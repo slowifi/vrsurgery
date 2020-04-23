@@ -115,7 +115,6 @@ public class CGAL
             return;
         }
 
-
         ClipPolyhedronByPlane(heart, slicerVerticesCoordinate);
         Vector3[] newVertices = ConvertToVector(GetVertices(heart), GetNumberOfVertices(heart), GameObject.Find("PartialModel").transform);
         int[] newTriangles = ConvertToTriangle(GetFaces(heart), GetNumberOfFaces(heart));
@@ -175,10 +174,6 @@ public class CGAL
 
         return indexList;
     }
-
-
-
-
 
     public void NewversionOfBoundaryCut(List<Vector3> clipperVertices, List<Vector3> rayDirections, Vector3 rayDirection)
     {

@@ -29,9 +29,9 @@ public class Algorithms//Manager : Singleton<AlgorithmsManager>
             if (d == 0)
                 return (-b) / (2.0 * a);
             else
-                Debug.Log("허근");
+                return 0;
         }
-        return 0;
+        //return 0;
     }
 
     public static Vector3 GetPlaneNormal(Vector3 vertexPoint1, Vector3 vertexPoint2, Vector3 vertexPoint3)

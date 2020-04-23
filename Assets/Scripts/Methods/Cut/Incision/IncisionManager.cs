@@ -100,9 +100,9 @@ public class IncisionManager : Singleton<IncisionManager>
         Debug.Log(endVertexIndex);
         Debug.Log(leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
         Debug.Log(rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
-        
-        int[] leftSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
-        int[] rightSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
+
+        int[] leftSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 3]);
+        int[] rightSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 3]);
 
         foreach (var item in rightSideTemptest)
         {
@@ -121,12 +121,12 @@ public class IncisionManager : Singleton<IncisionManager>
         int[] leftSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
         int[] rightSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
 
-        return;
+        
         leftSide[currentIndex].Clear();
         rightSide[currentIndex].Clear();
 
-        leftSide[currentIndex] = leftSideTemptest.ToList();
-        rightSide[currentIndex] = rightSideTemptest.ToList();
+        leftSide[currentIndex] = leftSideTemp.ToList();
+        rightSide[currentIndex] = rightSideTemp.ToList();
 
         //BFS.Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, true, zMin, zMax);
         //BFS.Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, false, zMin, zMax);
@@ -278,7 +278,6 @@ public class IncisionManager : Singleton<IncisionManager>
 
         while (true)
         {
-            Debug.Log("얼마나 ㅁ낳이");
             if (outerTriangleIndex == -1)
             {
                 ChatManager.Instance.GenerateMessage(" 자를 수 없는 Edge 입니다.");

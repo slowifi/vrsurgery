@@ -4,7 +4,11 @@ using System.Collections.Generic;
 
 public class CHD : MonoBehaviour
 {
+    public static CHD Instance = null;
     public GameObject playerObject;
+
+    public ModeEvents Events;
+
     private GameObject mode;
     private bool isOn = false;
 
@@ -105,8 +109,15 @@ public class CHD : MonoBehaviour
         Destroy(mode);
     }
 
+    private void Events_OnModeCompleted()
+    {
+        Debug.Log("event 실행?");
+    }
+
     void Awake()
     {
+        Instance = this;
+        //Events.OnModeChanged += Events_OnModeCompleted;
         Debug.Log("Load되었습니다.");
         MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Initialize();
