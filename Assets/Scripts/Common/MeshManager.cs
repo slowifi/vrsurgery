@@ -16,6 +16,8 @@ public class MeshManager : Singleton<MeshManager>
 {
     public MeshInformation MeshInfo;
 
+    public Stack<Mesh> MeshList;
+
     public GameObject Heart;
     public GameObject LeftHeart;
     public GameObject RightHeart;

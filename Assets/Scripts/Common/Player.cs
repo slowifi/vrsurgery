@@ -10,6 +10,50 @@ public class Player : MonoBehaviour
     private bool boundary = false;
     private bool patch = false;
 
+    private bool boolRotation = true;
+    private bool boolScale = true;
+    private bool boolTranslate = true;
+
+    private void stopRotating()
+    {
+        if (boolRotation)
+        {
+            boolRotation = false;
+        }
+        else
+        {
+            boolRotation = true;
+        }
+    }
+
+    private void stopScaling()
+    {
+        if (boolScale)
+        {
+            boolScale = false;
+        }
+        else
+        {
+            boolScale = true;
+        }
+    }
+
+    private void stopTranslating()
+    {
+        if (boolTranslate)
+        {
+            boolTranslate = false;
+        }
+        else
+        {
+            boolTranslate = true;
+        }
+    }
+
+
+
+
+
     private void Awake()
     {
         EventManager.Instance.Events.OnModeChanged += Events_OnChanged;
@@ -62,6 +106,17 @@ public class Player : MonoBehaviour
     {
         boundary = false;
     }
+
+    
+
+
+
+
+
+
+
+
+
 
     void Update()
     {

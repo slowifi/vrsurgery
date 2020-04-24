@@ -5,9 +5,6 @@ using UnityEditor;
 
 public class IncisionMode : Mode
 {
-    public GameObject PlayerObject;
-    public GameObject MainObject;
-
     private bool firstIncision;
     private float oldExtendValue;
     private Vector3 oldPosition;
@@ -16,7 +13,6 @@ public class IncisionMode : Mode
 
     void Awake()
     {
-        PlayerObject = gameObject;
         oldExtendValue = 0;
         firstIncision = false;
         mode = "incision";
@@ -125,6 +121,7 @@ public class IncisionMode : Mode
             MeshManager.Instance.SaveCurrentMesh();
             IncisionManager.Instance.currentIndex++;
             MeshManager.Instance.mesh.RecalculateNormals();
+            // chatmanager 대신 popup manager에서 팝업 호출하기.
             ChatManager.Instance.GenerateMessage(" 절개하였습니다. 확장이 가능합니다.");
             PlayerObject.SetActive(true);
             mode = "extand";

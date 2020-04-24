@@ -59,9 +59,9 @@ public class CHD : MonoBehaviour
     public void Exit()
     {
         Debug.Log("Exit");
-        playerObject.SetActive(true);
-        playerObject.SendMessage("BoundaryModeOff");
-        playerObject.SendMessage("IncisionModeOff");
+        //playerObject.SetActive(true);
+        //playerObject.SendMessage("BoundaryModeOff");
+        //playerObject.SendMessage("IncisionModeOff");
         MeshManager.Instance.SaveCurrentMesh();
 
         Destroy(mode);
