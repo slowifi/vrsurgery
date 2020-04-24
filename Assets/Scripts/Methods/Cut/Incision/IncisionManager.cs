@@ -96,40 +96,40 @@ public class IncisionManager : Singleton<IncisionManager>
         
         zMax += MeshManager.Instance.pivotTransform.lossyScale.z;
         zMin -= MeshManager.Instance.pivotTransform.lossyScale.z;
-        Debug.Log(startVertexIndex);
-        Debug.Log(endVertexIndex);
-        Debug.Log(leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
-        Debug.Log(rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
+        //Debug.Log(startVertexIndex);
+        //Debug.Log(endVertexIndex);
+        //Debug.Log(leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
+        //Debug.Log(rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
 
-        int[] leftSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 3]);
-        int[] rightSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 3]);
+        //int[] leftSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 3]);
+        //int[] rightSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 3]);
 
-        foreach (var item in rightSideTemptest)
-        {
-            GameObject v_test1 = new GameObject();
-            v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            v_test1.transform.position = worldPosition[item];
-        }
+        //foreach (var item in rightSideTemptest)
+        //{
+        //    GameObject v_test1 = new GameObject();
+        //    v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        //    v_test1.transform.position = worldPosition[item];
+        //}
 
-        foreach (var item in leftSideTemptest)
-        {
-            GameObject v_test1 = new GameObject();
-            v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            v_test1.transform.position = worldPosition[item];
-        }
+        //foreach (var item in leftSideTemptest)
+        //{
+        //    GameObject v_test1 = new GameObject();
+        //    v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        //    v_test1.transform.position = worldPosition[item];
+        //}
 
-        int[] leftSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
-        int[] rightSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
+        //int[] leftSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
+        //int[] rightSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
 
-        
-        leftSide[currentIndex].Clear();
-        rightSide[currentIndex].Clear();
 
-        leftSide[currentIndex] = leftSideTemp.ToList();
-        rightSide[currentIndex] = rightSideTemp.ToList();
+        //leftSide[currentIndex].Clear();
+        //rightSide[currentIndex].Clear();
 
-        //BFS.Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, true, zMin, zMax);
-        //BFS.Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, false, zMin, zMax);
+        //leftSide[currentIndex] = leftSideTemp.ToList();
+        //rightSide[currentIndex] = rightSideTemp.ToList();
+
+        BFS.Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, true, zMin, zMax);
+        BFS.Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, false, zMin, zMax);
 
         startPointIndices.Add(newTriangles.Values.First());
         endPointIndices.Add(vertices.Length - 1);

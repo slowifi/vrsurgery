@@ -85,7 +85,6 @@ public class BoundaryCutMode : Mode
             else if (Vector3.Distance(oldRay.origin, ray.origin) > 0.005f)
             {
                 boundaryCount++;
-                Debug.Log("intersected");
                 lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100f, ray.origin + ray.direction * 100f);
                 oldRay = ray;
                 rayList.Add(ray);

@@ -12,8 +12,6 @@ public class ButtonPress : Singleton<ButtonPress>
     /// </summary>
     /// 
 
-    
-
     public GameObject MainManager;
     public Button CutButton;
     public Button SliceButton;
@@ -70,21 +68,21 @@ public class ButtonPress : Singleton<ButtonPress>
 
     public void Slicing()
     {
-        
+        // 지금 이 지저분한 코드도 수정할 수 있으면 하도록하기.
         if (SliceButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = SliceButton.colors;
-            colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            SliceButton.colors = colorTemp;
+            //ColorBlock colorTemp = SliceButton.colors;
+            //colorTemp.normalColor = new Color32(137, 96, 96, 255);
+            //SliceButton.colors = colorTemp;
             Events_OnModeChanged("Exit");
         }
         else
         {
             ColorBlock colorTemp = SliceButton.colors;
-            PatchButton.colors = colorTemp;
-            MeasureButton.colors = colorTemp;
-            IncisionButton.colors = colorTemp;
-            CutButton.colors = colorTemp;
+            //PatchButton.colors = colorTemp;
+            //MeasureButton.colors = colorTemp;
+            //IncisionButton.colors = colorTemp;
+            //CutButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             SliceButton.colors = colorTemp;
             Events_OnModeChanged("Exit");
@@ -99,18 +97,18 @@ public class ButtonPress : Singleton<ButtonPress>
         // unselected Color32(137, 96, 96, 255);
         if (CutButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = CutButton.colors;
-            colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            CutButton.colors = colorTemp;
+            //ColorBlock colorTemp = CutButton.colors;
+            //colorTemp.normalColor = new Color32(137, 96, 96, 255);
+            //CutButton.colors = colorTemp;
             Events_OnModeChanged("Exit");
         }
         else
         {
             ColorBlock colorTemp = CutButton.colors;
-            PatchButton.colors = colorTemp;
-            MeasureButton.colors = colorTemp;
-            IncisionButton.colors = colorTemp;
-            SliceButton.colors = colorTemp;
+            //PatchButton.colors = colorTemp;
+            //MeasureButton.colors = colorTemp;
+            //IncisionButton.colors = colorTemp;
+            //SliceButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             CutButton.colors = colorTemp;
             Events_OnModeChanged("Exit");
@@ -123,18 +121,18 @@ public class ButtonPress : Singleton<ButtonPress>
         
         if (PatchButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = PatchButton.colors;
-            colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            PatchButton.colors = colorTemp;
+            //ColorBlock colorTemp = PatchButton.colors;
+            //colorTemp.normalColor = new Color32(137, 96, 96, 255);
+            //PatchButton.colors = colorTemp;
             Events_OnModeChanged("Exit");
         }
         else
         {
             ColorBlock colorTemp = PatchButton.colors;
-            CutButton.colors = colorTemp;
-            MeasureButton.colors = colorTemp;
-            IncisionButton.colors = colorTemp;
-            SliceButton.colors = colorTemp;
+            //CutButton.colors = colorTemp;
+            //MeasureButton.colors = colorTemp;
+            //IncisionButton.colors = colorTemp;
+            //SliceButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             PatchButton.colors = colorTemp;
             Events_OnModeChanged("Exit");
@@ -146,18 +144,18 @@ public class ButtonPress : Singleton<ButtonPress>
     {
         if (MeasureButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = MeasureButton.colors;
-            colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            MeasureButton.colors = colorTemp;
+            //ColorBlock colorTemp = MeasureButton.colors;
+            //colorTemp.normalColor = new Color32(137, 96, 96, 255);
+            //MeasureButton.colors = colorTemp;
             Events_OnModeChanged("Exit");
         }
         else
         {
             ColorBlock colorTemp = MeasureButton.colors;
-            PatchButton.colors = colorTemp;
-            CutButton.colors = colorTemp;
-            IncisionButton.colors = colorTemp;
-            SliceButton.colors = colorTemp;
+            //PatchButton.colors = colorTemp;
+            //CutButton.colors = colorTemp;
+            //IncisionButton.colors = colorTemp;
+            //SliceButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             MeasureButton.colors = colorTemp;
             Events_OnModeChanged("Exit");
@@ -169,18 +167,18 @@ public class ButtonPress : Singleton<ButtonPress>
     {
         if (IncisionButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = IncisionButton.colors;
-            colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            IncisionButton.colors = colorTemp;
+            //ColorBlock colorTemp = IncisionButton.colors;
+            //colorTemp.normalColor = new Color32(137, 96, 96, 255);
+            //IncisionButton.colors = colorTemp;
             Events_OnModeChanged("Exit");
         }
         else
         {
             ColorBlock colorTemp = IncisionButton.colors;
-            PatchButton.colors = colorTemp;
-            MeasureButton.colors = colorTemp;
-            CutButton.colors = colorTemp;
-            SliceButton.colors = colorTemp;
+            //PatchButton.colors = colorTemp;
+            //MeasureButton.colors = colorTemp;
+            //CutButton.colors = colorTemp;
+            //SliceButton.colors = colorTemp;
             colorTemp.normalColor = new Color32(176, 48, 48, 255);
             IncisionButton.colors = colorTemp;
             Events_OnModeChanged("Exit");

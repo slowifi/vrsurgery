@@ -337,7 +337,6 @@ public class CGAL
             if (i >= vertexCount)
             {
                 newVertices[i] = rayList[newCount].origin + rayList[newCount++].direction * 5000f;
-                Debug.Log(newVertices[i]);
             }
             else
             {
