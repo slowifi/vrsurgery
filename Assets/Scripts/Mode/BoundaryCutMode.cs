@@ -16,12 +16,14 @@ public class BoundaryCutMode : Mode
     private List<Ray> rayList;
     private List<Vector3> intersectedVerticesPos;
 
+    // 라인렌더러는 한곳에서 관리하는게 나을지도 모르겠음.
     private LineRendererManipulate lineRenderer;
 
     private Material heartMaterial;
+
     void Awake()
     {
-        lineRenderer = new LineRendererManipulate();
+        lineRenderer = new LineRendererManipulate(transform);
         intersectedVerticesPos = new List<Vector3>();
         rayList = new List<Ray>();
 
@@ -49,12 +51,14 @@ public class BoundaryCutMode : Mode
         else if(isLast)
         {
             CGALCut();
+            EventManager.Instance.Events.InvokeModeManipulate("EndAll");
             EventManager.Instance.Events.InvokeModeChanged("ResetButton");
             Destroy(lineRenderer.lineObject);
             Destroy(this);
         }
         else if(Input.GetMouseButtonDown(0))
         {
+            EventManager.Instance.Events.InvokeModeManipulate("StopAll");
             Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
 

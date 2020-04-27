@@ -11,14 +11,13 @@ public class PatchMode : Mode
     private Vector3 oldPosition;
     private Vector3 firstPosition;
     private GameObject lineRenderer;
-    public GameObject playerObject;
-    public GameObject mainObject;
     MeasureManager MeasureManager;
+
+    // patch manager 싹 다 손봐야됨.
 
     void Awake()
     {
         MeasureManager = new MeasureManager();
-        playerObject = gameObject;
         isFirstPatch = true;
         isPatchUpdate = false;
         oldPosition = Vector3.zero;
@@ -37,7 +36,6 @@ public class PatchMode : Mode
         else if (isPatchUpdate)
         {
             // 숫자에 patch index들어가는게 좋을듯. 지금 patch, incision 관련해서는 리스트화는 시켜놨음. 추후 undo등 작업 가능.
-            playerObject.SetActive(true);
             PatchManager.Instance.UpdateCurve(PatchManager.Instance.newPatch.Count - 1);
         }
         else if (Input.GetMouseButtonDown(0))
@@ -46,7 +44,7 @@ public class PatchMode : Mode
             if (vertexPosition != Vector3.zero)
             {
                 firstPosition = vertexPosition;
-                //playerObject.SetActive(false);
+                EventManager.Instance.Events.InvokeModeManipulate("StopAll");
                 AdjacencyList.Instance.ListUpdate();
                 PatchManager.Instance.Generate();
                 PatchManager.Instance.AddVertex(vertexPosition);
@@ -58,6 +56,7 @@ public class PatchMode : Mode
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            EventManager.Instance.Events.InvokeModeManipulate("EndAll");
             if (oldPosition == Vector3.zero)
                 return;
             Destroy(lineRenderer);
@@ -74,6 +73,7 @@ public class PatchMode : Mode
                 //first position이 저장되어 있어야함.
                 if (patchCount > 8 && Vector3.Distance(firstPosition, vertexPosition) < 2.0f * MeshManager.Instance.pivotTransform.lossyScale.z)
                 {
+                    EventManager.Instance.Events.InvokeModeManipulate("EndAll");
                     Destroy(lineRenderer);
                     PatchManager.Instance.GenerateMesh();
                     isPatchUpdate = true;
@@ -110,6 +110,7 @@ public class PatchMode : Mode
                 Destroy(lineRenderer);
                 PatchManager.Instance.RemovePatchVariables();
                 ChatManager.Instance.GenerateMessage(" 패치 라인이 심장을 벗어났습니다.");
+                EventManager.Instance.Events.InvokeModeManipulate("EndAll");
                 // 이게 또 겹쳐부렀네
 
 

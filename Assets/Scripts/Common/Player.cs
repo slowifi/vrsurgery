@@ -6,57 +6,46 @@ public class Player : MonoBehaviour
 {
     // 행동제어를 아예 player쪽에서 하기.
 
-    private bool incision = false;
-    private bool boundary = false;
-    private bool patch = false;
-
     private bool boolRotation = true;
-    private bool boolScale = true;
-    private bool boolTranslate = true;
-
-    private void stopRotating()
-    {
-        if (boolRotation)
-        {
-            boolRotation = false;
-        }
-        else
-        {
-            boolRotation = true;
-        }
-    }
-
-    private void stopScaling()
-    {
-        if (boolScale)
-        {
-            boolScale = false;
-        }
-        else
-        {
-            boolScale = true;
-        }
-    }
-
-    private void stopTranslating()
-    {
-        if (boolTranslate)
-        {
-            boolTranslate = false;
-        }
-        else
-        {
-            boolTranslate = true;
-        }
-    }
-
-
-
+    private bool boolScaling = true;
+    private bool boolTranslation = true;
 
 
     private void Awake()
     {
         EventManager.Instance.Events.OnModeChanged += Events_OnChanged;
+        EventManager.Instance.Events.OnModeManipulate += Events_OnModeManipulate;
+    }
+
+    private void SetTrueTransformBool()
+    {
+        boolRotation = true;
+        boolScaling = true;
+        boolTranslation = true;
+    }
+
+    private void SetFalseTransformBool()
+    {
+        boolRotation = false;
+        boolScaling = false;
+        boolTranslation = false;
+    }
+
+    private void Events_OnModeManipulate(string action)
+    {
+        switch (action)
+        {
+            case "StopAll":
+                SetFalseTransformBool();
+                break;
+            case "EndAll":
+                SetTrueTransformBool();
+                break;
+            case "EndWithoutScaling":
+                SetTrueTransformBool();
+                boolScaling = false;
+                break;
+        }
     }
 
     private void Events_OnChanged(string mode)
@@ -81,49 +70,12 @@ public class Player : MonoBehaviour
         }
     }
 
-
-    public void OneSecondOff()
-    {
-        patch = true;
-    }
-
-    public void IncisionModeOn()
-    {
-        incision = true;
-    }
-
-    public void IncisionModeOff()
-    {
-        incision = false;
-    }
-
-    public void BoundaryModeOn()
-    {
-        boundary = true;
-    }
-
-    public void BoundaryModeOff()
-    {
-        boundary = false;
-    }
-
-    
-
-
-
-
-
-
-
-
-
-
     void Update()
     {
 #if UNITY_STANDALONE_WIN
 
         float wheel = Input.GetAxis("Mouse ScrollWheel");
-        if (wheel!=0)
+        if (wheel!=0 && boolScaling)
         {
             // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
             MeshManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
@@ -133,7 +85,7 @@ public class Player : MonoBehaviour
 
             AdjacencyList.Instance.WorldPositionUpdate();
         }
-        else if (Input.GetMouseButton(1))
+        else if (Input.GetMouseButton(1) && boolRotation)
         {
             // 여기에 UI 추가.
             float x = Input.GetAxis("Mouse X");
@@ -142,7 +94,7 @@ public class Player : MonoBehaviour
             MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
             AdjacencyList.Instance.WorldPositionUpdate();
         }
-        else if (Input.GetMouseButton(2))
+        else if (Input.GetMouseButton(2) && boolTranslation)
         {
             // 여기에 UI 추가.
             // 전체 이동.
@@ -165,27 +117,24 @@ public class Player : MonoBehaviour
         float XResolution = resolutions.width;
         float YResolution = resolutions.height;
 
-        if (Input.touchCount == 1) // For Touch Input with a finger
+        if (Input.touchCount == 1 && boolRotation) // For Touch Input with a finger
         {
-            if(!boundary && !patch)
-            {    
-                if (Input.GetTouch(0).phase == TouchPhase.Moved)
-                {
-                    float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
-                    float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
-                    // select the axis by which you want to rotate the GameObject                               
-                    MeshManager.Instance.pivotTransform.RotateAround(Vector3.up, XaxisRotation/20f);
-                    MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, YaxisRotation/20f);
-                }
-                AdjacencyList.Instance.WorldPositionUpdate();
-                return;
+            
+            if (Input.GetTouch(0).phase == TouchPhase.Moved)
+            {
+                float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
+                float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
+                // select the axis by which you want to rotate the GameObject                               
+                MeshManager.Instance.pivotTransform.RotateAround(Vector3.up, XaxisRotation/20f);
+                MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, YaxisRotation/20f);
             }
-            patch = false;
+            AdjacencyList.Instance.WorldPositionUpdate();
             return;
+            
         }
 
 
-        if (Input.touchCount == 2)
+        if (Input.touchCount == 2 && boolScaling)
         {
             // Store both touches.
             Touch touchZero = Input.GetTouch(0);
@@ -226,7 +175,7 @@ public class Player : MonoBehaviour
             return;
         }
 
-        if (Input.touchCount == 3)
+        if (Input.touchCount == 3 && boolTranslation)
         {
             if (Input.GetTouch(0).phase == TouchPhase.Moved)
             {

@@ -17,7 +17,7 @@ public class IncisionMode : Mode
         firstIncision = false;
         mode = "incision";
         oldPosition = Vector3.zero;
-        lineRenderer = new LineRendererManipulate();
+        lineRenderer = new LineRendererManipulate(transform);
     }
 
     void Update()
@@ -36,14 +36,10 @@ public class IncisionMode : Mode
     {
         IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
         bool checkInside = intersectedValues.Intersected;
-        if (Input.GetMouseButtonDown(0))
+        
+        if (Input.GetMouseButtonDown(0) && checkInside)
         {
-            //PlayerObject.SetActive(false);
-            //incision mode awake 될 때 마다 
-            //line.SetLineRenderer();
-            //lineRenderer = new GameObject("Incision Line", typeof(LineRenderer));
-            //lineRenderer.layer = 8;
-            //incisionCount++;
+            EventManager.Instance.Events.InvokeModeManipulate("StopAll");
             firstIncision = true;
 
             oldPosition = intersectedValues.IntersectedPosition;
@@ -57,8 +53,6 @@ public class IncisionMode : Mode
             // 여기안에 지속적으로 거리계산되는 txt넣는게 좋을듯.
             if (!firstIncision)
             {
-                if (PlayerObject.activeSelf)
-                    PlayerObject.SendMessage("IncisionModeOff");
                 return;
             }
             //var line = lineRenderer.GetComponent<LineRenderer>();
@@ -67,11 +61,8 @@ public class IncisionMode : Mode
             {
                 Destroy(lineRenderer.lineObject);
                 ChatManager.Instance.GenerateMessage(" 심장을 벗어났습니다.");
-                //incisionCount--;
-
-                PlayerObject.SendMessage("IncisionModeOff");
+                EventManager.Instance.Events.InvokeModeManipulate("EndAll");
                 Destroy(this);
-                // return true;
             }
             Vector3 currentPosition = intersectedValues.IntersectedPosition;
             Vector3 curPos = currentPosition;
@@ -90,6 +81,7 @@ public class IncisionMode : Mode
                 if (Vector3.Distance(oldPosition, currentPosition) < 2.5f * MeshManager.Instance.pivotTransform.lossyScale.z)
                 {
                     Destroy(lineRenderer.lineObject);
+                    EventManager.Instance.Events.InvokeModeManipulate("EndAll");
                     ChatManager.Instance.GenerateMessage(" incision 거리가 너무 짧습니다.");
                     IncisionManager.Instance.IncisionUpdate();
                     firstIncision = false;
@@ -106,8 +98,7 @@ public class IncisionMode : Mode
                 IncisionManager.Instance.rightSide.RemoveAt(IncisionManager.Instance.currentIndex);
                 //incisionCount--;
                 IncisionManager.Instance.IncisionUpdate();
-                if (PlayerObject.activeSelf)
-                    PlayerObject.SendMessage("IncisionModeOff");
+                EventManager.Instance.Events.InvokeModeManipulate("EndAll");
 
                 Destroy(this);
                 // return true;
@@ -123,8 +114,8 @@ public class IncisionMode : Mode
             MeshManager.Instance.mesh.RecalculateNormals();
             // chatmanager 대신 popup manager에서 팝업 호출하기.
             ChatManager.Instance.GenerateMessage(" 절개하였습니다. 확장이 가능합니다.");
-            PlayerObject.SetActive(true);
             mode = "extand";
+            EventManager.Instance.Events.InvokeModeManipulate("EndWithoutScaling");
         }
 
     }

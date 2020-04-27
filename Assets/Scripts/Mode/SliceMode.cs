@@ -36,7 +36,7 @@ public class SliceMode : Mode
     {
         if (Input.GetMouseButtonDown(0))
         {
-            lineRenderer = new LineRendererManipulate();
+            lineRenderer = new LineRendererManipulate(transform);
             Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             oldRay = ray;
             SliceMethods.SetIntersectedValues("first", ray);

@@ -25,7 +25,7 @@ public class MeasureMode : Mode
     void OnDestroy()
     {
         Destroy(MeasureManager);
-        EventManager.Instance.Events.InvokeModeChanged("ResetButton");
+        //EventManager.Instance.Events.InvokeModeChanged("ResetButton");
         Destroy(GameObject.Find("MeasureLine"));
     }
 }

@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 public class CHD : MonoBehaviour
 {
-    public GameObject playerObject;
-
     private GameObject mode;
     private bool isOn = false;
 
@@ -48,20 +46,16 @@ public class CHD : MonoBehaviour
     public void ButtonOff()
     {
         isOn = false;
-        playerObject.SetActive(true);
-        playerObject.SendMessage("BoundaryModeOff");
-        playerObject.SendMessage("IncisionModeOff");
-        MeshManager.Instance.LoadOldMesh();
-        ButtonPress.Instance.ResetButton();
+        //MeshManager.Instance.LoadOldMesh();
+        //ButtonPress.Instance.ResetButton();
         Exit();
     }
 
     public void Exit()
     {
         Debug.Log("Exit");
-        //playerObject.SetActive(true);
-        //playerObject.SendMessage("BoundaryModeOff");
-        //playerObject.SendMessage("IncisionModeOff");
+        
+        EventManager.Instance.Events.InvokeModeManipulate("EndAll");
         MeshManager.Instance.SaveCurrentMesh();
 
         Destroy(mode);
@@ -96,9 +90,6 @@ public class CHD : MonoBehaviour
         IncisionManager.Instance.Reinitialize();
         Debug.Log("reined");
         MakeDoubleFaceMesh.Instance.Reinitialize();
-        playerObject.SetActive(true);
-        playerObject.SendMessage("IncisionModeOff");
-        playerObject.SendMessage("BoundaryModeOff");
         //lineRenderer = new GameObject>();
         MeshManager.Instance.startMeasurePoint.SetActive(false);
         MeshManager.Instance.endMeasurePoint.SetActive(false);
@@ -147,7 +138,6 @@ public class CHD : MonoBehaviour
         PatchManager.Instance.Initialize();
         IncisionManager.Instance.Initialize();
         MakeDoubleFaceMesh.Instance.Initialize();
-        playerObject.SetActive(true);
     }
 
     void Update()

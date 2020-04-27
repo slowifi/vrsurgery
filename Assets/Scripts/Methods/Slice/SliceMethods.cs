@@ -32,10 +32,24 @@ public class SliceMethods
     {
         string result = "none";
         Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        leftWorldPos = AdjacencyList.Instance.LocalToWorldPosition(leftHeart.GetComponent<MeshFilter>().mesh);
+        rightWorldPos = AdjacencyList.Instance.LocalToWorldPosition(rightHeart.GetComponent<MeshFilter>().mesh);
         IntersectedValues valuesLeft = Intersections.GetIntersectedValues(ray, leftHeart.GetComponent<MeshFilter>().mesh.triangles, leftWorldPos);
         IntersectedValues valuesRight = Intersections.GetIntersectedValues(ray, rightHeart.GetComponent<MeshFilter>().mesh.triangles, rightWorldPos);
 
-        if (valuesLeft.Intersected)
+        // 돌렸을때 두개다 만져지면 문제임.
+        if(valuesLeft.Intersected && valuesRight.Intersected)
+        {
+            if(valuesLeft.IntersectedPosition.z > valuesRight.IntersectedPosition.z)
+            {
+                result = "left";
+            }
+            else
+            {
+                result = "right";
+            }
+        }
+        else if (valuesLeft.Intersected)
         {
             result = "left";
         }

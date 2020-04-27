@@ -4,10 +4,11 @@ using UnityEditor;
 public class LineRendererManipulate
 {
     public GameObject lineObject;
-    public LineRendererManipulate()
+    public LineRendererManipulate(Transform parent)
     {
         lineObject = new GameObject("LineRenderer", typeof(LineRenderer));
         lineObject.layer = 8;
+        lineObject.transform.SetParent(parent);
         lineObject.GetComponent<LineRenderer>().numCornerVertices = 45;
         lineObject.GetComponent<LineRenderer>().material.color = Color.blue;
     }
