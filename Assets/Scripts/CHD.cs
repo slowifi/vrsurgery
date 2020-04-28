@@ -5,39 +5,33 @@ using System.Collections.Generic;
 public class CHD : MonoBehaviour
 {
     private GameObject mode;
-    private bool isOn = false;
 
     public void SliceMode()
     {
-        isOn = true;
         mode = new GameObject("SliceMode");
         mode.AddComponent<SliceMode>();
     }
 
     public void CutMode()
     {
-        isOn = true;
         mode = new GameObject("CutMode");
         mode.AddComponent<BoundaryCutMode>();
     }
 
     public void PatchMode()
     {
-        isOn = true;
         mode = new GameObject("PatchMode");
         mode.AddComponent<PatchMode>();
     }
 
     public void MeasureMode()
     {
-        isOn = true;
         mode = new GameObject("MeasureMode");
         mode.AddComponent<MeasureMode>();
     }
 
     public void IncisionMode()
     {
-        isOn = true;
         mode = new GameObject("IncisionMode");
         mode.AddComponent<IncisionMode>();
         UIManager.Instance.extendBar.value = 0;
@@ -45,16 +39,13 @@ public class CHD : MonoBehaviour
 
     public void ButtonOff()
     {
-        isOn = false;
-        //MeshManager.Instance.LoadOldMesh();
-        //ButtonPress.Instance.ResetButton();
         Exit();
     }
 
     public void Exit()
     {
         Debug.Log("Exit");
-        
+
         EventManager.Instance.Events.InvokeModeManipulate("EndAll");
         MeshManager.Instance.SaveCurrentMesh();
 
@@ -131,7 +122,7 @@ public class CHD : MonoBehaviour
     void Awake()
     {
         EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
-        
+
         MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Initialize();
         AdjacencyList.Instance.Initialize();
@@ -149,11 +140,6 @@ public class CHD : MonoBehaviour
             bool checkInside = intersectedValues.Intersected;
             if (!checkInside)
                 return;
-        }
-
-        if (mode == null && isOn)
-        {
-            ButtonOff();
         }
     }
 }
