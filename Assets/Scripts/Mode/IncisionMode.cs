@@ -11,9 +11,11 @@ public class IncisionMode : MonoBehaviour
     private LineRendererManipulate lineRenderer;
     private string mode;
     private bool testbool = false;
+    private IncisionManager IncisionManager;
 
     void Awake()
     {
+        IncisionManager = new IncisionManager();
         oldExtendValue = 0;
         firstIncision = false;
         mode = "incision";
@@ -37,7 +39,7 @@ public class IncisionMode : MonoBehaviour
     {
         IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
         bool checkInside = intersectedValues.Intersected;
-        
+
         if (Input.GetMouseButtonDown(0) && checkInside)
         {
             EventManager.Instance.Events.InvokeModeManipulate("StopAll");
@@ -45,9 +47,9 @@ public class IncisionMode : MonoBehaviour
 
             oldPosition = intersectedValues.IntersectedPosition;
 
-            IncisionManager.Instance.IncisionUpdate();
+            IncisionManager.IncisionUpdate();
             AdjacencyList.Instance.ListUpdate();
-            IncisionManager.Instance.SetStartVerticesDF();
+            IncisionManager.SetStartVerticesDF();
         }
         else if (Input.GetMouseButton(0))
         {
@@ -84,21 +86,21 @@ public class IncisionMode : MonoBehaviour
                     Destroy(lineRenderer.lineObject);
                     EventManager.Instance.Events.InvokeModeManipulate("EndAll");
                     ChatManager.Instance.GenerateMessage(" incision 거리가 너무 짧습니다.");
-                    IncisionManager.Instance.IncisionUpdate();
+                    IncisionManager.IncisionUpdate();
                     firstIncision = false;
                     return;
                 }
             }
             Destroy(lineRenderer.lineObject);
             bool checkEdge = false;
-            IncisionManager.Instance.SetEndVerticesDF();
-            IncisionManager.Instance.SetDividingListDF(ref checkEdge);
+            IncisionManager.SetEndVerticesDF();
+            IncisionManager.SetDividingListDF(ref checkEdge);
             if (checkEdge)
             {
-                IncisionManager.Instance.leftSide.RemoveAt(IncisionManager.Instance.currentIndex);
-                IncisionManager.Instance.rightSide.RemoveAt(IncisionManager.Instance.currentIndex);
+                IncisionManager.leftSide.RemoveAt(IncisionManager.currentIndex);
+                IncisionManager.rightSide.RemoveAt(IncisionManager.currentIndex);
                 //incisionCount--;
-                IncisionManager.Instance.IncisionUpdate();
+                IncisionManager.IncisionUpdate();
                 EventManager.Instance.Events.InvokeModeManipulate("EndAll");
 
                 Destroy(this);
@@ -107,12 +109,12 @@ public class IncisionMode : MonoBehaviour
 
             // 위에서 잘못되면 끊어야됨.
             Debug.Log(MeshManager.Instance.mesh.vertexCount);
-            IncisionManager.Instance.ExecuteDividing();
+            IncisionManager.ExecuteDividing();
             AdjacencyList.Instance.ListUpdate();
-            IncisionManager.Instance.GenerateIncisionList();
+            IncisionManager.GenerateIncisionList();
             MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
             MeshManager.Instance.SaveCurrentMesh();
-            IncisionManager.Instance.currentIndex++;
+            IncisionManager.currentIndex++;
             MeshManager.Instance.mesh.RecalculateNormals();
             // chatmanager 대신 popup manager에서 팝업 호출하기.
             ChatManager.Instance.GenerateMessage(" 절개하였습니다. 확장이 가능합니다.");
@@ -124,18 +126,18 @@ public class IncisionMode : MonoBehaviour
     private void handleExtand()
     {
         //추후 incision된 파트들 indexing 해서 관리를 해줘야됨 + undo를 위한 작업도 미리미리 해놓는게 좋음.
-        if(testbool)
+        if (testbool)
         {
             Debug.Log("계속 진입중");
-            //IncisionManager.Instance.testCGAL(IncisionManager.Instance.currentIndex - 1);
+            //IncisionManager.testCGAL(IncisionManager.currentIndex - 1);
             return;
         }
         if (oldExtendValue != UIManager.Instance.extendBar.value)
         {
-            IncisionManager.Instance.Extending(IncisionManager.Instance.currentIndex - 1, UIManager.Instance.extendBar.value, oldExtendValue);
+            IncisionManager.Extending(IncisionManager.currentIndex - 1, UIManager.Instance.extendBar.value, oldExtendValue);
             oldExtendValue = UIManager.Instance.extendBar.value;
             MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
-            IncisionManager.Instance.TestGenerateCGAL();
+            IncisionManager.TestGenerateCGAL();
             testbool = true;
         }
     }

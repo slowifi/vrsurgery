@@ -68,19 +68,19 @@ public class BFS
                 temp.Enqueue(item);
             }
         }
-        
+
         List<int> removeTrianglesList = removeTrianglesSet.ToList();
         removeTrianglesList.Sort();
 
         int[] triangles = MeshManager.Instance.mesh.triangles;
-        
+
         int[] newTriangles = new int[triangles.Length - removeTrianglesList.Count * 3];
 
         int removeCount = 0, newTriangleCount = 0;
         bool checkRemove = true;
-        for (int i = 0; i < triangles.Length; i+=3)
+        for (int i = 0; i < triangles.Length; i += 3)
         {
-            if(checkRemove && removeTrianglesList[removeCount] == i)
+            if (checkRemove && removeTrianglesList[removeCount] == i)
             {
                 removeCount++;
                 if (removeCount == removeTrianglesList.Count)
@@ -89,17 +89,17 @@ public class BFS
             else
             {
                 newTriangles[newTriangleCount++] = triangles[i];
-                newTriangles[newTriangleCount++] = triangles[i+1];
-                newTriangles[newTriangleCount++] = triangles[i+2];
+                newTriangles[newTriangleCount++] = triangles[i + 1];
+                newTriangles[newTriangleCount++] = triangles[i + 2];
             }
         }
 
         MeshManager.Instance.mesh.triangles = newTriangles;
 
         return true;
-        
+
     }
-    
+
 
     /// <summary>
     /// Incision 전용
@@ -108,29 +108,30 @@ public class BFS
     /// <param name="startPoint"></param>
     /// <param name="endPoint"></param>
     /// <param name="isLeft"></param>
-    public static void Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, bool isLeft, float zMin, float zMax)
+    public static List<int> Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, float zMin, float zMax, int currentIndex, int firstOuterVertexIndex, int lastOuterVertexIndex)
     {
+        List<int> result = new List<int>();
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
         List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
-        int currentIndex = IncisionManager.Instance.currentIndex;
+
         Debug.Log(currentIndex);
         // vertex_num
         Queue<int> temp = new Queue<int>();
         HashSet<int> duplicateCheck = new HashSet<int>();
         duplicateCheck.Add(vertex_num);
-        duplicateCheck.Add(IncisionManager.Instance.firstOuterVertexIndex);
-        duplicateCheck.Add(IncisionManager.Instance.lastOuterVertexIndex);
-        
+        duplicateCheck.Add(firstOuterVertexIndex);
+        duplicateCheck.Add(lastOuterVertexIndex);
+
         temp.Enqueue(vertex_num);
         int exceptionalErrorCheck = 0;
         while (temp.Count != 0)
         {
             exceptionalErrorCheck++;
-            if(exceptionalErrorCheck==4000)
+            if (exceptionalErrorCheck == 4000)
             {
                 ChatManager.Instance.GenerateMessage(" BFS 에러");
-                return;
+                return result;
                 //여기에 다른 초기화 함수들 다시 넣고 다 해야됨.
             }
             foreach (int item in AdjacencyList.Instance.connectedVertices[temp.Dequeue()])
@@ -157,23 +158,14 @@ public class BFS
                     if (worldVertices[item].z < zMax && worldVertices[item].z > zMin)
                     {
                         temp.Enqueue(item);
-                        if (isLeft)
-                        {
-                            //float sideTemp = Mathf.Sign((endPoint.x - startPoint.x) * (worldVertices[item].y - startPoint.y) - (endPoint.y - startPoint.y) * (worldVertices[item].x - startPoint.x));
-                            //if (sideTemp >= -0.001)
-                                IncisionManager.Instance.leftSide[currentIndex].Add(item);
-                        }
-                        else
-                        {
-                            //float sideTemp = Mathf.Sign((endPoint.x - startPoint.x) * (worldVertices[item].y - startPoint.y) - (endPoint.y - startPoint.y) * (worldVertices[item].x - startPoint.x));
-                            //if (sideTemp <= 0.001)
-                                IncisionManager.Instance.rightSide[currentIndex].Add(item);
-                        }
+                        result.Add(item);
+
                     }
                 }
             }
         }
+        return result;
     }
-    
+
 
 }

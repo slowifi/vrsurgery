@@ -47,7 +47,7 @@ public class CHD : MonoBehaviour
     public void Exit()
     {
         Debug.Log("Exit");
-        
+
         EventManager.Instance.Events.InvokeModeManipulate("EndAll");
         MeshManager.Instance.SaveCurrentMesh();
 
@@ -72,7 +72,7 @@ public class CHD : MonoBehaviour
         MeshManager.Instance.startMeasurePoint.SetActive(false);
         MeshManager.Instance.endMeasurePoint.SetActive(false);
 
-        
+
     }
 
     public void ResetMain()
@@ -95,11 +95,10 @@ public class CHD : MonoBehaviour
             }
             Destroy(mode);
         }
-        
+
         MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Reinitialize();
         AdjacencyList.Instance.ListUpdate();
-        IncisionManager.Instance.Reinitialize();
         MakeDoubleFaceMesh.Instance.Reinitialize();
         MeshManager.Instance.startMeasurePoint.SetActive(false);
         MeshManager.Instance.endMeasurePoint.SetActive(false);
@@ -142,7 +141,6 @@ public class CHD : MonoBehaviour
         MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Initialize();
         AdjacencyList.Instance.Initialize();
-        IncisionManager.Instance.Initialize();
         MakeDoubleFaceMesh.Instance.Initialize();
     }
 

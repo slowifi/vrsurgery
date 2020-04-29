@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
 
-public class IncisionManager : Singleton<IncisionManager>
+public class IncisionManager : MonoBehaviour
 {
     public Dictionary<int, Vector3> newVertices;
     public Dictionary<int, int> newTriangles;
@@ -41,13 +41,49 @@ public class IncisionManager : Singleton<IncisionManager>
     private List<GameObject> leftVectorObject;
     private List<GameObject> rightVectorObject;
 
-
     public int currentIndex;
     private int trianglesCount;
 
-    private DivideTriangle _dividingMethods;
 
     private IntPtr heart;
+
+    public IncisionManager()
+    {
+        startVertexPosition = Vector3.zero;
+        //startInnerVertexPosition = Vector3.zero;
+        endVertexPosition = Vector3.zero;
+        //endInnerVertexPosition = Vector3.zero;
+
+        startOuterTriangleIndex = -1;
+        //startInnerTriangleIndex = -1;
+        endOuterTriangleIndex = -1;
+        //endInnerTriangleIndex = -1;
+        trianglesCount = 0;
+        currentIndex = 0;
+
+        startVertexIndex = -1;
+        endVertexIndex = -1;
+
+        startScreenRay = new Ray();
+        endScreenRay = new Ray();
+
+        startPointIndices = new List<int>();
+        endPointIndices = new List<int>();
+
+        leftSide = new List<List<int>>();
+        rightSide = new List<List<int>>();
+
+        leftVectorObject = new List<GameObject>();
+        rightVectorObject = new List<GameObject>();
+
+        leftSideWeight = new List<List<float>>();
+        rightSideWeight = new List<List<float>>();
+
+        newVertices = new Dictionary<int, Vector3>();
+        newTriangles = new Dictionary<int, int>();
+
+    }
+
 
     public void SetHeartCGAL()
     {
@@ -115,7 +151,7 @@ public class IncisionManager : Singleton<IncisionManager>
     public void TestGenerateCGAL()
     {
         SetHeartCGAL();
-        
+
         float radius_f = Vector3.Distance(startVertexPosition, endVertexPosition) / 2;
         GameObject v_test = new GameObject();
         v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -180,8 +216,24 @@ public class IncisionManager : Singleton<IncisionManager>
         ////leftSide[currentIndex] = leftSideTemp.ToList();
         ////rightSide[currentIndex] = rightSideTemp.ToList();
 
-        BFS.Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, true, zMin, zMax);
-        BFS.Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, false, zMin, zMax);
+        List<int> leftItems = BFS.Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, zMin, zMax, currentIndex, firstOuterVertexIndex, lastOuterVertexIndex);
+        List<int> rightItems = BFS.Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, zMin, zMax, currentIndex, firstOuterVertexIndex, lastOuterVertexIndex);
+
+        if (leftItems.Count > 0 && rightItems.Count > 0)
+        {
+            foreach (int item in leftItems)
+            {
+                leftSide[currentIndex].Add(item);
+
+            }
+            foreach (int item in rightItems)
+            {
+                rightSide[currentIndex].Add(item);
+
+            }
+        }
+
+
 
         startPointIndices.Add(newTriangles.Values.First());
         endPointIndices.Add(worldPosition.Count - 1);
@@ -245,7 +297,7 @@ public class IncisionManager : Singleton<IncisionManager>
 
         Vector3 leftVector = leftVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
         Vector3 rightVector = rightVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
-        DeformCGAL(leftVector.normalized/10f);
+        DeformCGAL(leftVector.normalized / 10f);
     }
 
     public void Extending(int incisionIndex, float currentExtendValue, float oldExtendValue)
@@ -345,7 +397,7 @@ public class IncisionManager : Singleton<IncisionManager>
             }
         }
 
-        _dividingMethods.DivideTrianglesStartIncision(startVertexPosition, outerEdgePoint, startOuterTriangleIndex, outerNotEdgeVertex, outerEdgeIdx, ref outerTriangleCount, false);
+        DivideTrianglesStartIncision(startVertexPosition, outerEdgePoint, startOuterTriangleIndex, outerNotEdgeVertex, outerEdgeIdx, ref outerTriangleCount, false);
 
         while (true)
         {
@@ -362,7 +414,7 @@ public class IncisionManager : Singleton<IncisionManager>
 
             if (outerTriangleIndex == endOuterTriangleIndex)
             {
-                _dividingMethods.DivideTrianglesEndIncision(endVertexPosition, endOuterTriangleIndex, ref outerTriangleCount, outerEdgeIdx, false);
+                DivideTrianglesEndIncision(endVertexPosition, endOuterTriangleIndex, ref outerTriangleCount, outerEdgeIdx, false);
                 endVertexIndex = startVertexIndex + newVertices.Count - 1;
                 break;
             }
@@ -370,9 +422,9 @@ public class IncisionManager : Singleton<IncisionManager>
             outerSide = Intersections.TriangleEdgeIntersection(ref outerEdgeIdx, ref outerEdgePoint, startVertexPosition, endVertexPosition, ref outerTriangleIndex, startScreenRay, endScreenRay, edgeList, worldVertices);
 
             if (outerSide == 2)
-                _dividingMethods.DivideTrianglesClockWiseIncision(outerEdgePoint, edgeList[outerEdgeIdx].tri1, ref outerTriangleCount, outerEdgeIdx, false);
+                DivideTrianglesClockWiseIncision(outerEdgePoint, edgeList[outerEdgeIdx].tri1, ref outerTriangleCount, outerEdgeIdx, false);
             else if (outerSide == 1)
-                _dividingMethods.DivideTrianglesCounterClockWiseIncision(outerEdgePoint, edgeList[outerEdgeIdx].tri1, ref outerTriangleCount, outerEdgeIdx, false);
+                DivideTrianglesCounterClockWiseIncision(outerEdgePoint, edgeList[outerEdgeIdx].tri1, ref outerTriangleCount, outerEdgeIdx, false);
             else
             {
                 ChatManager.Instance.GenerateMessage(" 자를 수 없는 Edge 입니다.");
@@ -406,74 +458,191 @@ public class IncisionManager : Singleton<IncisionManager>
         newTriangles.Clear();
     }
 
-    public void Reinitialize()
-    {
-        startVertexPosition = Vector3.zero;
-        endVertexPosition = Vector3.zero;
-
-        startOuterTriangleIndex = -1;
-        endOuterTriangleIndex = -1;
-        trianglesCount = 0;
-        currentIndex = 0;
-        startVertexIndex = -1;
-        endVertexIndex = -1;
-        startScreenRay = new Ray();
-        endScreenRay = new Ray();
-
-        startPointIndices = new List<int>();
-        endPointIndices = new List<int>();
-
-        leftSide = new List<List<int>>();
-        rightSide = new List<List<int>>();
-
-        leftVectorObject = new List<GameObject>();
-        rightVectorObject = new List<GameObject>();
-
-        leftSideWeight = new List<List<float>>();
-        rightSideWeight = new List<List<float>>();
-
-        newVertices = new Dictionary<int, Vector3>();
-        newTriangles = new Dictionary<int, int>();
-
-        _dividingMethods = new DivideTriangle();
-    }
 
     // elements가 10만개 넘으면 reinitializing이 효과적이고 밑이면 그냥 clear 쓰는게 이득.
-    protected override void InitializeChild()
+
+    // divide triangle
+
+
+    //incision
+    private void DivideTrianglesStartIncision(Vector3 centerPosition, Vector3 newEdgeVertexPosition, int triangleIdx, int vertexIndex, int edgeIdx, ref int triangleCount, bool isInner)
     {
-        startVertexPosition = Vector3.zero;
-        //startInnerVertexPosition = Vector3.zero;
-        endVertexPosition = Vector3.zero;
-        //endInnerVertexPosition = Vector3.zero;
+        int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + newTriangles.Count;
+        int newVertexLength = MeshManager.Instance.mesh.vertexCount + newVertices.Count;
+        int currentIncisionIndex = currentIndex;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
 
-        startOuterTriangleIndex = -1;
-        //startInnerTriangleIndex = -1;
-        endOuterTriangleIndex = -1;
-        //endInnerTriangleIndex = -1;
-        trianglesCount = 0;
-        currentIndex = 0;
+        if (!isInner)
+        {
+            // outer 딱 가운데 점들만 모으고 나서 BFS할 때 쓰일 vtx는 따로 찾는걸로.
+            firstOuterVertexIndex = newVertexLength;
+            leftSide[currentIncisionIndex].Add(newVertexLength + 1);
+            rightSide[currentIncisionIndex].Add(newVertexLength + 2);
+        }
 
-        startVertexIndex = -1;
-        endVertexIndex = -1;
+        newTriangles.Add(triangleIdx, newVertexLength);
+        newTriangles.Add(triangleIdx + 1, edgeList[edgeIdx].vtx1);
+        newTriangles.Add(triangleIdx + 2, newVertexLength + 1);
 
-        startScreenRay = new Ray();
-        endScreenRay = new Ray();
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, newVertexLength + 2);
+        newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx2);
 
-        startPointIndices = new List<int>();
-        endPointIndices = new List<int>();
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx2);
+        newTriangles.Add(triangleCount++, vertexIndex);
 
-        leftSide = new List<List<int>>();
-        rightSide = new List<List<int>>();
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, vertexIndex);
+        newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx1);
 
-        leftVectorObject = new List<GameObject>();
-        rightVectorObject = new List<GameObject>();
+        // 이걸 반환해줘야됨.
+        newVertices.Add(newVertexLength++, centerPosition);
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
 
-        leftSideWeight = new List<List<float>>();
-        rightSideWeight = new List<List<float>>();
+    }
 
-        newVertices = new Dictionary<int, Vector3>();
-        newTriangles = new Dictionary<int, int>();
+    private void DivideTrianglesEndIncision(Vector3 centerPosition, int triangleIdx, ref int triangleCount, int edgeIdx, bool isInner)
+    {
+        int newTriangleLength;
+        int newVertexLength;
+        // 지금 이부분에 문제가 있는데 뭐가 문젠지 모르겠다 어떻게 뚫리게된거지?
+        newTriangleLength = MeshManager.Instance.mesh.triangles.Length + newTriangles.Count;
+        newVertexLength = MeshManager.Instance.mesh.vertexCount + newVertices.Count;
 
-        _dividingMethods = new DivideTriangle();
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
+
+        int notEdgeVertex = -1;
+        for (int i = 0; i < 3; i++)
+        {
+            if (edgeList[edgeIdx].vtx1 == edgeList[triangleIdx + i].vtx2)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx1;
+                break;
+            }
+            else if (edgeList[edgeIdx].vtx2 == edgeList[triangleIdx + i].vtx1)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx2;
+                break;
+            }
+        }
+
+
+        if (!isInner)
+            lastOuterVertexIndex = newVertexLength;
+
+
+        //left
+        newTriangles.Add(triangleIdx, newVertexLength);
+        newTriangles.Add(triangleIdx + 1, newVertexLength - 2);
+        newTriangles.Add(triangleIdx + 2, edgeList[edgeIdx].vtx2);
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx2);
+        newTriangles.Add(triangleCount++, notEdgeVertex);
+
+        //right
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, notEdgeVertex);
+        newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx1);
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, edgeList[edgeIdx].vtx1);
+        newTriangles.Add(triangleCount++, newVertexLength - 1);
+
+        newVertices.Add(newVertexLength++, centerPosition);
+    }
+
+    private void DivideTrianglesClockWiseIncision(Vector3 newEdgeVertexPosition, int triangleIdx, ref int triangleCount, int intersectEdgeIdx, bool isInner)
+    {
+        int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + newTriangles.Count;
+        int newVertexLength = MeshManager.Instance.mesh.vertexCount + newVertices.Count;
+        int currentIncisionIndex = currentIndex;
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
+
+        int notEdgeVertex = -1;
+        for (int i = 0; i < 3; i++)
+        {
+            if (edgeList[intersectEdgeIdx].vtx1 == edgeList[triangleIdx + i].vtx2)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx1;
+                break;
+            }
+            else if (edgeList[intersectEdgeIdx].vtx2 == edgeList[triangleIdx + i].vtx1)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx2;
+                break;
+            }
+        }
+
+        if (!isInner)
+        {
+            leftSide[currentIncisionIndex].Add(newVertexLength);
+            rightSide[currentIncisionIndex].Add(newVertexLength + 1);
+        }
+
+
+        //left
+        newTriangles.Add(triangleIdx, newVertexLength - 2);
+        newTriangles.Add(triangleIdx + 1, edgeList[intersectEdgeIdx].vtx1);
+        newTriangles.Add(triangleIdx + 2, newVertexLength);
+
+        //right
+        newTriangles.Add(triangleCount++, newVertexLength - 1);
+        newTriangles.Add(triangleCount++, newVertexLength + 1);
+        newTriangles.Add(triangleCount++, edgeList[intersectEdgeIdx].vtx2);
+        newTriangles.Add(triangleCount++, newVertexLength - 1);
+        newTriangles.Add(triangleCount++, edgeList[intersectEdgeIdx].vtx2);
+        newTriangles.Add(triangleCount++, notEdgeVertex);
+
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
+    }
+
+    private void DivideTrianglesCounterClockWiseIncision(Vector3 newEdgeVertexPosition, int triangleIdx, ref int triangleCount, int intersectEdgeIdx, bool isInner)
+    {
+        int newTriangleLength = MeshManager.Instance.mesh.triangles.Length + newTriangles.Count;
+        int newVertexLength = MeshManager.Instance.mesh.vertexCount + newVertices.Count;
+        int currentIncisionIndex = currentIndex;
+
+        List<Edge> edgeList = AdjacencyList.Instance.edgeList;
+
+        int notEdgeVertex = -1;
+        for (int i = 0; i < 3; i++)
+        {
+            if (edgeList[intersectEdgeIdx].vtx1 == edgeList[triangleIdx + i].vtx2)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx1;
+                break;
+            }
+            else if (edgeList[intersectEdgeIdx].vtx2 == edgeList[triangleIdx + i].vtx1)
+            {
+                notEdgeVertex = edgeList[triangleIdx + i].vtx2;
+                break;
+            }
+        }
+
+        if (!isInner)
+        {
+            leftSide[currentIncisionIndex].Add(newVertexLength);
+            rightSide[currentIncisionIndex].Add(newVertexLength + 1);
+        }
+
+
+
+        //right
+        newTriangles.Add(triangleIdx, newVertexLength - 1);
+        newTriangles.Add(triangleIdx + 1, newVertexLength + 1);
+        newTriangles.Add(triangleIdx + 2, edgeList[intersectEdgeIdx].vtx2);
+
+        //left
+        newTriangles.Add(triangleCount++, newVertexLength - 2);
+        newTriangles.Add(triangleCount++, edgeList[intersectEdgeIdx].vtx1);
+        newTriangles.Add(triangleCount++, newVertexLength);
+        newTriangles.Add(triangleCount++, newVertexLength - 2);
+        newTriangles.Add(triangleCount++, notEdgeVertex);
+        newTriangles.Add(triangleCount++, edgeList[intersectEdgeIdx].vtx1);
+
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
+        newVertices.Add(newVertexLength++, newEdgeVertexPosition);
     }
 }
