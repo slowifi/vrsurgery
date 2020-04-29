@@ -3,7 +3,7 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 
-public class SliceMode : Mode
+public class SliceMode : MonoBehaviour
 {
     private Ray oldRay;
     private GameObject leftHeart;

@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System;
-using SimpleFileBrowser;
+using Crosstales.FB;
+//using SimpleFileBrowser;
 
 
 public class ExportMesh : MonoBehaviour
@@ -24,26 +25,24 @@ public class ExportMesh : MonoBehaviour
     public int normalOffset = 0;
     public int uvOffset = 0;
 
-    IEnumerator ShowSaveDialogCoroutine()
-    {
-        yield return FileBrowser.WaitForSaveDialog(true, "/storage/emulated/0/hearts", "Save File", "Save");
-
-        if (FileBrowser.Success)
-        {
-            Exporting(FileBrowser.Result);
-            playerObject.SetActive(true);
-        }
-    }
 
     public void FileBrowsing()
     {
-        //FileBrowser.SetFilters(false, new FileBrowser.Filter("obj files", ".obj"));
+        bool player = playerObject.activeSelf;
         playerObject.SetActive(false);
-        StartCoroutine(ShowSaveDialogCoroutine());
+        string path = FileBrowser.SaveFile(extension:"obj");
+        if(path=="")
+        {
+            Debug.Log("저장 안됨");
+        }
+        else
+        {
+            Debug.Log(path);
+            Exporting(path);
+        }
+        playerObject.SetActive(player);
+
     }
-
-
-
 
     string MeshToString(MeshFilter mf, Dictionary<string, ObjMaterial> materialList)
     {
@@ -111,14 +110,13 @@ public class ExportMesh : MonoBehaviour
         return new Dictionary<string, ObjMaterial>();
     }
 
-    void MeshToFile(MeshFilter mf, string folder, string filename)
+    void MeshToFile(MeshFilter mf, string path)
     {
         Dictionary<string, ObjMaterial> materialList = PrepareFileWrite();
 
-        using (StreamWriter sw = new StreamWriter(folder + "/" + filename + ".obj"))
+        using (StreamWriter sw = new StreamWriter(path))
         {
-            sw.Write("mtllib ./" + filename + ".mtl\n");
-
+            //sw.Write("mtllib ./" + filename + ".mtl\n");
             sw.Write(MeshToString(mf, materialList));
         }
 
@@ -130,7 +128,7 @@ public class ExportMesh : MonoBehaviour
         //여기에 현재 모델 집어 넣으면됨.
         //이름도 지정해서 index줘서 집어넣을까.
         MeshFilter obj = MeshManager.Instance.Heart.GetComponent<MeshFilter>();
-        MeshToFile(obj, path, "ModifiedHeart"+exportCount);
+        MeshToFile(obj, path);//, "ModifiedHeart"+exportCount);
         exportCount++;
     }
 

@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.InteropServices;
 
 public class IncisionManager : Singleton<IncisionManager>
 {
@@ -35,6 +36,8 @@ public class IncisionManager : Singleton<IncisionManager>
     private int startVertexIndex;
     private int endVertexIndex;
 
+    private int middleIndextest;
+
     private List<GameObject> leftVectorObject;
     private List<GameObject> rightVectorObject;
 
@@ -43,6 +46,42 @@ public class IncisionManager : Singleton<IncisionManager>
     private int trianglesCount;
 
     private DivideTriangle _dividingMethods;
+
+    private IntPtr heart;
+
+    public void SetHeartCGAL()
+    {
+        AdjacencyList.Instance.ListUpdate();
+        heart = CGAL.CreateMeshObject();
+        float[] verticesCoordinate = CGAL.ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
+        CGAL.BuildPolyhedron(heart,
+            verticesCoordinate,
+            verticesCoordinate.Length / 3,
+            MeshManager.Instance.mesh.triangles,
+            MeshManager.Instance.mesh.triangles.Length / 3);
+    }
+
+    public void SetPreprocessCGAL(int centerIndex, float radius)
+    {
+        CGAL.PreprocessDeformMesh(heart, centerIndex, radius, 0.5f);
+        IntPtr asdf = CGAL.GetRoiVertices(heart);
+        int[] lengthTemp = new int[1];
+        Marshal.Copy(asdf, lengthTemp, 0, 1);
+        int length = lengthTemp[0];
+        int[] verticesIndex = new int[length];
+        Marshal.Copy(asdf, verticesIndex, 1, length);
+        Debug.Log(verticesIndex[0]);
+        Debug.Log(verticesIndex.Length);
+    }
+
+    public void DeformCGAL(Vector3 direction)
+    {
+        Mesh mesh = MeshManager.Instance.mesh;
+        float[] directionFloat = { direction.x, direction.y, direction.z };
+        CGAL.DeformMesh(heart, directionFloat);
+        Vector3[] newVertices = CGAL.ConvertToVector(CGAL.GetVertices(heart), CGAL.GetNumberOfVertices(heart), GameObject.Find("PartialModel").transform);
+        mesh.vertices = newVertices;
+    }
 
     // 여기서 버텍스 두개 입력 받고 start end points
     // 기존것들은 유지한 상태에서 추가
@@ -73,15 +112,29 @@ public class IncisionManager : Singleton<IncisionManager>
         mesh.triangles = triangles;
     }
 
+    public void TestGenerateCGAL()
+    {
+        SetHeartCGAL();
+        
+        float radius_f = Vector3.Distance(startVertexPosition, endVertexPosition) / 2;
+        GameObject v_test = new GameObject();
+        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        v_test.transform.position = startVertexPosition;
+
+        v_test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        v_test.transform.position = endVertexPosition;
+        SetPreprocessCGAL(middleIndextest, radius_f);
+    }
+
     public void GenerateIncisionList()
     {
         AdjacencyList.Instance.WorldPositionUpdate();
         Vector3[] vertices = MeshManager.Instance.mesh.vertices;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        //MeshManager.Instance.mesh.vertices = AdjacencyList.Instance.worldPositionVertices.ToArray();
+        ////MeshManager.Instance.mesh.vertices = AdjacencyList.Instance.worldPositionVertices.ToArray();
         leftSideWeight.Add(new List<float>());
         rightSideWeight.Add(new List<float>());
-        
+
         float zMin = 1000000;
         float zMax = -1000000;
 
@@ -93,52 +146,51 @@ public class IncisionManager : Singleton<IncisionManager>
             if (tempZ > zMax)
                 zMax = tempZ;
         }
-        
+        middleIndextest = leftSide[currentIndex][leftSide[currentIndex].Count / 2];
         zMax += MeshManager.Instance.pivotTransform.lossyScale.z;
         zMin -= MeshManager.Instance.pivotTransform.lossyScale.z;
-        //Debug.Log(startVertexIndex);
-        //Debug.Log(endVertexIndex);
-        //Debug.Log(leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
-        //Debug.Log(rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
+        ////Debug.Log(startVertexIndex);
+        ////Debug.Log(endVertexIndex);
+        ////Debug.Log(leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
+        ////Debug.Log(rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
 
-        //int[] leftSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 3]);
-        //int[] rightSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 3]);
+        ////int[] leftSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 3]);
+        ////int[] rightSideTemptest = CGAL.ExtractCircleByBFS_Test(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 3]);
 
-        //foreach (var item in rightSideTemptest)
-        //{
-        //    GameObject v_test1 = new GameObject();
-        //    v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        //    v_test1.transform.position = worldPosition[item];
-        //}
+        ////foreach (var item in rightSideTemptest)
+        ////{
+        ////    GameObject v_test1 = new GameObject();
+        ////    v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        ////    v_test1.transform.position = worldPosition[item];
+        ////}
 
-        //foreach (var item in leftSideTemptest)
-        //{
-        //    GameObject v_test1 = new GameObject();
-        //    v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        //    v_test1.transform.position = worldPosition[item];
-        //}
+        ////foreach (var item in leftSideTemptest)
+        ////{
+        ////    GameObject v_test1 = new GameObject();
+        ////    v_test1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        ////    v_test1.transform.position = worldPosition[item];
+        ////}
 
-        //int[] leftSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
-        //int[] rightSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
+        ////int[] leftSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, leftSide[currentIndex][leftSide[currentIndex].Count - 1]);
+        ////int[] rightSideTemp = CGAL.ExtractCircleByBFS(startVertexIndex, endVertexIndex, rightSide[currentIndex][rightSide[currentIndex].Count - 1]);
 
+        ////leftSide[currentIndex].Clear();
+        ////rightSide[currentIndex].Clear();
 
-        //leftSide[currentIndex].Clear();
-        //rightSide[currentIndex].Clear();
-
-        //leftSide[currentIndex] = leftSideTemp.ToList();
-        //rightSide[currentIndex] = rightSideTemp.ToList();
+        ////leftSide[currentIndex] = leftSideTemp.ToList();
+        ////rightSide[currentIndex] = rightSideTemp.ToList();
 
         BFS.Circle(leftSide[currentIndex][leftSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, true, zMin, zMax);
         BFS.Circle(rightSide[currentIndex][rightSide[currentIndex].Count - 1], startVertexPosition, endVertexPosition, false, zMin, zMax);
 
         startPointIndices.Add(newTriangles.Values.First());
-        endPointIndices.Add(vertices.Length - 1);
+        endPointIndices.Add(worldPosition.Count - 1);
 
-        //Vector3 normalVector = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[newTriangles.Values.First()];
+        ////Vector3 normalVector = worldPosition[startPointIndices[currentIndex]] + MeshManager.Instance.mesh.normals[newTriangles.Values.First()];
 
         Transform objTransform = MeshManager.Instance.pivotTransform;
 
-        //여기에다가 안쪽면인지 바깥면인지를 판단 필요.
+        ////여기에다가 안쪽면인지 바깥면인지를 판단 필요.
         Vector2 rightVector = Vector2.zero;
         Vector2 leftVector = Vector2.zero;
 
@@ -152,7 +204,6 @@ public class IncisionManager : Singleton<IncisionManager>
             leftVector = Vector2.Perpendicular(worldPosition[endPointIndices[currentIndex]] - worldPosition[startPointIndices[currentIndex]]);
             rightVector = Vector2.Perpendicular(worldPosition[startPointIndices[currentIndex]] - worldPosition[endPointIndices[currentIndex]]);
         }
-
 
         leftVectorObject.Add(new GameObject("Left Vector" + currentIndex + 1));
         rightVectorObject.Add(new GameObject("Right Vector" + currentIndex + 1));
@@ -180,6 +231,23 @@ public class IncisionManager : Singleton<IncisionManager>
         MeshManager.Instance.mesh.vertices = vertices;
     }
 
+    public void testCGAL(int incisionIndex)
+    {
+        AdjacencyList.Instance.WorldPositionUpdate();
+
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        Vector3[] vertices = MeshManager.Instance.mesh.vertices;
+
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+
+        Transform objTransform = MeshManager.Instance.objTransform;
+        Transform pivotTransform = MeshManager.Instance.pivotTransform;
+
+        Vector3 leftVector = leftVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
+        Vector3 rightVector = rightVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
+        DeformCGAL(leftVector.normalized/10f);
+    }
+
     public void Extending(int incisionIndex, float currentExtendValue, float oldExtendValue)
     {
         AdjacencyList.Instance.WorldPositionUpdate();
@@ -194,17 +262,20 @@ public class IncisionManager : Singleton<IncisionManager>
 
         Vector3 leftVector = leftVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
         Vector3 rightVector = rightVectorObject[incisionIndex].transform.position - worldPosition[startPointIndices[incisionIndex]];
+
         int count = 0;
         foreach (int item in leftSide[incisionIndex])
         {
-            Vector3 temp = (currentExtendValue - oldExtendValue) * leftSideWeight[incisionIndex][count] * leftVector;
+            //Vector3 temp = (currentExtendValue - oldExtendValue) * leftSideWeight[incisionIndex][count] * leftVector; // original
+            Vector3 temp = (0.1f) * leftSideWeight[incisionIndex][count] * leftVector;
             vertices[item] = objTransform.InverseTransformPoint(worldPosition[item] + temp);
             count++;
         }
         count = 0;
         foreach (int item in rightSide[incisionIndex])
         {
-            Vector3 temp = (currentExtendValue - oldExtendValue) * rightSideWeight[incisionIndex][count] * rightVector;
+            //Vector3 temp = (currentExtendValue - oldExtendValue) * rightSideWeight[incisionIndex][count] * rightVector; // original
+            Vector3 temp = (0.1f) * rightSideWeight[incisionIndex][count] * rightVector;
             vertices[item] = objTransform.InverseTransformPoint(worldPosition[item] + temp);
             count++;
         }

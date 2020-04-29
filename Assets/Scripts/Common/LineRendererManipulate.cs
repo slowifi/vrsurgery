@@ -10,7 +10,7 @@ public class LineRendererManipulate
         lineObject.layer = 8;
         lineObject.transform.SetParent(parent);
         lineObject.GetComponent<LineRenderer>().numCornerVertices = 45;
-        lineObject.GetComponent<LineRenderer>().material.color = Color.blue;
+        lineObject.GetComponent<LineRenderer>().material = Resources.Load("Materials/LineRenderer", typeof(Material)) as Material;
     }
 
     public void SetLineRenderer(Vector3 rayOldOrigin, Vector3 rayNewOrigin)

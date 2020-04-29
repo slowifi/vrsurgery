@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using UnityEditor;
 
-public class BoundaryCutMode : Mode
+public class BoundaryCutMode : MonoBehaviour
 {
     private bool isLast;
     private int boundaryCount;
@@ -146,7 +146,6 @@ public class BoundaryCutMode : Mode
                 Debug.Log(" 만들어지지 않음");
             }
             CGAL.FillHole(stamp);
-
             
             CGAL.ClipPolyhedronByMesh(heart, stamp);
             MeshManager.Instance.SetNewObject(CGAL.GenerateNewObject(heart, heartMaterial));
@@ -154,7 +153,6 @@ public class BoundaryCutMode : Mode
             //CGAL.GenerateNewObject(stamp, leftMaterial);
             // 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
             //MeshManager.Instance.Heart.SetActive(false);
-
         }
         else
         {

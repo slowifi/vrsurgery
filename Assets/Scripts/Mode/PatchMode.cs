@@ -3,119 +3,114 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class PatchMode : Mode
+public class PatchMode : MonoBehaviour
 {
-    private bool isFirstPatch;
     private bool isPatchUpdate;
+    private bool isLastPatch;
     private int patchCount;
     private Vector3 oldPosition;
     private Vector3 firstPosition;
-    private GameObject lineRenderer;
-    MeasureManager MeasureManager;
-
+    private Ray oldRay;
+    private Ray firstRay;
+    private LineRendererManipulate lineRenderer;
+    private PatchManager patchManager;
     // patch manager 싹 다 손봐야됨.
 
-    void Awake()
+    private void FirstSet()
     {
-        MeasureManager = new MeasureManager();
-        isFirstPatch = true;
+        lineRenderer = new LineRendererManipulate(transform);
         isPatchUpdate = false;
+        isLastPatch = false;
         oldPosition = Vector3.zero;
         patchCount = 0;
     }
+
+    void Awake()
+    {
+        FirstSet();
+        this.gameObject.AddComponent<PatchManager>();
+        patchManager = GetComponent<PatchManager>();
+    }
     void Update()
     {
+        // 패치 방법부터 바꿔야됨.
         Ray cameraRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        // 처음에 실행되어야함.
-        if (isFirstPatch)
+        if(isLastPatch)
         {
-            Debug.Log("Patch 실행");
-            isFirstPatch = false;
-            return;
+            Destroy(lineRenderer.lineObject);
+            patchManager.GenerateMesh();
+            isPatchUpdate = true;
+            isLastPatch = false;
         }
         else if (isPatchUpdate)
         {
             // 숫자에 patch index들어가는게 좋을듯. 지금 patch, incision 관련해서는 리스트화는 시켜놨음. 추후 undo등 작업 가능.
-            PatchManager.Instance.UpdateCurve(PatchManager.Instance.newPatch.Count - 1);
+            patchManager.UpdateCurve(patchManager.newPatch.Count - 1);
         }
         else if (Input.GetMouseButtonDown(0))
         {
-            Vector3 vertexPosition = MeasureManager.vertexPosition(cameraRay);
-            if (vertexPosition != Vector3.zero)
+            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
+            if (intersectedValues.Intersected)
             {
-                firstPosition = vertexPosition;
+                firstRay = ray;
+                oldRay = ray;
+                firstPosition = intersectedValues.IntersectedPosition;
+                oldPosition = intersectedValues.IntersectedPosition;
                 EventManager.Instance.Events.InvokeModeManipulate("StopAll");
                 AdjacencyList.Instance.ListUpdate();
-                PatchManager.Instance.Generate();
-                PatchManager.Instance.AddVertex(vertexPosition);
-                oldPosition = vertexPosition;
-
-                Vector3 oldPos = oldPosition;
-                oldPos.z += 1f;
+                patchManager.Generate();
+                patchManager.AddVertex(intersectedValues.IntersectedPosition);
             }
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            EventManager.Instance.Events.InvokeModeManipulate("EndAll");
             if (oldPosition == Vector3.zero)
                 return;
-            Destroy(lineRenderer);
-            PatchManager.Instance.GenerateMesh();
-            isPatchUpdate = true;
+            EventManager.Instance.Events.InvokeModeManipulate("EndAll");
+            lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100, firstRay.origin + firstRay.direction * 100);
+            isLastPatch = true;
         }
         else if (Input.GetMouseButton(0))
         {
             if (oldPosition == Vector3.zero)
                 return;
-            Vector3 vertexPosition = MeasureManager.vertexPosition(cameraRay);
-            if (vertexPosition != Vector3.zero)
+            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
+            
+            if (intersectedValues.Intersected)
             {
                 //first position이 저장되어 있어야함.
-                if (patchCount > 8 && Vector3.Distance(firstPosition, vertexPosition) < 2.0f * MeshManager.Instance.pivotTransform.lossyScale.z)
+                if (patchCount > 8 && Vector3.Distance(firstPosition, intersectedValues.IntersectedPosition) < 2.0f * MeshManager.Instance.pivotTransform.lossyScale.z)
                 {
                     EventManager.Instance.Events.InvokeModeManipulate("EndAll");
-                    Destroy(lineRenderer);
-                    PatchManager.Instance.GenerateMesh();
-                    isPatchUpdate = true;
+                    isLastPatch = true;
                     return;
                 }
 
-                PatchManager.Instance.AddVertex(vertexPosition);
-                LineRenderer line;
+                patchManager.AddVertex(intersectedValues.IntersectedPosition);
 
                 if (patchCount != 0)
                 {
-                    line = lineRenderer.GetComponent<LineRenderer>();
-                    line.positionCount++;
+                    lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100, ray.origin + ray.direction * 100);
                 }
                 else
                 {
-                    lineRenderer = new GameObject("Patch Line", typeof(LineRenderer));
-                    lineRenderer.layer = 8;
-                    line = lineRenderer.GetComponent<LineRenderer>();
-                    line.numCornerVertices = 45;
-                    line.material.color = Color.black;
-                    line.SetPosition(0, oldPosition);
+                    lineRenderer.SetFixedLineRenderer(oldRay.origin + oldRay.direction * 100, ray.origin + ray.direction * 100);
                 }
-
-                line.SetPosition(patchCount + 1, vertexPosition);
                 patchCount++;
-                oldPosition = vertexPosition;
+                oldPosition = intersectedValues.IntersectedPosition;
+                oldRay = ray;
                 return;
             }
             else
             {
                 if (patchCount == 0)
                     return;
-                Destroy(lineRenderer);
-                PatchManager.Instance.RemovePatchVariables();
+                Destroy(lineRenderer.lineObject);
+                patchManager.RemovePatchVariables();
                 ChatManager.Instance.GenerateMessage(" 패치 라인이 심장을 벗어났습니다.");
-                EventManager.Instance.Events.InvokeModeManipulate("EndAll");
-                // 이게 또 겹쳐부렀네
-
-
-                Destroy(this);
-                // return true;
+                FirstSet();
             }
         }
         return;

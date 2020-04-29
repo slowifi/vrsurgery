@@ -3,7 +3,7 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 
-public class DrawingCutMode : Mode
+public class DrawingCutMode : MonoBehaviour
 {
 
     private Vector3 oldPosition;

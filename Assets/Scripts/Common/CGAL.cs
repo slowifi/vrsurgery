@@ -85,6 +85,32 @@ public class CGAL
     [DllImport("CGALtest_dll.dll", EntryPoint = "VertexNormal", CallingConvention = CallingConvention.Cdecl)]
     public static extern float vertexNormal(IntPtr value, int v);
 
+    [DllImport("CGALtest_dll.dll", EntryPoint = "GetRoiVertices", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr GetRoiVertices(IntPtr value);
+
+    [DllImport("CGALtest_dll.dll", EntryPoint = "GetControlVertices", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr GetControlVertices(IntPtr value);
+
+    public void RabbitIncision(int centerIndex, float radius)
+    {
+        IntPtr heart = CreateMeshObject();
+        float[] verticesCoordinate = ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
+        BuildPolyhedron(heart,
+            verticesCoordinate,
+            verticesCoordinate.Length / 3,
+            MeshManager.Instance.mesh.triangles,
+            MeshManager.Instance.mesh.triangles.Length / 3);
+
+        PreprocessDeformMesh(heart, centerIndex, radius, 0.1f);
+        
+        Vector3[] newVertices = ConvertToVector(GetVertices(heart), GetNumberOfVertices(heart), GameObject.Find("PartialModel").transform);
+        MeshManager.Instance.mesh.vertices = newVertices;
+
+    }
+
+
+
+
 
 
     public void Slicer(Vector3 firstPoint, Vector3 lastPoint, Vector3 rayOrigin)
@@ -175,7 +201,7 @@ public class CGAL
         return indexList;
     }
 
-    public void NewversionOfBoundaryCut(List<Vector3> clipperVertices, List<Vector3> rayDirections, Vector3 rayDirection)
+    public void NewBoundaryCut(List<Vector3> clipperVertices, List<Vector3> rayDirections, Vector3 rayDirection)
     {
         //Debug.Log(clipperVertices.Count);
         IntPtr heart = CreateMeshObject();
@@ -286,7 +312,6 @@ public class CGAL
             vertices[i].y = verticesCoordinate[newCount++];
             vertices[i].z = verticesCoordinate[newCount++] + 100f;
         }
-
         return vertices;
     }
 
@@ -367,8 +392,6 @@ public class CGAL
             newTriangles[newCount++] = newVertexCount;
             newTriangles[newCount++] = ++newVertexCount;
         }
-
-
         // 그냥 여기 뒤에 holefilling 넣어야 맞겠다. 
 
         //GameObject newObject = new GameObject("Heart_", typeof(MeshFilter), typeof(MeshRenderer));
@@ -382,7 +405,6 @@ public class CGAL
         //newMesh.vertices = newVertices;
         //newMesh.triangles = newTriangles;
         //newMesh.RecalculateNormals();
-
     }
 
     public static void GenerateStampWithHeart(List<Vector3> verticesPos, List<Ray> rayList, ref Vector3[] newVertices, ref int[] newTriangles)

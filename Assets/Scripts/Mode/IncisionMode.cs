@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class IncisionMode : Mode
+public class IncisionMode : MonoBehaviour
 {
     private bool firstIncision;
     private float oldExtendValue;
     private Vector3 oldPosition;
     private LineRendererManipulate lineRenderer;
     private string mode;
+    private bool testbool = false;
 
     void Awake()
     {
@@ -105,6 +106,7 @@ public class IncisionMode : Mode
             }
 
             // 위에서 잘못되면 끊어야됨.
+            Debug.Log(MeshManager.Instance.mesh.vertexCount);
             IncisionManager.Instance.ExecuteDividing();
             AdjacencyList.Instance.ListUpdate();
             IncisionManager.Instance.GenerateIncisionList();
@@ -122,11 +124,19 @@ public class IncisionMode : Mode
     private void handleExtand()
     {
         //추후 incision된 파트들 indexing 해서 관리를 해줘야됨 + undo를 위한 작업도 미리미리 해놓는게 좋음.
+        if(testbool)
+        {
+            Debug.Log("계속 진입중");
+            //IncisionManager.Instance.testCGAL(IncisionManager.Instance.currentIndex - 1);
+            return;
+        }
         if (oldExtendValue != UIManager.Instance.extendBar.value)
         {
             IncisionManager.Instance.Extending(IncisionManager.Instance.currentIndex - 1, UIManager.Instance.extendBar.value, oldExtendValue);
             oldExtendValue = UIManager.Instance.extendBar.value;
             MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
+            IncisionManager.Instance.TestGenerateCGAL();
+            testbool = true;
         }
     }
 }

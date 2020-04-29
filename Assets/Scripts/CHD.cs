@@ -58,35 +58,41 @@ public class CHD : MonoBehaviour
         EventManager.Instance.Events.InvokeModeManipulate("EndAll");
         MeshManager.Instance.SaveCurrentMesh();
 
-        Destroy(mode);
+        if (mode != null)
+        {
+            if (mode.name == "PatchMode")
+            {
+                GameObject patchObject = GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
+                if (patchObject)
+                {
+                    MeshRenderer ren = patchObject.GetComponent<MeshRenderer>();
+                    if (ren.material.color != new Color32(115, 0, 0, 255))
+                    {
+                        patchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                        MakeDoubleFaceMesh.Instance.MakePatchInnerFace(patchObject);
+                        ren.material.color = new Color32(115, 0, 0, 255);
+                    }
+                }
+            }
+            Destroy(mode);
+        }
 
         MeshManager.Instance.startMeasurePoint.SetActive(false);
         MeshManager.Instance.endMeasurePoint.SetActive(false);
 
-        GameObject patchObject = GameObject.Find("Patch" + (PatchManager.Instance.newPatch.Count - 1));
-        if (patchObject)
-        {
-            MeshRenderer ren = patchObject.GetComponent<MeshRenderer>();
-            if (ren.material.color != new Color32(115, 0, 0, 255))
-            {
-                patchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                MakeDoubleFaceMesh.Instance.MakePatchInnerFace(patchObject);
-                ren.material.color = new Color32(115, 0, 0, 255);
-            }
-        }
+        
     }
 
     public void ResetMain()
     {
-        for (int i = 0; i < PatchManager.Instance.newPatch.Count; i++)
+        if(mode.name=="PatchMode")
         {
-            Destroy(PatchManager.Instance.newPatch[i]);
-            Destroy(GameObject.Find("Patch" + i + "_Inner"));
+
         }
+
         MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Reinitialize();
         AdjacencyList.Instance.ListUpdate();
-        PatchManager.Instance.Reinitialize();
         IncisionManager.Instance.Reinitialize();
         Debug.Log("reined");
         MakeDoubleFaceMesh.Instance.Reinitialize();
@@ -131,17 +137,16 @@ public class CHD : MonoBehaviour
     void Awake()
     {
         EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
-        
         MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Initialize();
         AdjacencyList.Instance.Initialize();
-        PatchManager.Instance.Initialize();
         IncisionManager.Instance.Initialize();
         MakeDoubleFaceMesh.Instance.Initialize();
     }
 
     void Update()
     {
+        // 여기서는 아예 update를 안돌려도 될 듯. 
         if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
         {
             AdjacencyList.Instance.WorldPositionUpdate();

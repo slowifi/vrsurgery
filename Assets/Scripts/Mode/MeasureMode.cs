@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class MeasureMode : Mode
+public class MeasureMode : MonoBehaviour
 {
     MeasureManager MeasureManager;
 
