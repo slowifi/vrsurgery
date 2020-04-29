@@ -5,39 +5,33 @@ using System.Collections.Generic;
 public class CHD : MonoBehaviour
 {
     private GameObject mode;
-    private bool isOn = false;
 
     public void SliceMode()
     {
-        isOn = true;
         mode = new GameObject("SliceMode");
         mode.AddComponent<SliceMode>();
     }
 
     public void CutMode()
     {
-        isOn = true;
         mode = new GameObject("CutMode");
         mode.AddComponent<BoundaryCutMode>();
     }
 
     public void PatchMode()
     {
-        isOn = true;
         mode = new GameObject("PatchMode");
         mode.AddComponent<PatchMode>();
     }
 
     public void MeasureMode()
     {
-        isOn = true;
         mode = new GameObject("MeasureMode");
         mode.AddComponent<MeasureMode>();
     }
 
     public void IncisionMode()
     {
-        isOn = true;
         mode = new GameObject("IncisionMode");
         mode.AddComponent<IncisionMode>();
         UIManager.Instance.extendBar.value = 0;
@@ -45,7 +39,6 @@ public class CHD : MonoBehaviour
 
     public void ButtonOff()
     {
-        isOn = false;
         //MeshManager.Instance.LoadOldMesh();
         //ButtonPress.Instance.ResetButton();
         Exit();
@@ -76,7 +69,6 @@ public class CHD : MonoBehaviour
             }
             Destroy(mode);
         }
-
         MeshManager.Instance.startMeasurePoint.SetActive(false);
         MeshManager.Instance.endMeasurePoint.SetActive(false);
 
@@ -85,22 +77,32 @@ public class CHD : MonoBehaviour
 
     public void ResetMain()
     {
-        if(mode.name=="PatchMode")
+        if (mode != null)
         {
-
+            if (mode.name == "PatchMode")
+            {
+                GameObject patchObject = GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
+                if (patchObject)
+                {
+                    MeshRenderer ren = patchObject.GetComponent<MeshRenderer>();
+                    if (ren.material.color != new Color32(115, 0, 0, 255))
+                    {
+                        patchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                        MakeDoubleFaceMesh.Instance.MakePatchInnerFace(patchObject);
+                        ren.material.color = new Color32(115, 0, 0, 255);
+                    }
+                }
+            }
+            Destroy(mode);
         }
-
+        
         MeshManager.Instance.ObjUpdate();
         MeshManager.Instance.Reinitialize();
         AdjacencyList.Instance.ListUpdate();
         IncisionManager.Instance.Reinitialize();
-        Debug.Log("reined");
         MakeDoubleFaceMesh.Instance.Reinitialize();
-        //lineRenderer = new GameObject>();
         MeshManager.Instance.startMeasurePoint.SetActive(false);
         MeshManager.Instance.endMeasurePoint.SetActive(false);
-
-        Destroy(mode);
     }
 
     private void Events_OnModeChanged(string mode)
@@ -156,9 +158,5 @@ public class CHD : MonoBehaviour
                 return;
         }
 
-        if (mode == null && isOn)
-        {
-            ButtonOff();
-        }
     }
 }
