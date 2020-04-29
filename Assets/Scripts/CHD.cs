@@ -34,20 +34,11 @@ public class CHD : MonoBehaviour
     {
         mode = new GameObject("IncisionMode");
         mode.AddComponent<IncisionMode>();
-        UIManager.Instance.extendBar.value = 0;
-    }
-
-    public void ButtonOff()
-    {
-        //MeshManager.Instance.LoadOldMesh();
-        //ButtonPress.Instance.ResetButton();
-        Exit();
+        UIManager.Instance.extendBar.value = 0.1f;
     }
 
     public void Exit()
     {
-        Debug.Log("Exit");
-
         EventManager.Instance.Events.InvokeModeManipulate("EndAll");
         MeshManager.Instance.SaveCurrentMesh();
 
@@ -71,8 +62,6 @@ public class CHD : MonoBehaviour
         }
         MeshManager.Instance.startMeasurePoint.SetActive(false);
         MeshManager.Instance.endMeasurePoint.SetActive(false);
-
-
     }
 
     public void ResetMain()

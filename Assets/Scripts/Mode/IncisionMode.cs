@@ -121,24 +121,18 @@ public class IncisionMode : MonoBehaviour
             mode = "extand";
             EventManager.Instance.Events.InvokeModeManipulate("EndWithoutScaling");
         }
-
     }
     private void handleExtand()
     {
         //추후 incision된 파트들 indexing 해서 관리를 해줘야됨 + undo를 위한 작업도 미리미리 해놓는게 좋음.
-        if (testbool)
-        {
-            Debug.Log("계속 진입중");
-            //IncisionManager.testCGAL(IncisionManager.currentIndex - 1);
-            return;
-        }
+        
         if (oldExtendValue != UIManager.Instance.extendBar.value)
         {
             IncisionManager.Extending(IncisionManager.currentIndex - 1, UIManager.Instance.extendBar.value, oldExtendValue);
             oldExtendValue = UIManager.Instance.extendBar.value;
             MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
-            IncisionManager.TestGenerateCGAL();
-            testbool = true;
+            //IncisionManager.TestGenerateCGAL();
+            //testbool = true;
         }
     }
 }

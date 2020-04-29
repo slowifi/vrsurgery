@@ -6,89 +6,89 @@ using System.Runtime.InteropServices;
 
 public class CGAL
 {
-    [DllImport("CGALtest_dll.dll", EntryPoint = "CreateMeshObject", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "CreateMeshObject", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr CreateMeshObject();
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "BuildPolyhedron", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "BuildPolyhedron", CallingConvention = CallingConvention.Cdecl)]
     public static extern int BuildPolyhedron(IntPtr value, float[] _vertices, int verticesLength, int[] _indices, int indicesLength);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "SavePolyhedron", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "SavePolyhedron", CallingConvention = CallingConvention.Cdecl)]
     public static extern int SavePolyhedron(IntPtr value, string path);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "ClipPolyhedronByMesh", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "ClipPolyhedronByMesh", CallingConvention = CallingConvention.Cdecl)]
     public static extern int ClipPolyhedronByMesh(IntPtr clippee, IntPtr clipper);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "ClipPolyhedron", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "ClipPolyhedron", CallingConvention = CallingConvention.Cdecl)]
     public static extern int ClipPolyhedron(IntPtr value, float[] _vertices, int verticesLength, int[] _indices, int indicesLength);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "GetVertices", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "GetVertices", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetVertices(IntPtr value);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "GetFaces", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "GetFaces", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetFaces(IntPtr value);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "GetNumberOfVertices", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "GetNumberOfVertices", CallingConvention = CallingConvention.Cdecl)]
     public static extern int GetNumberOfVertices(IntPtr value);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "GetNumberOfFaces", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "GetNumberOfFaces", CallingConvention = CallingConvention.Cdecl)]
     public static extern int GetNumberOfFaces(IntPtr value);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "BuildPolyhedronByPath", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "BuildPolyhedronByPath", CallingConvention = CallingConvention.Cdecl)]
     public static extern int BuildPolyhedronByPath(IntPtr value, string path);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "ClipPolyhedronByHull", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "ClipPolyhedronByHull", CallingConvention = CallingConvention.Cdecl)]
     public static extern int ClipPolyhedronByHull(IntPtr value, float[] _vertices, int _verticesLength);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "ClipPolyhedronByPlane", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "ClipPolyhedronByPlane", CallingConvention = CallingConvention.Cdecl)]
     public static extern int ClipPolyhedronByPlane(IntPtr value, float[] _vertices);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "PreprocessDeformMeshArray", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "PreprocessDeformMeshArray", CallingConvention = CallingConvention.Cdecl)]
     public static extern int PreprocessDeformMesh(IntPtr value, int[] _roi, int roiLength, int[] _cvertices, int _cverticesLength);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "PreprocessDeformMeshRadius", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "PreprocessDeformMeshRadius", CallingConvention = CallingConvention.Cdecl)]
     public static extern int PreprocessDeformMesh(IntPtr value, int centerIndex, float roiRadius, float controlRadius);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "DeformMesh", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "DeformMesh", CallingConvention = CallingConvention.Cdecl)]
     public static extern int DeformMesh(IntPtr value, float[] direction);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "FillHole", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "FillHole", CallingConvention = CallingConvention.Cdecl)]
     public static extern int FillHole(IntPtr value, char option = 'd');
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "Extrude", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "Extrude", CallingConvention = CallingConvention.Cdecl)]
     public static extern int Extrude(IntPtr value, float[] direction);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "TriangulateVertices", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "TriangulateVertices", CallingConvention = CallingConvention.Cdecl)]
     public static extern int TriangulateVertices(IntPtr value, float[] _vertices, int _verticesLength);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "GeodesicDistance", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "GeodesicDistance", CallingConvention = CallingConvention.Cdecl)]
     public static extern float GeodesicDistance(IntPtr value, int v1, int v2);
 
     //사용시에 첫번째 포인트로 카메라 origin을 넣어줘야함.
-    [DllImport("CGALtest_dll.dll", EntryPoint = "Intersection", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "Intersection", CallingConvention = CallingConvention.Cdecl)]
     public static extern void Intersection(IntPtr value, float[] plane);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "CorefineByMesh", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "CorefineByMesh", CallingConvention = CallingConvention.Cdecl)]
     public static extern int CorefineByMesh(IntPtr clippee, IntPtr clipper);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "ExtractCircle", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "ExtractCircle", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr ExtractCircle(IntPtr value, int v1, int v2, int v3);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "ExtractCircleLength", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "ExtractCircleLength", CallingConvention = CallingConvention.Cdecl)]
     public static extern int ExtractCircleLength(IntPtr value);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "ExtractCircleFixed", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "ExtractCircleFixed", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr ExtractCircleFixed(IntPtr value, int v1, int v2, int v3);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "ExtractCircleFixedLength", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "ExtractCircleFixedLength", CallingConvention = CallingConvention.Cdecl)]
     public static extern int ExtractCircleFixedLength(IntPtr value);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "VertexNormal", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "VertexNormal", CallingConvention = CallingConvention.Cdecl)]
     public static extern float vertexNormal(IntPtr value, int v);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "GetRoiVertices", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "GetRoiVertices", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetRoiVertices(IntPtr value);
 
-    [DllImport("CGALtest_dll.dll", EntryPoint = "GetControlVertices", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("CGALtest_dll", EntryPoint = "GetControlVertices", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetControlVertices(IntPtr value);
 
     public void RabbitIncision(int centerIndex, float radius)

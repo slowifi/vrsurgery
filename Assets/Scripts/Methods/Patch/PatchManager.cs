@@ -3,12 +3,11 @@ using UnityEngine;
 
 public class PatchManager : MonoBehaviour
 {
-    public List<GameObject> newPatch;
-    public List<Vector3> avgNorm;
-    public List<Vector3> weightCenterPos;
-    public List<Vector3> patchCenterPos;
-    public List<List<Vector3>[]> insidePatchVertices;
-    public List<int> patchVerticesCount;
+    public Vector3 avgNorm;
+    public Vector3 weightCenterPos;
+    public Vector3 patchCenterPos;
+    public List<Vector3>[] insidePatchVertices;
+    public int patchVerticesCount;
 
     private Vector3 _patchVertexPosition;
     private List<Vector3> _patchVertices;
@@ -18,17 +17,19 @@ public class PatchManager : MonoBehaviour
     public float patchVerticesIntervalValue;
     public float patchWeight;
 
-    private GeneratePatch _generatePatch;
+    // 아직 손 좀 더 봐야됨.
+
+
 
     private void Awake()
     {
-        newPatch = new List<GameObject>();
-        avgNorm = new List<Vector3>();
-        weightCenterPos = new List<Vector3>();
-        patchCenterPos = new List<Vector3>();
-
-        insidePatchVertices = new List<List<Vector3>[]>();
-        patchVerticesCount = new List<int>();
+        //newPatch = new List<GameObject>();
+        avgNorm = Vector3.zero;
+        weightCenterPos = Vector3.zero;
+        patchCenterPos = Vector3.zero;
+        
+        insidePatchVertices = new List<Vector3>[5];
+        patchVerticesCount = 0;
         patchVerticesIntervalValue = 3.0f;
 
         patchWeight = 0f;
@@ -36,12 +37,12 @@ public class PatchManager : MonoBehaviour
 
     public void RemovePatchVariables()
     {
-        Destroy(newPatch[newPatch.Count - 1]);
-        newPatch.RemoveAt(newPatch.Count - 1);
-        avgNorm.RemoveAt(avgNorm.Count - 1);
-        weightCenterPos.RemoveAt(weightCenterPos.Count-1);
-        patchCenterPos.RemoveAt(patchCenterPos.Count-1);
-        insidePatchVertices.RemoveAt(insidePatchVertices.Count-1);
+        Destroy(MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1]);
+        MeshManager.Instance.PatchList.RemoveAt(MeshManager.Instance.PatchList.Count - 1);
+        avgNorm = Vector3.zero;
+        weightCenterPos = Vector3.zero;
+        patchCenterPos = Vector3.zero;
+        insidePatchVertices = new List<Vector3>[5];
     }
 
     public void Generate()
@@ -61,24 +62,23 @@ public class PatchManager : MonoBehaviour
 
     public void UpdateCurve(int patchIndex)
     {
-        newPatch[patchIndex].GetComponent<MeshFilter>().mesh.RecalculateNormals();
+        MeshManager.Instance.PatchList[patchIndex].GetComponent<MeshFilter>().mesh.RecalculateNormals();
         float heightValue = UIManager.Instance.heightBar.value;
         float curveValue = UIManager.Instance.curveBar.value;
 
-        patchCenterPos[patchIndex] = weightCenterPos[patchIndex] + ((heightValue - 0.5f) * 40) * avgNorm[patchIndex];
+        patchCenterPos = weightCenterPos + ((heightValue - 0.5f) * 40) * avgNorm;
         patchWeight = curveValue * 20.0f * MeshManager.Instance.pivotTransform.lossyScale.z;
         RecalculateNormal(patchIndex);
     }
     
     public void Reinitialize()
     {
-        newPatch = new List<GameObject>();
-        avgNorm = new List<Vector3>();
-        weightCenterPos = new List<Vector3>();
-        patchCenterPos = new List<Vector3>();
+        avgNorm = Vector3.zero;
+        weightCenterPos = Vector3.zero;
+        patchCenterPos = Vector3.zero;
 
-        insidePatchVertices = new List<List<Vector3>[]>();
-        patchVerticesCount = new List<int>();
+        insidePatchVertices = new List<Vector3>[5];
+        patchVerticesCount = 0;
         patchVerticesIntervalValue = 3.0f;
 
         patchWeight = 0f;
@@ -87,19 +87,15 @@ public class PatchManager : MonoBehaviour
 
     public void GenerateInit()
     {
-        newPatch.Add(new GameObject("", typeof(MeshFilter), typeof(MeshRenderer)));
-        avgNorm.Add(Vector3.zero);
-        weightCenterPos.Add(Vector3.zero);
-        patchCenterPos.Add(Vector3.zero);
-        insidePatchVertices.Add(new List<Vector3>[5]);
+        MeshManager.Instance.PatchList.Add(new GameObject("", typeof(MeshFilter), typeof(MeshRenderer)));
         patchVerticesIntervalValue = 3.0f;
         patchWeight = UIManager.Instance.curveBar.value * 20f * MeshManager.Instance.pivotTransform.lossyScale.z;
 
         _patchVertexPosition = Vector3.zero;
         _patchVertices = new List<Vector3>();
         _insidePatchVertices = new List<Vector3>[5];
-        _patchIndex = newPatch.Count - 1;
-        newPatch[_patchIndex].name = "Patch" + _patchIndex;
+        _patchIndex = MeshManager.Instance.PatchList.Count - 1;
+        MeshManager.Instance.PatchList[_patchIndex].name = "Patch";
 
         for (int i = 0; i < 5; i++)
             _insidePatchVertices[i] = new List<Vector3>();
@@ -123,7 +119,7 @@ public class PatchManager : MonoBehaviour
 
     public void GeneratePatchTriangle()
     {
-        Vector3 _patchCenterPos = patchCenterPos[_patchIndex];
+        Vector3 _patchCenterPos = patchCenterPos;
         Vector3[] vtrList = new Vector3[_patchVertices.Count];
 
         float minDst = 1000000;
@@ -132,7 +128,7 @@ public class PatchManager : MonoBehaviour
             _patchCenterPos += _patchVertices[i];
         _patchCenterPos /= _patchVertices.Count;
 
-        patchCenterPos[_patchIndex] = _patchCenterPos;
+        patchCenterPos = _patchCenterPos;
 
         for (int i = 0; i < _patchVertices.Count; i++)
         {
@@ -157,7 +153,7 @@ public class PatchManager : MonoBehaviour
     private void GeneratePatchObj()
     {
         //PatchManager.Instance.newPatch.Add(new GameObject("Patch", typeof(MeshFilter), typeof(MeshRenderer)));
-        GameObject patchObj = newPatch[newPatch.Count - 1];
+        GameObject patchObj = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1];
         Mesh mesh = new Mesh();
         patchObj.GetComponent<MeshFilter>().mesh = mesh;
         patchObj.transform.parent = MeshManager.Instance.pivotTransform; //GameObject.Find("HumanHeart").transform;
@@ -176,7 +172,7 @@ public class PatchManager : MonoBehaviour
                 points[i] = _insidePatchVertices[j][i % patchVertexCount];
         }
 
-        points[patchVertexCount * 5] = patchCenterPos[_patchIndex];
+        points[patchVertexCount * 5] = patchCenterPos;
 
 
         BuildMesh(ref triangles, 5 - 1);
@@ -232,10 +228,10 @@ public class PatchManager : MonoBehaviour
 
     private void CalculateNormal()
     {
-        patchVerticesCount.Add(_patchVertices.Count);
-        insidePatchVertices[_patchIndex] = _insidePatchVertices;
+        patchVerticesCount = _patchVertices.Count;
+        insidePatchVertices = _insidePatchVertices;
 
-        Mesh mesh = newPatch[_patchIndex].GetComponent<MeshFilter>().mesh;
+        Mesh mesh = MeshManager.Instance.PatchList[_patchIndex].GetComponent<MeshFilter>().mesh;
         mesh.RecalculateNormals();
 
         int tempNum = _patchVertices.Count;
@@ -245,10 +241,10 @@ public class PatchManager : MonoBehaviour
             _avgNorm += mesh.normals[i];
         _avgNorm /= mesh.normals.Length;
 
-        avgNorm[_patchIndex] = _avgNorm;
-        patchCenterPos[_patchIndex] += 10 * _avgNorm;
-        Vector3 newCenterPos = patchCenterPos[_patchIndex];
-        weightCenterPos[_patchIndex] = newCenterPos;
+        avgNorm = _avgNorm;
+        patchCenterPos += 10 * _avgNorm;
+        Vector3 newCenterPos = patchCenterPos;
+        weightCenterPos = newCenterPos;
         Vector3[] patchVertexPosition = mesh.vertices;
 
         for (int i = 0; i < tempNum; i++)
@@ -272,22 +268,22 @@ public class PatchManager : MonoBehaviour
     // 업데이트용
     public void RecalculateNormal(int patchIndex)
     {
-        Mesh mesh = newPatch[patchIndex].GetComponent<MeshFilter>().mesh;
-        int patchVertexCount = patchVerticesCount[patchIndex];
-        List<Vector3>[] _insidePatchVertices = insidePatchVertices[patchIndex];
+        Mesh mesh = MeshManager.Instance.PatchList[patchIndex].GetComponent<MeshFilter>().mesh;
+        int patchVertexCount = patchVerticesCount;
+        List<Vector3>[] _insidePatchVertices = insidePatchVertices;
         Vector3[] patchVertexPosition = mesh.vertices;
 
         for (int i = 0; i < patchVertexCount; i++)
         {
             Vector3 p1 = _insidePatchVertices[0][i];
-            Vector3 p2 = _insidePatchVertices[2][i] + avgNorm[patchIndex] * patchWeight;
-            Vector3 p3 = patchCenterPos[patchIndex];
+            Vector3 p2 = _insidePatchVertices[2][i] + avgNorm * patchWeight;
+            Vector3 p3 = patchCenterPos;
             patchVertexPosition[i + patchVertexCount] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.2f), Vector3.Lerp(p2, p3, 0.2f), 0.2f);
             patchVertexPosition[i + patchVertexCount * 2] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.4f), Vector3.Lerp(p2, p3, 0.4f), 0.4f);
             patchVertexPosition[i + patchVertexCount * 3] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.6f), Vector3.Lerp(p2, p3, 0.6f), 0.6f);
             patchVertexPosition[i + patchVertexCount * 4] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.8f), Vector3.Lerp(p2, p3, 0.8f), 0.8f);
         }
-        patchVertexPosition[mesh.normals.Length - 1] = patchCenterPos[patchIndex];
+        patchVertexPosition[mesh.normals.Length - 1] = patchCenterPos;
 
         mesh.vertices = patchVertexPosition;
     }

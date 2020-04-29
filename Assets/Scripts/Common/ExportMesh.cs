@@ -5,9 +5,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System;
-using Crosstales.FB;
-//using SimpleFileBrowser;
 
+#if UNITY_ANDROID
+using SimpleFileBrowser;
+#endif
+
+#if UNITY_STANDALONE_WIN
+using Crosstales.FB;
+#endif
 
 public class ExportMesh : MonoBehaviour
 {
@@ -25,7 +30,7 @@ public class ExportMesh : MonoBehaviour
     public int normalOffset = 0;
     public int uvOffset = 0;
 
-
+#if UNITY_STANDALONE_WIN
     public void FileBrowsing()
     {
         bool player = playerObject.activeSelf;
@@ -43,6 +48,23 @@ public class ExportMesh : MonoBehaviour
         playerObject.SetActive(player);
 
     }
+#endif
+#if UNITY_ANDROID
+    IEnumerator ShowSaveDialogCoroutine()
+    {
+        yield return FileBrowser.WaitForSaveDialog(true, "/storage/emulated/0/hearts", "Save File", "Save");
+
+        if (FileBrowser.Success)
+        {
+            Exporting(FileBrowser.Result);
+            playerObject.SetActive(true);
+        }
+    }
+    public void FileBrowsing()
+    {
+        StartCoroutine(ShowSaveDialogCoroutine());
+    }
+#endif
 
     string MeshToString(MeshFilter mf, Dictionary<string, ObjMaterial> materialList)
     {

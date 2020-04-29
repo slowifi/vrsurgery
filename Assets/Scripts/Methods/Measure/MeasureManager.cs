@@ -3,11 +3,10 @@ using System.Collections.Generic;
 
 public class MeasureManager : MonoBehaviour
 {
-    public float distanceStartToEnd = 0f;
-    public Vector3 measureStart;
-    public Vector3 measureEnd;
-
-
+    private float distanceStartToEnd = 0f;
+    private Vector3 measureStart;
+    private Vector3 measureEnd;
+    
     public float MeasureDistance(Vector3 vertexPosition, Ray cameraRay)
     {
         if (vertexPosition != Vector3.zero)
@@ -16,7 +15,6 @@ public class MeasureManager : MonoBehaviour
             GameObject endPoint = MeshManager.Instance.endMeasurePoint;
             if (!startPoint.activeSelf)
             {
-                Destroy(GameObject.Find("MeasureLine"));
                 measureStart = cameraRay.direction;
                 startPoint.SetActive(true);
                 startPoint.transform.position = vertexPosition;
@@ -27,16 +25,10 @@ public class MeasureManager : MonoBehaviour
                 endPoint.transform.position = vertexPosition;
                 measureEnd = cameraRay.direction;
                 // Debug.DrawLine(startPoint.transform.position, endPoint.transform.position, Color.yellow, 2, false);
-                GameObject lineRenderer = new GameObject("MeasureLine");
-
-                var line = lineRenderer.AddComponent<LineRenderer>();
-                line.useWorldSpace = false;
-                line.material.color = Color.white;
-                line.SetWidth(0.6f, 0.6f);
-                line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 0.5f * MeshManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 0.5f * MeshManager.Instance.objTransform.lossyScale.z });
-                //line.SetPositions(new Vector3[] { startPoint.transform.position, endPoint.transform.position});
-                line.transform.SetParent(MeshManager.Instance.pivotTransform);
+                
+                //line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 0.5f * MeshManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 0.5f * MeshManager.Instance.objTransform.lossyScale.z });
+                ////line.SetPositions(new Vector3[] { startPoint.transform.position, endPoint.transform.position});
+                //line.transform.SetParent(MeshManager.Instance.pivotTransform);
                 distanceStartToEnd = Vector3.Distance(endPoint.transform.position, startPoint.transform.position);
             }
             else

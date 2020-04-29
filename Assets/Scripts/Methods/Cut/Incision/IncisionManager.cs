@@ -318,16 +318,16 @@ public class IncisionManager : MonoBehaviour
         int count = 0;
         foreach (int item in leftSide[incisionIndex])
         {
-            //Vector3 temp = (currentExtendValue - oldExtendValue) * leftSideWeight[incisionIndex][count] * leftVector; // original
-            Vector3 temp = (0.1f) * leftSideWeight[incisionIndex][count] * leftVector;
+            Vector3 temp = (currentExtendValue - oldExtendValue) * leftSideWeight[incisionIndex][count] * leftVector; // original
+            //Vector3 temp = (0.1f) * leftSideWeight[incisionIndex][count] * leftVector;
             vertices[item] = objTransform.InverseTransformPoint(worldPosition[item] + temp);
             count++;
         }
         count = 0;
         foreach (int item in rightSide[incisionIndex])
         {
-            //Vector3 temp = (currentExtendValue - oldExtendValue) * rightSideWeight[incisionIndex][count] * rightVector; // original
-            Vector3 temp = (0.1f) * rightSideWeight[incisionIndex][count] * rightVector;
+            Vector3 temp = (currentExtendValue - oldExtendValue) * rightSideWeight[incisionIndex][count] * rightVector; // original
+            //Vector3 temp = (0.1f) * rightSideWeight[incisionIndex][count] * rightVector;
             vertices[item] = objTransform.InverseTransformPoint(worldPosition[item] + temp);
             count++;
         }

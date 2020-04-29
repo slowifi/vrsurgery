@@ -154,24 +154,39 @@ public class Player : MonoBehaviour
             //여기서 조건 두개임. 하나는 그냥 확대고, 하나는 ui에서 스크롤 조절하게.
 
             // incision임을 안다면 scroll값만 바꾸게 해야되는데 흠...
-            Debug.Log(incision);
-            if(incision)
-            {
-                float extendValue = UIManager.Instance.extendBar.value + deltaMagnitudeDiff/500;
-                if (extendValue >= 1)
-                    UIManager.Instance.extendBar.value = 1;
-                else if (extendValue <= 0)
-                    UIManager.Instance.extendBar.value = 0;
-                else
-                    UIManager.Instance.extendBar.value = extendValue;
-                return;
-            }
+            
             MeshManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/700;
 
             if (MeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
                 MeshManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
             AdjacencyList.Instance.WorldPositionUpdate();
 
+            return;
+        }
+        else if(Input.touchCount == 2)
+        {
+            // Store both touches.
+            Touch touchZero = Input.GetTouch(0);
+            Touch touchOne = Input.GetTouch(1);
+
+            // Find the position in the previous frame of each touch.
+            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+
+            // Find the magnitude of the vector (the distance) between the touches in each frame.
+            float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+            float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+
+            // Find the difference in the distances between each frame.
+            float deltaMagnitudeDiff = touchDeltaMag - prevTouchDeltaMag;
+
+            float extendValue = UIManager.Instance.extendBar.value + deltaMagnitudeDiff / 500;
+            if (extendValue >= 1)
+                UIManager.Instance.extendBar.value = 1;
+            else if (extendValue <= 0)
+                UIManager.Instance.extendBar.value = 0;
+            else
+                UIManager.Instance.extendBar.value = extendValue;
             return;
         }
 

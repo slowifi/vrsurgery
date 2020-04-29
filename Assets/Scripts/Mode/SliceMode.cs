@@ -40,9 +40,11 @@ public class SliceMode : MonoBehaviour
             Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             oldRay = ray;
             SliceMethods.SetIntersectedValues("first", ray);
+            EventManager.Instance.Events.InvokeModeManipulate("StopAll");
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            EventManager.Instance.Events.InvokeModeManipulate("EndAll");
             Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             SliceMethods.SetIntersectedValues("second", ray);
 

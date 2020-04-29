@@ -18,6 +18,8 @@ public class MeshManager : Singleton<MeshManager>
 
     public Stack<Mesh> MeshList;
 
+    public List<GameObject> PatchList;
+
     public GameObject Heart;
     public GameObject LeftHeart;
     public GameObject RightHeart;
@@ -110,6 +112,11 @@ public class MeshManager : Singleton<MeshManager>
         Destroy(disableHeart);
 
         mesh.RecalculateNormals();
+        foreach (var item in PatchList)
+        {
+            Destroy(item);
+        }
+        PatchList.Clear();
         Debug.Log(mesh.normals.Length);
         Debug.Log(mesh.vertexCount);
     }
@@ -128,7 +135,7 @@ public class MeshManager : Singleton<MeshManager>
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         firstMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         Destroy(disableHeart);
-
+        PatchList = new List<GameObject>();
         mesh.RecalculateNormals();
         ChatManager.Instance.GenerateMessage(" " + mesh.normals.Length);
         Debug.Log(mesh.normals.Length);

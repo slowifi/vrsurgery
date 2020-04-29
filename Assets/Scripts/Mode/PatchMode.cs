@@ -45,7 +45,7 @@ public class PatchMode : MonoBehaviour
         else if (isPatchUpdate)
         {
             // 숫자에 patch index들어가는게 좋을듯. 지금 patch, incision 관련해서는 리스트화는 시켜놨음. 추후 undo등 작업 가능.
-            patchManager.UpdateCurve(patchManager.newPatch.Count - 1);
+            patchManager.UpdateCurve(MeshManager.Instance.PatchList.Count - 1);
         }
         else if (Input.GetMouseButtonDown(0))
         {

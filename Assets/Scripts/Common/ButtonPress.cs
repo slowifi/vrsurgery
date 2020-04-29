@@ -56,7 +56,7 @@ public class ButtonPress : Singleton<ButtonPress>
         //unselectedColorBlock = SliceButton.colors;
         //selectedColorBlock.normalColor = new Color32(176, 48, 48, 255);
     }
-
+    
     public void Events_OnModeChanged(string mode)
     {
         switch(mode)
