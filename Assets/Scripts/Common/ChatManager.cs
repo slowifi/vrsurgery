@@ -77,7 +77,8 @@ public class ChatManager : Singleton<ChatManager>
         // 5칸이 지나면 마지막거 지우기.
         if (messageList.Count < 5)
         {
-            GameObject newChat = Instantiate(cloneButton, GameObject.Find("ButtonManager").transform);
+            //이것도 find로 되어있는거 수정필요함.
+            GameObject newChat = Instantiate(cloneButton, GameObject.Find("UICanvas").transform);
             newChat.SetActive(true);
             newChat.GetComponentInChildren<Text>().text = errorMessage;
             messageList.Add(newChat);
@@ -88,7 +89,8 @@ public class ChatManager : Singleton<ChatManager>
             Destroy(messageList[0]);
             messageList.RemoveAt(0);
             generateTimeList.RemoveAt(0);
-            GameObject newChat = Instantiate(cloneButton, GameObject.Find("ButtonManager").transform);
+            //이것도 find로 되어있는거 수정필요함.
+            GameObject newChat = Instantiate(cloneButton, GameObject.Find("UICanvas").transform);
             newChat.SetActive(true);
             newChat.GetComponentInChildren<Text>().text = errorMessage;
             messageList.Add(newChat);

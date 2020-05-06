@@ -1,9 +1,9 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class PatchMode : MonoBehaviour
+public class MeasureDiameterMode : MonoBehaviour
 {
     private bool isPatchUpdate;
     private bool isLastPatch;
@@ -35,17 +35,12 @@ public class PatchMode : MonoBehaviour
     {
         // 패치 방법부터 바꿔야됨.
         Ray cameraRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        if(isLastPatch)
+        if (isLastPatch)
         {
             Destroy(lineRenderer.lineObject);
-            patchManager.GenerateMesh();
-            isPatchUpdate = true;
+            patchManager.GenerateMeshForMeasure();
             isLastPatch = false;
-        }
-        else if (isPatchUpdate)
-        {
-            // 숫자에 patch index들어가는게 좋을듯. 지금 patch, incision 관련해서는 리스트화는 시켜놨음. 추후 undo등 작업 가능.
-            patchManager.UpdateCurve(MeshManager.Instance.PatchList.Count - 1);
+            Destroy(this);
         }
         else if (Input.GetMouseButtonDown(0))
         {
@@ -77,7 +72,7 @@ public class PatchMode : MonoBehaviour
                 return;
             Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
-            
+
             if (intersectedValues.Intersected)
             {
                 //first position이 저장되어 있어야함.
@@ -100,12 +95,13 @@ public class PatchMode : MonoBehaviour
                 if (Vector3.Distance(firstPosition, intersectedValues.IntersectedPosition) > 1.5f * MeshManager.Instance.pivotTransform.lossyScale.z)
                 {
                     patchManager.AddVertex(intersectedValues.IntersectedPosition);
-
+                    
                     patchCount++;
                     oldPosition = intersectedValues.IntersectedPosition;
                     oldRay = ray;
                     return;
                 }
+                
             }
             else
             {

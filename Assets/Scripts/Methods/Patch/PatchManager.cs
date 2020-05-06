@@ -60,6 +60,11 @@ public class PatchManager : MonoBehaviour
         GeneratePatchTriangle();
     }
 
+    public void GenerateMeshForMeasure()
+    {
+        GeneratePatchTriangleForMeasure();
+    }
+
     public void UpdateCurve(int patchIndex)
     {
         MeshManager.Instance.PatchList[patchIndex].GetComponent<MeshFilter>().mesh.RecalculateNormals();
@@ -287,4 +292,88 @@ public class PatchManager : MonoBehaviour
 
         mesh.vertices = patchVertexPosition;
     }
+
+
+
+
+
+
+    // measure 용
+
+    public void GeneratePatchTriangleForMeasure()
+    {
+        Vector3 _patchCenterPos = patchCenterPos;
+        Vector3[] vtrList = new Vector3[_patchVertices.Count];
+
+        float minDst = 1000000;
+
+        for (int i = 0; i < _patchVertices.Count; i++)
+            _patchCenterPos += _patchVertices[i];
+        _patchCenterPos /= _patchVertices.Count;
+
+        patchCenterPos = _patchCenterPos;
+
+        for (int i = 0; i < _patchVertices.Count; i++)
+        {
+            vtrList[i] = _patchCenterPos - _patchVertices[i];
+            float dst = Vector3.Distance(_patchVertices[i], _patchCenterPos);
+            if (dst < minDst)
+                minDst = dst;
+        }
+
+        for (int i = 0; i < _patchVertices.Count; i++)
+        {
+            _insidePatchVertices[0].Add(_patchVertices[i]);
+            _insidePatchVertices[1].Add(_patchVertices[i] + (vtrList[i] / 5 * 1));
+            _insidePatchVertices[2].Add(_patchVertices[i] + (vtrList[i] / 5 * 2));
+            _insidePatchVertices[3].Add(_patchVertices[i] + (vtrList[i] / 5 * 3));
+            _insidePatchVertices[4].Add(_patchVertices[i] + (vtrList[i] / 5 * 4));
+        }
+
+        GeneratePatchObjForMeasure();
+    }
+
+    private void GeneratePatchObjForMeasure()
+    {
+        //PatchManager.Instance.newPatch.Add(new GameObject("Patch", typeof(MeshFilter), typeof(MeshRenderer)));
+        GameObject patchObj = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1];
+        Mesh mesh = new Mesh();
+        patchObj.GetComponent<MeshFilter>().mesh = mesh;
+        patchObj.transform.parent = MeshManager.Instance.pivotTransform; //GameObject.Find("HumanHeart").transform;
+
+        int patchVertexCount = _patchVertices.Count;
+
+        Renderer rend = patchObj.GetComponent<Renderer>();
+        rend.material.color = Color.white;
+
+        Vector3[] points = new Vector3[patchVertexCount * 5 + 1];
+        int[] triangles = new int[((patchVertexCount * 2) * 4 + patchVertexCount) * 3];
+        // int[] triangles = new int[((patchVertices.Count * 2) * 4 + patchVertices.Count) * 3];
+        for (int j = 0; j < 5; j++)
+        {
+            for (int i = patchVertexCount * j; i < patchVertexCount * (j + 1); i++)
+                points[i] = _insidePatchVertices[j][i % patchVertexCount];
+        }
+
+        points[patchVertexCount * 5] = patchCenterPos;
+
+
+        BuildMesh(ref triangles, 5 - 1);
+
+        mesh.vertices = points;
+        mesh.triangles = triangles;
+
+        float area = 0;
+        for (int i = 0; i < triangles.Length; i+=3)
+        {
+            Vector3 left = points[triangles[i+1]] - points[triangles[i]];
+            Vector3 right = points[triangles[i+2]] - points[triangles[i]];
+            area += (Vector3.Cross(left, right).magnitude / 2.0f);
+        }
+        Destroy(MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count-1]);
+        MeshManager.Instance.PatchList.RemoveAt(MeshManager.Instance.PatchList.Count - 1);
+        // 면적과 둘레길이에 대한 직경 둘의 계산값의 평균을 내는게 맞으려나?
+        Debug.Log(Mathf.Sqrt(area / Mathf.PI) * 2 / MeshManager.Instance.objTransform.lossyScale.z);
+    }
 }
+

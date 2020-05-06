@@ -37,6 +37,12 @@ public class CHD : MonoBehaviour
         UIManager.Instance.extendBar.value = 0.1f;
     }
 
+    public void MeasureDiameterMode()
+    {
+        mode = new GameObject("MeasureDiameterMode");
+        mode.AddComponent<MeasureDiameterMode>();
+    }
+
     public void Exit()
     {
         EventManager.Instance.Events.InvokeModeManipulate("EndAll");
@@ -117,6 +123,10 @@ public class CHD : MonoBehaviour
                 MeasureMode();
                 Debug.Log("measure 실행");
                 break;
+            case "MeasureDiameterMode":
+                MeasureDiameterMode();
+                Debug.Log("Measure Diameter 실행");
+                break;
             case "Exit":
                 Exit();
                 Debug.Log("Exit");
@@ -135,15 +145,16 @@ public class CHD : MonoBehaviour
 
     void Update()
     {
-        // 여기서는 아예 update를 안돌려도 될 듯. 
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
-        {
-            AdjacencyList.Instance.WorldPositionUpdate();
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
-            bool checkInside = intersectedValues.Intersected;
-            if (!checkInside)
-                return;
-        }
-
+        
+        //// 여기서는 아예 update를 안돌려도 될 듯. 
+        //if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
+        //{
+        //    AdjacencyList.Instance.WorldPositionUpdate();
+        //    IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
+        //    bool checkInside = intersectedValues.Intersected;
+        //    if (!checkInside)
+        //        return;
+        //}
+        
     }
 }

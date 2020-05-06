@@ -18,6 +18,7 @@ public class ButtonPress : Singleton<ButtonPress>
     public Button PatchButton;
     public Button MeasureButton;
     public Button IncisionButton;
+    public Button MeasureDiameterButton;
 
     private Sprite[] cutImage;
     private Sprite[] sliceImage;
@@ -81,6 +82,10 @@ public class ButtonPress : Singleton<ButtonPress>
                 EventManager.Instance.Events.InvokeModeChanged("MeasureMode");
                 Debug.Log("measure 실행");
                 break;
+            case "MeasureDiameter":
+                EventManager.Instance.Events.InvokeModeChanged("MeasureDiameterMode");
+                Debug.Log("Measure diameter 실행");
+                break;
             case "ResetButton":
                 ResetButton();
                 break;
@@ -100,7 +105,7 @@ public class ButtonPress : Singleton<ButtonPress>
     public void Slicing()
     {
         // 지금 이 지저분한 코드도 수정할 수 있으면 하도록하기.
-        if (SliceButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (SliceButton.image.sprite == sliceImage[1])
         {
             SliceButton.image.sprite = sliceImage[0];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
@@ -117,7 +122,7 @@ public class ButtonPress : Singleton<ButtonPress>
 
     public void Cutting()
     {
-        if (CutButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (CutButton.image.sprite == cutImage[1])
         {
             CutButton.image.sprite = cutImage[0];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
@@ -134,7 +139,7 @@ public class ButtonPress : Singleton<ButtonPress>
     public void Patching()
     {
         
-        if (PatchButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (PatchButton.image.sprite == patchImage[1])
         {
             PatchButton.image.sprite = patchImage[0];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
@@ -164,9 +169,28 @@ public class ButtonPress : Singleton<ButtonPress>
         }
     }
 
+    public void MeasureDiameter()
+    {
+        ResetButton();
+        EventManager.Instance.Events.InvokeModeChanged("Exit");
+        Events_OnModeChanged("MeasureDiameter");
+        //if (IncisionButton.image.sprite == incisionImage[1])
+        //{
+        //    IncisionButton.image.sprite = incisionImage[0];
+        //    EventManager.Instance.Events.InvokeModeChanged("Exit");
+        //}
+        //else
+        //{
+        //    ResetButton();
+        //    IncisionButton.image.sprite = incisionImage[1];
+        //    EventManager.Instance.Events.InvokeModeChanged("Exit");
+        //    Events_OnModeChanged("Incision");
+        //}
+    }
+
     public void Incisioning()
     {
-        if (IncisionButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (IncisionButton.image.sprite == incisionImage[1])
         {
             IncisionButton.image.sprite = incisionImage[0];
             EventManager.Instance.Events.InvokeModeChanged("Exit");

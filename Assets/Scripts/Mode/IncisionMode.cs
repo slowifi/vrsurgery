@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.UI;
 
 public class IncisionMode : MonoBehaviour
 {
@@ -12,15 +13,31 @@ public class IncisionMode : MonoBehaviour
     private string mode;
     private bool testbool = false;
     private IncisionManager IncisionManager;
+    private GameObject incisionDistance;
+    private Canvas rectCanvas;
+
+    private void OnDestroy()
+    {
+        Destroy(incisionDistance);
+        Destroy(lineRenderer.lineObject);
+        EventManager.Instance.Events.InvokeModeChanged("ResetButton");
+    }
 
     void Awake()
     {
-        IncisionManager = new IncisionManager();
+        IncisionManager = this.gameObject.AddComponent<IncisionManager>();
         oldExtendValue = 0;
         firstIncision = false;
         mode = "incision";
         oldPosition = Vector3.zero;
         lineRenderer = new LineRendererManipulate(transform);
+        // 꺼져있으면 못찾는구나. 그냥 생성을 해줄까.
+        Object prefab =  Resources.Load("Prefab/IncisionDistanceText");
+        incisionDistance = (GameObject)Instantiate(prefab);
+        GameObject newCanvas = GameObject.Find("UICanvas");
+        incisionDistance.transform.SetParent(newCanvas.transform);
+        rectCanvas = newCanvas.GetComponent<Canvas>();
+        incisionDistance.SetActive(false);
     }
 
     void Update()
@@ -44,9 +61,8 @@ public class IncisionMode : MonoBehaviour
         {
             EventManager.Instance.Events.InvokeModeManipulate("StopAll");
             firstIncision = true;
-
+            incisionDistance.SetActive(true);
             oldPosition = intersectedValues.IntersectedPosition;
-
             IncisionManager.IncisionUpdate();
             AdjacencyList.Instance.ListUpdate();
             IncisionManager.SetStartVerticesDF();
@@ -65,6 +81,7 @@ public class IncisionMode : MonoBehaviour
                 Destroy(lineRenderer.lineObject);
                 ChatManager.Instance.GenerateMessage(" 심장을 벗어났습니다.");
                 EventManager.Instance.Events.InvokeModeManipulate("EndAll");
+                Destroy(incisionDistance);
                 Destroy(this);
             }
             Vector3 currentPosition = intersectedValues.IntersectedPosition;
@@ -74,15 +91,23 @@ public class IncisionMode : MonoBehaviour
             //oldPos.z += 1f;
             //line.material.color = Color.black;
             //line.SetPositions(new Vector3[] { oldPos, curPos });
+            
+            Vector2 newRectPos;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectCanvas.transform as RectTransform, Input.mousePosition, rectCanvas.worldCamera, out newRectPos);
+            incisionDistance.GetComponent<RectTransform>().localPosition = newRectPos;
+            //rectDistance.localPosition = newRectPos;
+            incisionDistance.GetComponent<Text>().text = (Vector3.Distance(oldPos, curPos) / MeshManager.Instance.pivotTransform.localScale.z).ToString("N3") + " mm";
             lineRenderer.SetFixedLineRenderer(oldPos, curPos);
         }
         else if (Input.GetMouseButtonUp(0) && firstIncision)
         {
             if (checkInside)
             {
+                
                 Vector3 currentPosition = intersectedValues.IntersectedPosition;
                 if (Vector3.Distance(oldPosition, currentPosition) < 2.5f * MeshManager.Instance.pivotTransform.lossyScale.z)
                 {
+                    Destroy(incisionDistance);
                     Destroy(lineRenderer.lineObject);
                     EventManager.Instance.Events.InvokeModeManipulate("EndAll");
                     ChatManager.Instance.GenerateMessage(" incision 거리가 너무 짧습니다.");
@@ -102,9 +127,9 @@ public class IncisionMode : MonoBehaviour
                 //incisionCount--;
                 IncisionManager.IncisionUpdate();
                 EventManager.Instance.Events.InvokeModeManipulate("EndAll");
-
+                Destroy(incisionDistance);
                 Destroy(this);
-                // return true;
+                return;
             }
 
             // 위에서 잘못되면 끊어야됨.
@@ -118,6 +143,7 @@ public class IncisionMode : MonoBehaviour
             MeshManager.Instance.mesh.RecalculateNormals();
             // chatmanager 대신 popup manager에서 팝업 호출하기.
             ChatManager.Instance.GenerateMessage(" 절개하였습니다. 확장이 가능합니다.");
+            Destroy(incisionDistance);
             mode = "extand";
             EventManager.Instance.Events.InvokeModeManipulate("EndWithoutScaling");
         }
