@@ -11,12 +11,12 @@ public class SliceMode : MonoBehaviour
 
     private LineRendererManipulate lineRenderer;
     private string mode;
-    private SliceMethods SliceMethods;
+    private SliceMethods sliceMethods;
 
     private void Awake()
     {
         mode = "slice";
-        SliceMethods = new SliceMethods();
+        sliceMethods = new SliceMethods();
     }
 
     private void Update()
@@ -39,16 +39,16 @@ public class SliceMode : MonoBehaviour
             lineRenderer = new LineRendererManipulate(transform);
             Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             oldRay = ray;
-            SliceMethods.SetIntersectedValues("first", ray);
+            sliceMethods.SetIntersectedValues("first", ray);
             EventManager.Instance.Events.InvokeModeManipulate("StopAll");
         }
         else if (Input.GetMouseButtonUp(0))
         {
             EventManager.Instance.Events.InvokeModeManipulate("EndAll");
             Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-            SliceMethods.SetIntersectedValues("second", ray);
+            sliceMethods.SetIntersectedValues("second", ray);
 
-            GameObject[] SliceResult = SliceMethods.Slicing();
+            GameObject[] SliceResult = sliceMethods.Slicing();
             leftHeart = SliceResult[0];
             rightHeart = SliceResult[1];
             mode = "select";
@@ -65,7 +65,7 @@ public class SliceMode : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            string selected = SliceMethods.CheckSelected(leftHeart, rightHeart);
+            string selected = sliceMethods.CheckSelected(leftHeart, rightHeart);
             SelectHeart(selected);
             mode = "slice";
             EventManager.Instance.Events.InvokeModeChanged("ResetButton");

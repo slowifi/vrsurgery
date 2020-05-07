@@ -35,6 +35,11 @@ public class PatchManager : MonoBehaviour
         patchWeight = 0f;
     }
 
+    public void GetVerticesList()
+    {
+
+    }
+
     public void RemovePatchVariables()
     {
         Destroy(MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1]);
@@ -373,7 +378,22 @@ public class PatchManager : MonoBehaviour
         Destroy(MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count-1]);
         MeshManager.Instance.PatchList.RemoveAt(MeshManager.Instance.PatchList.Count - 1);
         // 면적과 둘레길이에 대한 직경 둘의 계산값의 평균을 내는게 맞으려나?
-        Debug.Log(Mathf.Sqrt(area / Mathf.PI) * 2 / MeshManager.Instance.objTransform.lossyScale.z);
+        float areaByFaces = Mathf.Sqrt(area / Mathf.PI) * 2 / MeshManager.Instance.objTransform.lossyScale.z;
+        float areaByCircumference = 0;
+        for (int i = 0; i < _patchVertices.Count; i++)
+        {
+            if(i == _patchVertices.Count-1)
+            {
+                areaByCircumference += Vector3.Distance(_patchVertices[i], _patchVertices[0]);
+                break;
+            }
+            areaByCircumference += Vector3.Distance(_patchVertices[i], _patchVertices[i+1]);
+        }
+        areaByCircumference = areaByCircumference / Mathf.PI / MeshManager.Instance.objTransform.lossyScale.z;
+
+        // 두개의 중간 값으로 해야되지 않을까.
+        Debug.Log(areaByFaces);
+        Debug.Log(areaByCircumference);
     }
 }
 

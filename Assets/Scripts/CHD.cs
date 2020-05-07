@@ -8,30 +8,35 @@ public class CHD : MonoBehaviour
 
     public void SliceMode()
     {
+        AdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("SliceMode");
         mode.AddComponent<SliceMode>();
     }
 
     public void CutMode()
     {
+        AdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("CutMode");
         mode.AddComponent<BoundaryCutMode>();
     }
 
     public void PatchMode()
     {
+        AdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("PatchMode");
         mode.AddComponent<PatchMode>();
     }
 
     public void MeasureMode()
     {
+        AdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("MeasureMode");
         mode.AddComponent<MeasureMode>();
     }
 
     public void IncisionMode()
     {
+        AdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("IncisionMode");
         mode.AddComponent<IncisionMode>();
         UIManager.Instance.extendBar.value = 0.1f;
@@ -39,6 +44,7 @@ public class CHD : MonoBehaviour
 
     public void MeasureDiameterMode()
     {
+        AdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("MeasureDiameterMode");
         mode.AddComponent<MeasureDiameterMode>();
     }

@@ -6,10 +6,12 @@ using UnityEditor;
 public class MeasureMode : MonoBehaviour
 {
     MeasureManager MeasureManager;
+    LineRendererManipulate lineRenderer;
 
     void Awake()
     {
         MeasureManager = new MeasureManager();
+        lineRenderer = new LineRendererManipulate(transform);
     }
     void Update()
     {

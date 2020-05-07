@@ -51,6 +51,7 @@ public class BoundaryCutMode : MonoBehaviour
         else if(isLast)
         {
             CGALCut();
+            AdjacencyList.Instance.ListUpdate();
             EventManager.Instance.Events.InvokeModeManipulate("EndAll");
             EventManager.Instance.Events.InvokeModeChanged("ResetButton");
             Destroy(lineRenderer.lineObject);
@@ -127,6 +128,7 @@ public class BoundaryCutMode : MonoBehaviour
                 MeshManager.Instance.mesh.triangles.Length / 3) == -1)
             {
                 Debug.Log(" 만들어지지 않음");
+                return;
             }
 
             Vector3[] newVertices = new Vector3[rayList.Count * 2];
@@ -144,15 +146,24 @@ public class BoundaryCutMode : MonoBehaviour
                 ) == -1)
             {
                 Debug.Log(" 만들어지지 않음");
+                return;
             }
-            CGAL.FillHole(stamp);
-            
-            CGAL.ClipPolyhedronByMesh(heart, stamp);
+            if(CGAL.FillHole(stamp)==-1)
+            {
+                Debug.Log("fillhole error");
+                return;
+            }
+
+            if (CGAL.ClipPolyhedronByMesh(heart, stamp) == -1)
+            {
+                Debug.Log("Clip error");
+                return;
+            }
             MeshManager.Instance.SetNewObject(CGAL.GenerateNewObject(heart, heartMaterial));
             MakeDoubleFaceMesh.Instance.Reinitialize();
-            //CGAL.GenerateNewObject(stamp, leftMaterial);
-            // 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
-            //MeshManager.Instance.Heart.SetActive(false);
+            ////CGAL.GenerateNewObject(stamp, leftMaterial);
+            //// 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
+            ////MeshManager.Instance.Heart.SetActive(false);
         }
         else
         {
@@ -167,6 +178,7 @@ public class BoundaryCutMode : MonoBehaviour
                 MeshManager.Instance.mesh.triangles.Length / 3) == -1)
             {
                 Debug.Log(" 만들어지지 않음");
+                return;
             }
 
             Vector3[] newVertices = new Vector3[rayList.Count * 2];
@@ -183,14 +195,25 @@ public class BoundaryCutMode : MonoBehaviour
                 ) == -1)
             {
                 Debug.Log(" 만들어지지 않음");
+                return;
             }
-            CGAL.FillHole(stamp);
-            CGAL.ClipPolyhedronByMesh(heart, stamp);
+
+            if (CGAL.FillHole(stamp) == -1)
+            {
+                Debug.Log("fillhole error");
+                return;
+            }
+
+            if (CGAL.ClipPolyhedronByMesh(heart, stamp) == -1)
+            {
+                Debug.Log("Clip error");
+                return;
+            }
             MeshManager.Instance.SetNewObject(CGAL.GenerateNewObject(heart, heartMaterial));
             MakeDoubleFaceMesh.Instance.Reinitialize();
-            // 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
+            //// 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
 
-            //MeshManager.Instance.Heart.SetActive(false);
+            ////MeshManager.Instance.Heart.SetActive(false);
         }
     }
 }

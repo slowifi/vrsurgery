@@ -14,7 +14,6 @@ public class MeasureDiameterMode : MonoBehaviour
     private Ray firstRay;
     private LineRendererManipulate lineRenderer;
     private PatchManager patchManager;
-    // patch manager 싹 다 손봐야됨.
 
     private void FirstSet()
     {

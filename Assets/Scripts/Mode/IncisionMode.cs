@@ -11,7 +11,7 @@ public class IncisionMode : MonoBehaviour
     private Vector3 oldPosition;
     private LineRendererManipulate lineRenderer;
     private string mode;
-    private bool testbool = false;
+    
     private IncisionManager IncisionManager;
     private GameObject incisionDistance;
     private Canvas rectCanvas;
