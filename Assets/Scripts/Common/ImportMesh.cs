@@ -105,7 +105,7 @@ public class ImportMesh : MonoBehaviour
 
         Debug.Log(path);
         //var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
-        // 여기에 추가 해야될 것은 새로 읽어드렸을 때, 리셋 기능.
+        // 여기에 추가 해야될 것은 새로 읽어들였을 때, 리셋 기능.
 
         //ObjImporter asdf = new ObjImporter();
 
