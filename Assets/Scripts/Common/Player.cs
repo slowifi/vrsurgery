@@ -6,34 +6,68 @@ public class Player : MonoBehaviour
 {
     // 행동제어를 아예 player쪽에서 하기.
 
-    private bool incision = false;
-    private bool boundary = false;
-    private bool patch = false;
+    private bool boolRotation = true;
+    private bool boolScaling = true;
+    private bool boolTranslation = true;
 
-    public void OneSecondOff()
+
+    private void Awake()
     {
-        patch = true;
+        EventManager.Instance.Events.OnModeChanged += Events_OnChanged;
+        EventManager.Instance.Events.OnModeManipulate += Events_OnModeManipulate;
     }
 
-    public void IncisionModeOn()
+    private void SetTrueTransformBool()
     {
-        incision = true;
-        
+        boolRotation = true;
+        boolScaling = true;
+        boolTranslation = true;
     }
 
-    public void IncisionModeOff()
+    private void SetFalseTransformBool()
     {
-        incision = false;
+        boolRotation = false;
+        boolScaling = false;
+        boolTranslation = false;
     }
 
-    public void BoundaryModeOn()
+    private void Events_OnModeManipulate(string action)
     {
-        boundary = true;
+        switch (action)
+        {
+            case "StopAll":
+                SetFalseTransformBool();
+                break;
+            case "EndAll":
+                SetTrueTransformBool();
+                break;
+            case "EndWithoutScaling":
+                SetTrueTransformBool();
+                boolScaling = false;
+                break;
+        }
     }
 
-    public void BoundaryModeOff()
+    private void Events_OnChanged(string mode)
     {
-        boundary = false;
+        switch (mode)
+        {
+            case "Incision":
+                Debug.Log("incision 실행");
+                break;
+            case "Cut":
+                Debug.Log("cut 실행");
+                break;
+            case "Patch":
+                Debug.Log("patch 실행");
+                break;
+            case "Slice":
+                Debug.Log("slice 실행");
+                break;
+            case "Measure":
+                Debug.Log("measure 실행");
+                break;
+        }
     }
 
     void Update()
@@ -41,34 +75,34 @@ public class Player : MonoBehaviour
 #if UNITY_STANDALONE_WIN
 
         float wheel = Input.GetAxis("Mouse ScrollWheel");
-        if (wheel!=0)
+        if (wheel!=0 && boolScaling)
         {
             // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
-            ObjManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
+            MeshManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
 
-            if (ObjManager.Instance.pivotTransform.localScale.x <= 0.2f)
-                ObjManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
+            if (MeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
+                MeshManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
 
             AdjacencyList.Instance.WorldPositionUpdate();
         }
-        else if (Input.GetMouseButton(1))
+        else if (Input.GetMouseButton(1) && boolRotation)
         {
             // 여기에 UI 추가.
             float x = Input.GetAxis("Mouse X");
             float y = Input.GetAxis("Mouse Y");
-            ObjManager.Instance.pivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
-            ObjManager.Instance.pivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
+            MeshManager.Instance.pivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
+            MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
             AdjacencyList.Instance.WorldPositionUpdate();
         }
-        else if (Input.GetMouseButton(2))
+        else if (Input.GetMouseButton(2) && boolTranslation)
         {
             // 여기에 UI 추가.
             // 전체 이동.
             float xPos = Input.GetAxis("Mouse X");
             float yPos = Input.GetAxis("Mouse Y");
 
-            ObjManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
-            ObjManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
+            MeshManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
+            MeshManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
             AdjacencyList.Instance.WorldPositionUpdate();
         }
         // 특정 움직임이 있었을 때만 업데이트 하도록 해야됨.
@@ -83,27 +117,24 @@ public class Player : MonoBehaviour
         float XResolution = resolutions.width;
         float YResolution = resolutions.height;
 
-        if (Input.touchCount == 1) // For Touch Input with a finger
+        if (Input.touchCount == 1 && boolRotation) // For Touch Input with a finger
         {
-            if(!boundary && !patch)
-            {    
-                if (Input.GetTouch(0).phase == TouchPhase.Moved)
-                {
-                    float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
-                    float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
-                    // select the axis by which you want to rotate the GameObject                               
-                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.up, XaxisRotation/20f);
-                    ObjManager.Instance.pivotTransform.RotateAround(Vector3.right, YaxisRotation/20f);
-                }
-                AdjacencyList.Instance.WorldPositionUpdate();
-                return;
+            
+            if (Input.GetTouch(0).phase == TouchPhase.Moved)
+            {
+                float XaxisRotation = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
+                float YaxisRotation = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
+                // select the axis by which you want to rotate the GameObject                               
+                MeshManager.Instance.pivotTransform.RotateAround(Vector3.up, XaxisRotation/20f);
+                MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, YaxisRotation/20f);
             }
-            patch = false;
+            AdjacencyList.Instance.WorldPositionUpdate();
             return;
+            
         }
 
 
-        if (Input.touchCount == 2)
+        if (Input.touchCount == 2 && boolScaling)
         {
             // Store both touches.
             Touch touchZero = Input.GetTouch(0);
@@ -123,36 +154,51 @@ public class Player : MonoBehaviour
             //여기서 조건 두개임. 하나는 그냥 확대고, 하나는 ui에서 스크롤 조절하게.
 
             // incision임을 안다면 scroll값만 바꾸게 해야되는데 흠...
-            Debug.Log(incision);
-            if(incision)
-            {
-                float extendValue = UIManager.Instance.extendBar.value + deltaMagnitudeDiff/500;
-                if (extendValue >= 1)
-                    UIManager.Instance.extendBar.value = 1;
-                else if (extendValue <= 0)
-                    UIManager.Instance.extendBar.value = 0;
-                else
-                    UIManager.Instance.extendBar.value = extendValue;
-                return;
-            }
-            ObjManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/700;
+            
+            MeshManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/700;
 
-            if (ObjManager.Instance.pivotTransform.localScale.x <= 0.2f)
-                ObjManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
+            if (MeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
+                MeshManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
             AdjacencyList.Instance.WorldPositionUpdate();
 
             return;
         }
+        else if(Input.touchCount == 2)
+        {
+            // Store both touches.
+            Touch touchZero = Input.GetTouch(0);
+            Touch touchOne = Input.GetTouch(1);
 
-        if (Input.touchCount == 3)
+            // Find the position in the previous frame of each touch.
+            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+
+            // Find the magnitude of the vector (the distance) between the touches in each frame.
+            float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+            float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+
+            // Find the difference in the distances between each frame.
+            float deltaMagnitudeDiff = touchDeltaMag - prevTouchDeltaMag;
+
+            float extendValue = UIManager.Instance.extendBar.value + deltaMagnitudeDiff / 500;
+            if (extendValue >= 1)
+                UIManager.Instance.extendBar.value = 1;
+            else if (extendValue <= 0)
+                UIManager.Instance.extendBar.value = 0;
+            else
+                UIManager.Instance.extendBar.value = extendValue;
+            return;
+        }
+
+        if (Input.touchCount == 3 && boolTranslation)
         {
             if (Input.GetTouch(0).phase == TouchPhase.Moved)
             {
                 float xPos = Input.GetTouch(0).deltaPosition.x / XResolution * -90.0f;
                 float yPos = Input.GetTouch(0).deltaPosition.y / YResolution * -90.0f;
                 // select the axis by which you want to rotate the GameObject                               
-                ObjManager.Instance.pivotTransform.position += Vector3.left * -xPos;
-                ObjManager.Instance.pivotTransform.position += Vector3.up * -yPos;
+                MeshManager.Instance.pivotTransform.position += Vector3.left * -xPos;
+                MeshManager.Instance.pivotTransform.position += Vector3.up * -yPos;
             }
             AdjacencyList.Instance.WorldPositionUpdate();
         }

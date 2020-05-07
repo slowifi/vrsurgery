@@ -7,109 +7,200 @@ using UnityEngine;
 
 public class ButtonPress : Singleton<ButtonPress>
 {
-    public GameObject mainManager;
-    public Button cutButton;
-    public Button patchButton;
-    public Button measureButton;
-    public Button incisionButton;
+    /// <summary>
+    /// 여기도 대규모 수정 필요함.
+    /// </summary>
+    /// 
+
+    public GameObject MainManager;
+    public Button CutButton;
+    public Button SliceButton;
+    public Button PatchButton;
+    public Button MeasureButton;
+    public Button IncisionButton;
+    public Button MeasureDiameterButton;
+
+    private Sprite[] cutImage;
+    private Sprite[] sliceImage;
+    private Sprite[] patchImage;
+    private Sprite[] measureImage;
+    private Sprite[] incisionImage;
+
+    //private ColorBlock selectedColorBlock;
+    //private ColorBlock unselectedColorBlock;
+
+    private void Awake()
+    {
+        EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
+        cutImage = new Sprite[2];
+        sliceImage = new Sprite[2];
+        patchImage = new Sprite[2];
+        measureImage = new Sprite[2];
+        incisionImage = new Sprite[2];
+
+        cutImage[0] = Resources.Load("UI/Icon/Icon_D_0", typeof(Sprite)) as Sprite;
+        cutImage[1] = Resources.Load("UI/Icon/Icon_D_1", typeof(Sprite)) as Sprite;
+
+        sliceImage[0] = Resources.Load("UI/Icon/Icon_B_0", typeof(Sprite)) as Sprite;
+        sliceImage[1] = Resources.Load("UI/Icon/Icon_B_1", typeof(Sprite)) as Sprite;
+
+        patchImage[0] = Resources.Load("UI/Icon/Icon_C_0", typeof(Sprite)) as Sprite;
+        patchImage[1] = Resources.Load("UI/Icon/Icon_C_1", typeof(Sprite)) as Sprite;
+
+        //measureImage[0].sprite = Resources.Load("UI/Icon/Icon_D_0", typeof(Sprite)) as Sprite;
+        //measureImage[1].sprite = Resources.Load("UI/Icon/Icon_D_1", typeof(Sprite)) as Sprite;
+
+        incisionImage[0] = Resources.Load("UI/Icon/Icon_A_0", typeof(Sprite)) as Sprite;
+        incisionImage[1] = Resources.Load("UI/Icon/Icon_A_1", typeof(Sprite)) as Sprite;
+
+        //selectedColorBlock = SliceButton.colors;
+        //unselectedColorBlock = SliceButton.colors;
+        //selectedColorBlock.normalColor = new Color32(176, 48, 48, 255);
+    }
+    
+    public void Events_OnModeChanged(string mode)
+    {
+        switch(mode)
+        {
+            case "Incision":
+                EventManager.Instance.Events.InvokeModeChanged("IncisionMode");
+                Debug.Log("incision 실행");
+                break;
+            case "Cut":
+                EventManager.Instance.Events.InvokeModeChanged("CutMode");
+                Debug.Log("cut 실행");
+                break;
+            case "Patch":
+                EventManager.Instance.Events.InvokeModeChanged("PatchMode");
+                Debug.Log("patch 실행");
+                break;
+            case "Slice":
+                EventManager.Instance.Events.InvokeModeChanged("SliceMode");
+                Debug.Log("slice 실행");
+                break;
+            case "Measure":
+                EventManager.Instance.Events.InvokeModeChanged("MeasureMode");
+                Debug.Log("measure 실행");
+                break;
+            case "MeasureDiameter":
+                EventManager.Instance.Events.InvokeModeChanged("MeasureDiameterMode");
+                Debug.Log("Measure diameter 실행");
+                break;
+            case "ResetButton":
+                ResetButton();
+                break;
+        }
+    }
+
 
     public void ResetButton()
     {
-        ColorBlock colorTemp = cutButton.colors;
-        colorTemp.normalColor = new Color32(137, 96, 96, 255);
-        cutButton.colors = colorTemp;
-        patchButton.colors = colorTemp;
-        incisionButton.colors = colorTemp;
-        measureButton.colors = colorTemp;
+        SliceButton.image.sprite = sliceImage[0];
+        CutButton.image.sprite = cutImage[0];
+        PatchButton.image.sprite = patchImage[0];
+        IncisionButton.image.sprite = incisionImage[0];
+        //MeasureButton.colors = colorTemp;
     }
 
-    public void Cutting()
+    public void Slicing()
     {
-        // selected Color32(176, 48, 48, 255);
-        // unselected Color32(137, 96, 96, 255);
-        if (cutButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        // 지금 이 지저분한 코드도 수정할 수 있으면 하도록하기.
+        if (SliceButton.image.sprite == sliceImage[1])
         {
-            ColorBlock colorTemp = cutButton.colors;
-            colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            cutButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
+            SliceButton.image.sprite = sliceImage[0];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
         }
         else
         {
-            ColorBlock colorTemp = cutButton.colors;
-            patchButton.colors = colorTemp;
-            measureButton.colors = colorTemp;
-            incisionButton.colors = colorTemp;
-            colorTemp.normalColor = new Color32(176, 48, 48, 255);
-            cutButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
-            mainManager.SendMessage("CutMode");
+            ResetButton();
+            SliceButton.image.sprite = sliceImage[1];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
+            Events_OnModeChanged("Slice");
+        }
+    }
+
+
+    public void Cutting()
+    {
+        if (CutButton.image.sprite == cutImage[1])
+        {
+            CutButton.image.sprite = cutImage[0];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
+        }
+        else
+        {
+            ResetButton();
+            CutButton.image.sprite = cutImage[1];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
+            Events_OnModeChanged("Cut");
         }
     }
 
     public void Patching()
     {
-        if (patchButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        
+        if (PatchButton.image.sprite == patchImage[1])
         {
-            ColorBlock colorTemp = patchButton.colors;
-            colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            patchButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
+            PatchButton.image.sprite = patchImage[0];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
         }
         else
         {
-            ColorBlock colorTemp = patchButton.colors;
-            cutButton.colors = colorTemp;
-            measureButton.colors = colorTemp;
-            incisionButton.colors = colorTemp;
-            colorTemp.normalColor = new Color32(176, 48, 48, 255);
-            patchButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
-            mainManager.SendMessage("PatchMode");
+            ResetButton();
+            PatchButton.image.sprite = patchImage[1];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
+            Events_OnModeChanged("Patch");
         }
     }
 
     public void Measuring()
     {
-        if (measureButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (MeasureButton.colors.normalColor == new Color32(176, 48, 48, 255))
         {
-            ColorBlock colorTemp = measureButton.colors;
-            colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            measureButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
+            //MeasureButton.colors = unselectedColorBlock;
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
         }
         else
         {
-            ColorBlock colorTemp = measureButton.colors;
-            patchButton.colors = colorTemp;
-            cutButton.colors = colorTemp;
-            incisionButton.colors = colorTemp;
-            colorTemp.normalColor = new Color32(176, 48, 48, 255);
-            measureButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
-            mainManager.SendMessage("MeasureMode");
+            ResetButton();
+            //MeasureButton.colors = selectedColorBlock;
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
+            Events_OnModeChanged("Measure");
         }
+    }
+
+    public void MeasureDiameter()
+    {
+        ResetButton();
+        EventManager.Instance.Events.InvokeModeChanged("Exit");
+        Events_OnModeChanged("MeasureDiameter");
+        //if (IncisionButton.image.sprite == incisionImage[1])
+        //{
+        //    IncisionButton.image.sprite = incisionImage[0];
+        //    EventManager.Instance.Events.InvokeModeChanged("Exit");
+        //}
+        //else
+        //{
+        //    ResetButton();
+        //    IncisionButton.image.sprite = incisionImage[1];
+        //    EventManager.Instance.Events.InvokeModeChanged("Exit");
+        //    Events_OnModeChanged("Incision");
+        //}
     }
 
     public void Incisioning()
     {
-        if (incisionButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (IncisionButton.image.sprite == incisionImage[1])
         {
-            ColorBlock colorTemp = incisionButton.colors;
-            colorTemp.normalColor = new Color32(137, 96, 96, 255);
-            incisionButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
+            IncisionButton.image.sprite = incisionImage[0];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
         }
         else
         {
-            ColorBlock colorTemp = incisionButton.colors;
-            patchButton.colors = colorTemp;
-            measureButton.colors = colorTemp;
-            cutButton.colors = colorTemp;
-            colorTemp.normalColor = new Color32(176, 48, 48, 255);
-            incisionButton.colors = colorTemp;
-            mainManager.SendMessage("Exit");
-            mainManager.SendMessage("IncisionMode");
+            ResetButton();
+            IncisionButton.image.sprite = incisionImage[1];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
+            Events_OnModeChanged("Incision");
         }
     }
 

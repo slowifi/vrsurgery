@@ -1,311 +1,75 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class IntersectionManager : Singleton<IntersectionManager>
+public class IntersectedValues
 {
-    public int GetIntersectedValues(Ray cameraRay)
+    public IntersectedValues()
     {
-        float dst_min = 10000000;
+        Intersected = false;
+        TriangleIndex = -1;
+        VertexIndex = -1;
+        Disance = 0.0f;
+        IntersectedPosition = Vector3.zero;
+    }
+    public Ray ray;
+    public bool Intersected;
+    public int TriangleIndex;
+    //VertexIndex : 트라이앵글의 세 버텍스중 아무거나 하나.
+    public int VertexIndex;
+    public float Disance;
+    public Vector3 IntersectedPosition;
+}
+
+public class Intersections
+{
+    public static IntersectedValues GetIntersectedValues()
+    {
+        Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        Vector3 intersectionTemp = Vector3.zero;
-        int vertexIndex = -1;
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                {
-                    dst_min = dst_temp;
-                    vertexIndex = triangles[i];
-                }
-            }
-        }
-        return vertexIndex;
+        return GetIntersectedValues(ray, triangles, worldPosition);
     }
 
-    public void GetIntersectedValues(Ray cameraRay, ref int triangleIndex)
+    public static IntersectedValues GetIntersectedValues(Ray ray)
     {
-        float dst_min = 10000000;
         int[] triangles = MeshManager.Instance.mesh.triangles;
         List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        Vector3 intersectionTemp = Vector3.zero;
-
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                {
-                    dst_min = dst_temp;
-                    triangleIndex = i;
-                }
-            }
-        }
+        return GetIntersectedValues(ray, triangles, worldPosition);
     }
 
-    public void GetIntersectedValues(Ray cameraRay, ref Vector3 intersectionPoint)
+    public static IntersectedValues GetIntersectedValues(Ray cameraRay, int[] triangles, List<Vector3> worldPosition)
     {
+
+        IntersectedValues temp = new IntersectedValues();
         float dst_min = 10000000;
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
         Vector3 intersectionTemp = Vector3.zero;
 
         for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
+            if (RayTriangleIntersection(
+                worldPosition[triangles[i]],
+                worldPosition[triangles[i + 1]],
+                worldPosition[triangles[i + 2]],
+                cameraRay,
+                ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)
                 {
+                    temp.Disance = dst_temp;
+                    temp.VertexIndex = triangles[i];
+                    temp.TriangleIndex = i;
+                    temp.IntersectedPosition = intersectionTemp;
+                    temp.ray = cameraRay;
                     dst_min = dst_temp;
-                    intersectionPoint = intersectionTemp;
                 }
             }
         }
+        temp.Intersected = dst_min != 10000000;
+        return temp;
     }
 
-    public void GetIntersectedValues(Ray cameraRay, ref Vector3 intersectionPoint, ref int triangleIndex)
-    {
-        float dst_min = 10000000;
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        Vector3 intersectionTemp = Vector3.zero;
-
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                {
-                    dst_min = dst_temp;
-                    intersectionPoint = intersectionTemp;
-                    triangleIndex = i;
-                }
-            }
-        }
-    }
-
-    public void GetIntersectedValues(Ray cameraRay, ref int outerTriangleIndex, ref int innerTriangleIndex)
-    {
-        float dst_min = 10000000;
-        float dst_2nd = 10000000;
-
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        Vector3 intersectionTemp = Vector3.zero;
-
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                {
-                    if (dst_min != 10000000)
-                    {
-                        innerTriangleIndex = outerTriangleIndex;
-                        dst_2nd = dst_min;
-                        
-                    }
-                    dst_min = dst_temp;
-                    outerTriangleIndex = i;
-                    continue;
-                }
-                if (dst_2nd > dst_temp)
-                {
-                    innerTriangleIndex = i;
-                    dst_2nd = dst_temp;
-                }
-            }
-        }
-        if(outerTriangleIndex == -1)
-        {
-            Debug.Log("triangle이랑 intersect 되지 않음.");
-            // 여기다가 예외처리를 어떻게 해줄 것인지.
-        }
-        else if(innerTriangleIndex == -1)
-        {
-            Debug.Log("triangle이랑 intersect 되지 않음.");
-        }
-        
-    }
-
-    public void GetIntersectedValues(Ray cameraRay, ref Vector3 outerIntersectionPosition, ref Vector3 innerIntersectionPosition)
-    {
-        float dst_min = 10000000;
-        float dst_2nd = 10000000;
-
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-
-        Vector3 intersectionTemp = Vector3.zero;
-
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                {
-                    if (dst_min != 10000000)
-                    {
-                        innerIntersectionPosition = outerIntersectionPosition;
-                        dst_2nd = dst_min;
-                    }
-                    dst_min = dst_temp;
-                    outerIntersectionPosition = intersectionTemp;
-                    continue;
-                }
-                if (dst_2nd > dst_temp)
-                {
-                    innerIntersectionPosition = intersectionTemp;
-                    dst_2nd = dst_temp;
-                }
-            }
-        }
-
-        if (outerIntersectionPosition == Vector3.zero)
-        {
-            Debug.Log("triangle이랑 intersect 되지 않음.");
-            // 여기다가 예외처리를 어떻게 해줄 것인지.
-        }
-        else if (innerIntersectionPosition == Vector3.zero)
-        {
-            Debug.Log("triangle이랑 intersect 되지 않음.");
-        }
-
-    }
-
-    public void GetIntersectedValues(Ray cameraRay, ref Vector3 outerIntersectionPosition, ref Vector3 innerIntersectionPosition, ref int outerTriangleIndex, ref int innerTriangleIndex)
-    {
-        float dst_min = 10000000;
-        float dst_2nd = 10000000;
-
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-
-        //Vector3 intersectionInnerPoint = Vector3.zero;
-        //Vector3 intersectionOuterPoint = Vector3.zero;
-        Vector3 intersectionTemp = Vector3.zero;
-
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                {
-                    if (dst_min != 10000000)
-                    {
-                        innerTriangleIndex = outerTriangleIndex;
-                        innerIntersectionPosition = outerIntersectionPosition;
-                        dst_2nd = dst_min;
-                    }
-                    dst_min = dst_temp;
-                    outerTriangleIndex = i;
-                    outerIntersectionPosition = intersectionTemp;
-                    continue;
-                }
-                if (dst_2nd > dst_temp)
-                {
-                    innerTriangleIndex = i;
-                    innerIntersectionPosition = intersectionTemp;
-                    dst_2nd = dst_temp;
-                }
-            }
-        }
-        if (outerTriangleIndex == -1)
-        {
-            Debug.Log("triangle이랑 intersect 되지 않음.");
-            // 여기다가 예외처리를 어떻게 해줄 것인지.
-        }
-        else if (innerTriangleIndex == -1)
-        {
-            Debug.Log("triangle이랑 intersect 되지 않음.");
-        }
-    }
-
-    public bool RayObjectIntersection(Ray cameraRay)
-    {
-        float dst_min = 10000000;
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        Vector3 intersectionTemp = Vector3.zero;
-
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                    dst_min = dst_temp;
-            }
-        }
-        if (dst_min != 10000000)
-            return true;
-        else
-            return false;
-
-    }
-
-    public bool RayObjectIntersection(Ray cameraRay, ref Vector3 intersectionPoint)
-    {
-        float dst_min = 10000000;
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        Vector3 intersectionTemp = Vector3.zero;
-
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                {
-                    dst_min = dst_temp;
-                    intersectionPoint = intersectionTemp;
-                }
-            }
-        }
-        if (dst_min != 10000000)
-            return true;
-        else
-            return false;
-                
-    }
-
-    public bool RayObjectIntersection(Ray cameraRay, ref Vector3 intersectionPoint, ref int triangleIndex)
-    {
-        float dst_min = 10000000;
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        Vector3 intersectionTemp = Vector3.zero;
-
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(worldPosition[triangles[i]], worldPosition[triangles[i + 1]], worldPosition[triangles[i + 2]], cameraRay, ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                {
-                    dst_min = dst_temp;
-                    intersectionPoint = intersectionTemp;
-                    triangleIndex = i;
-                }
-            }
-        }
-
-        if (dst_min != 10000000)
-            return true;
-        else
-            return false;
-    }
-
-    public bool RayTriangleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, Ray ray, ref Vector3 intersectionTemp)
+    public static bool RayTriangleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, Ray ray, ref Vector3 intersectionTemp)
     {
         Vector3 e1, e2, T, P;
         float Epsilon = 0.000001f;
@@ -318,7 +82,9 @@ public class IntersectionManager : Singleton<IntersectionManager>
         var det = Vector3.Dot(e1, P);
 
         if (det > -Epsilon && det < Epsilon)
+        {
             return false;
+        }
 
         var invDet = 1 / det;
 
@@ -326,12 +92,16 @@ public class IntersectionManager : Singleton<IntersectionManager>
         var u = invDet * Vector3.Dot(T, P);
 
         if (u > 1 || u < 0)
+        {
             return false;
+        }
 
         var v = invDet * Vector3.Dot(ray.direction, Vector3.Cross(T, e1));
 
         if (v < 0 || u + v > 1)
+        {
             return false;
+        }
 
         var t = invDet * Vector3.Dot(e2, Vector3.Cross(T, e1));
 
@@ -343,7 +113,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
         return false;
     }
 
-    public bool RayTriangleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 origin, Vector3 direction, ref Vector3 intersectionTemp)
+    public static bool RayTriangleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 origin, Vector3 direction, ref Vector3 intersectionTemp)
     {
         Vector3 e1, e2, T, P;
         float Epsilon = 0.000001f;
@@ -356,7 +126,9 @@ public class IntersectionManager : Singleton<IntersectionManager>
         var det = Vector3.Dot(e1, P);
 
         if (det > -Epsilon && det < Epsilon)
+        {
             return false;
+        }
 
         var invDet = 1 / det;
 
@@ -364,12 +136,16 @@ public class IntersectionManager : Singleton<IntersectionManager>
         var u = invDet * Vector3.Dot(T, P);
 
         if (u > 1 || u < 0)
+        {
             return false;
+        }
 
         var v = invDet * Vector3.Dot(direction, Vector3.Cross(T, e1));
 
         if (v < 0 || u + v > 1)
+        {
             return false;
+        }
 
         var t = invDet * Vector3.Dot(e2, Vector3.Cross(T, e1));
 
@@ -382,12 +158,18 @@ public class IntersectionManager : Singleton<IntersectionManager>
         return false;
     }
 
-    public int TriangleEdgeIntersection(ref int edgeIdx, ref Vector3 edgePoint, Vector3 incisionStartPoint, Vector3 incisionEndPoint, ref int incisionTriangleIndex, Ray screenStartRay, Ray screenEndRay)
+    public static int TriangleEdgeIntersection(
+        ref int edgeIdx,
+        ref Vector3 edgePoint,
+        Vector3 incisionStartPoint,
+        Vector3 incisionEndPoint,
+        ref int incisionTriangleIndex,
+        Ray screenStartRay,
+        Ray screenEndRay,
+        List<Edge> edgeList,
+        List<Vector3> worldVertices)
     {
         // return side number : 1, 2, 0 / 1 : couter-clockwise, 2 : clockwise, 0 : 첫 시작, -1 : error 반환
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
-        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
-
         int currentEdgeIndex = edgeIdx;
 
         Vector3 intersectionPoint = Vector3.zero;
@@ -402,17 +184,27 @@ public class IntersectionManager : Singleton<IntersectionManager>
         {
             bool checkIntersection = true;
 
-            if (currentEdgeIndex != -1 && edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 && edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
+            if (currentEdgeIndex != -1 &&
+                edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 &&
+                edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
                 continue;
 
             // 이거 자체를 바꿔야하나?
-            if (RayTriangleIntersection(screenMiddlePoint, incisionStartPoint + screenStartRay.direction * 10, incisionEndPoint + screenEndRay.direction * 10, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1], ref intersectionTemp))
+
+            if (RayTriangleIntersection(
+                screenMiddlePoint,
+                incisionStartPoint + screenStartRay.direction * 10,
+                incisionEndPoint + screenEndRay.direction * 10,
+                worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
+                worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
+                ref intersectionTemp))
             {
                 //intersectionPoint = intersectionTemp;
-                if (!(intersectionTemp.x <= Mathf.Min(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)) && !(intersectionTemp.x >= Mathf.Max(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)))
+                if (!(intersectionTemp.x <= Mathf.Min(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)) &&
+                    !(intersectionTemp.x >= Mathf.Max(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)))
                 {
                     intersectionPoint = intersectionTemp;
-                    Debug.Log("ray triangle intersection");
+
                 }
                 else
                     checkIntersection = false;
@@ -452,44 +244,22 @@ public class IntersectionManager : Singleton<IntersectionManager>
             // clockwise
             return 2;
         }
-        //Debug.Log(edgeIdx);
-        //Debug.Log(currentEdgeIndex);
-        //Debug.Log(intersectionCount);
-        //int[] triangles = MeshManager.Instance.mesh.triangles;
-        //GameObject v_test = new GameObject();
-        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //v_test.transform.position = incisionStartPoint;
-
-        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //v_test.transform.position = incisionEndPoint;
-
-        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //v_test.transform.position = worldVertices[edgeList[edgeIdx].vtx1];
-
-        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //v_test.transform.position = worldVertices[edgeList[edgeIdx].vtx2];
-
-
-        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //v_test.transform.position = worldVertices[triangles[incisionTriangleIndex]];
-
-        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //v_test.transform.position = worldVertices[triangles[incisionTriangleIndex+1]];
-
-        //v_test = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //v_test.transform.position = worldVertices[triangles[incisionTriangleIndex+2]];
-
-        //Debug.Break();
         return -1;
     }
 
 
-    public int PlaneEdgeIntersection(ref int edgeIdx, ref Vector3 edgePoint, Vector3 incisionStartPoint, Vector3 incisionEndPoint, ref int incisionTriangleIndex, Ray screenStartRay, Ray screenEndRay)
+    public static int PlaneEdgeIntersection(
+        ref int edgeIdx,
+        ref Vector3 edgePoint,
+        Vector3 incisionStartPoint,
+        Vector3 incisionEndPoint,
+        ref int incisionTriangleIndex,
+        Ray screenStartRay,
+        Ray screenEndRay,
+        List<Edge> edgeList,
+        List<Vector3> worldVertices)
     {
         // return side number : 1, 2, 0 / 1 : couter-clockwise, 2 : clockwise, 0 : 첫 시작, -1 : error 반환
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
-        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
-
         int currentEdgeIndex = edgeIdx;
 
         Vector3 intersectionPoint = Vector3.zero;
@@ -497,7 +267,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
 
         // 이 밑에 두개 값들은 고정된 값이므로 여기서 계산하지말고 밖에서 한번만 계산해서 넘겨주는식으로.
         Vector3 screenMiddlePoint = Vector3.Lerp(screenStartRay.origin, screenEndRay.origin, 0.5f);
-        Vector3 planeNormal = AlgorithmsManager.Instance.GetPlaneNormal(screenMiddlePoint, incisionStartPoint, incisionEndPoint);
+        Vector3 planeNormal = Algorithms.GetPlaneNormal(screenMiddlePoint, incisionStartPoint, incisionEndPoint);
 
         // 여기를 다시 한 번 보자.
         int intersectionCount = 0;
@@ -505,11 +275,17 @@ public class IntersectionManager : Singleton<IntersectionManager>
         {
             bool checkIntersection = true;
 
-            if (currentEdgeIndex != -1 && edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 && edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
+            if (currentEdgeIndex != -1 &&
+                edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 &&
+                edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
                 continue;
 
             //처음에 방향 설정 관련
-            if (LinePlaneIntersection(ref intersectionTemp, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2]- worldVertices[edgeList[incisionTriangleIndex + i].vtx1], planeNormal, incisionStartPoint))
+            if (LinePlaneIntersection(ref intersectionTemp,
+                worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
+                worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
+                planeNormal,
+                incisionStartPoint))
             {
                 //첫 시작에서 두개가 잡혀야됨. 버텍스에서 시작할 때가 문제인데 아닌 버텍스인경우 엣지를 아예 검사하지 말아야됨.
                 Debug.Log("line plane intersection");
@@ -553,13 +329,19 @@ public class IntersectionManager : Singleton<IntersectionManager>
         return -1;
     }
 
-    public int PlaneEdgeIntersectionStart(ref int edgeIdx, ref Vector3 edgePoint, Vector3 incisionStartPoint, Vector3 incisionEndPoint, ref int incisionTriangleIndex, Ray screenStartRay, Ray screenEndRay)
+    public static int PlaneEdgeIntersectionStart(
+        ref int edgeIdx,
+        ref Vector3 edgePoint,
+        Vector3 incisionStartPoint,
+        Vector3 incisionEndPoint,
+        ref int incisionTriangleIndex,
+        Ray screenStartRay,
+        Ray screenEndRay,
+        List<Edge> edgeList,
+        List<Vector3> worldVertices)
     {
         // 여기서 근데 3개가 겹쳐야 정상인거 같은데?
         // return side number : 1, 2, 0 / 1 : couter-clockwise, 2 : clockwise, 0 : 첫 시작, -1 : error 반환
-        List<AdjacencyList.Edge> edgeList = AdjacencyList.Instance.edgeList;
-        List<Vector3> worldVertices = AdjacencyList.Instance.worldPositionVertices;
-
         int currentEdgeIndex = edgeIdx;
 
         Vector3 intersectionPoint = Vector3.zero;
@@ -567,20 +349,25 @@ public class IntersectionManager : Singleton<IntersectionManager>
 
         // 이 밑에 두개 값들은 고정된 값이므로 여기서 계산하지말고 밖에서 한번만 계산해서 넘겨주는식으로.
         Vector3 screenMiddlePoint = Vector3.Lerp(screenStartRay.origin, screenEndRay.origin, 0.5f);
-        Vector3 planeNormal = AlgorithmsManager.Instance.GetPlaneNormal(screenMiddlePoint, incisionStartPoint, incisionEndPoint);
+        Vector3 planeNormal = Algorithms.GetPlaneNormal(screenMiddlePoint, incisionStartPoint, incisionEndPoint);
 
         // 여기를 다시 한 번 보자.
-        int intersectionCount = 0;
         float distance = 1000000;
         for (int i = 0; i < 3; i++)
         {
             bool checkIntersection = true;
 
-            if (currentEdgeIndex != -1 && edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 && edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
+            if (currentEdgeIndex != -1 &&
+                edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 &&
+                edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
                 continue;
 
             //처음에 방향 설정 관련
-            if (LinePlaneIntersectionModified(ref intersectionTemp, worldVertices[edgeList[incisionTriangleIndex + i].vtx1], worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1], planeNormal, incisionStartPoint))
+            if (LinePlaneIntersectionModified(ref intersectionTemp,
+                worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
+                worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
+                planeNormal,
+                incisionStartPoint))
             {
                 //첫 시작에서 두개가 잡혀야됨. 버텍스에서 시작할 때가 문제인데 아닌 버텍스인경우 엣지를 아예 검사하지 말아야됨.
                 Debug.Log("line plane intersection");
@@ -592,7 +379,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
             if (checkIntersection)
             {
                 float curDistance = Vector3.Distance(intersectionPoint, incisionEndPoint);
-                if(curDistance<distance)
+                if (curDistance < distance)
                 {
                     distance = curDistance;
                     edgeIdx = incisionTriangleIndex + i;
@@ -627,7 +414,7 @@ public class IntersectionManager : Singleton<IntersectionManager>
         return -1;
     }
 
-    public bool LinePlaneIntersection(ref Vector3 intersectionPoint, Vector3 linePoint, Vector3 lineVec, Vector3 planeNormal, Vector3 planePoint)
+    public static bool LinePlaneIntersection(ref Vector3 intersectionPoint, Vector3 linePoint, Vector3 lineVec, Vector3 planeNormal, Vector3 planePoint)
     {
         float length;
         float dotNumerator;
@@ -698,23 +485,23 @@ public class IntersectionManager : Singleton<IntersectionManager>
         }
     }
 
-    public bool LinePlaneIntersectionModified(ref Vector3 intersectionPoint, Vector3 linePoint, Vector3 lineVec, Vector3 planeNormal, Vector3 planePoint)
+    public static bool LinePlaneIntersectionModified(ref Vector3 intersectionPoint, Vector3 linePoint, Vector3 lineVec, Vector3 planeNormal, Vector3 planePoint)
     {
         float denom = Vector3.Dot(planeNormal, lineVec);
         if (Mathf.Abs(denom) > 0.0001f) // your favorite epsilon
         {
-            float t = Vector3.Dot( (planePoint - linePoint), planeNormal) / denom;
+            float t = Vector3.Dot((planePoint - linePoint), planeNormal) / denom;
             if (t >= 0)
             {
                 intersectionPoint = linePoint + t * lineVec;
-                if(intersectionPoint.x < linePoint.x)
+                if (intersectionPoint.x < linePoint.x)
                 {
                     if (intersectionPoint.x > (linePoint + lineVec).x)
                         return true;
                     else
                         return false;
                 }
-                else if(intersectionPoint.x > linePoint.x)
+                else if (intersectionPoint.x > linePoint.x)
                 {
                     if (intersectionPoint.x < (linePoint + lineVec).x)
                         return true;

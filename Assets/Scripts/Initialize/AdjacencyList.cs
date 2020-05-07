@@ -4,26 +4,15 @@ using UnityEngine;
 
 public class AdjacencyList : Singleton<AdjacencyList>
 {
+    /// <summary>
+    /// 이거 싱글톤에서 해제하고 각 메쉬마다 생성이 되도록 해야됨.
+    /// </summary>
+
+
     public Dictionary<int, HashSet<int>> connectedVertices;
     public Dictionary<int, HashSet<int>> connectedTriangles;
     public List<Edge> edgeList;
     public List<Vector3> worldPositionVertices;
-
-    public class Edge
-    {
-        public int vtx1 { get; set; }
-        public int vtx2 { get; set; }
-        public int tri1 { get; set; }
-        public int tri2 { get; set; }
-
-        public Edge(int v1, int v2, int t1, int t2)
-        {
-            vtx1 = v1;
-            vtx2 = v2;
-            tri1 = t1;
-            tri2 = t2;
-        }
-    }
 
     public void ListUpdate()
     {
@@ -35,7 +24,7 @@ public class AdjacencyList : Singleton<AdjacencyList>
         int vertexCount = MeshManager.Instance.mesh.vertexCount;
         int[] triangles = MeshManager.Instance.mesh.triangles;
 
-        LocalToWorldPosition();
+        worldPositionVertices = LocalToWorldPosition(MeshManager.Instance.mesh);
         ConnectedVerticesAndTriangles(vertexCount, triangles);
         GenerateEdgeList(vertexCount, triangles);
     }
@@ -49,24 +38,26 @@ public class AdjacencyList : Singleton<AdjacencyList>
         int vertexCount = MeshManager.Instance.mesh.vertexCount;
         int[] triangles = MeshManager.Instance.mesh.triangles;
 
-        LocalToWorldPosition();
+        worldPositionVertices = LocalToWorldPosition(MeshManager.Instance.mesh);
         ConnectedTrianglesAndEdges(vertexCount, triangles);
         //GenerateEdgeList(vertexCount, triangles);
     }
 
     public void WorldPositionUpdate()
     {
-        LocalToWorldPosition();
+        worldPositionVertices = LocalToWorldPosition(MeshManager.Instance.mesh);
     }
 
-    private void LocalToWorldPosition()
+    public List<Vector3> LocalToWorldPosition(Mesh mesh)
     {
-        worldPositionVertices = new List<Vector3>(MeshManager.Instance.mesh.vertices);
-        Transform objTransform = ObjManager.Instance.objTransform;
-        for (int i = 0; i < worldPositionVertices.Count; i++)
+        List<Vector3> worldPosition = new List<Vector3>(mesh.vertices);
+        Transform objTransform = MeshManager.Instance.objTransform;
+        for (int i = 0; i < worldPosition.Count; i++)
         {
-            worldPositionVertices[i] = objTransform.TransformPoint(worldPositionVertices[i]);
+            worldPosition[i] = objTransform.TransformPoint(worldPosition[i]);
         }
+
+        return worldPosition;
     }
 
     private void ConnectedTrianglesAndEdges(int verticesLength, int[] triangles)

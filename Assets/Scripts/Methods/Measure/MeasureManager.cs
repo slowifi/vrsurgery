@@ -1,20 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class MeasureManager : Singleton<MeasureManager>
+public class MeasureManager : MonoBehaviour
 {
-    public float distanceStartToEnd = 0f;
-    public Vector3 measureStart;
-    public Vector3 measureEnd;
+    private float distanceStartToEnd = 0f;
+    private Vector3 measureStart;
+    private Vector3 measureEnd;
+    
     public float MeasureDistance(Vector3 vertexPosition, Ray cameraRay)
     {
         if (vertexPosition != Vector3.zero)
         {
-            GameObject startPoint = ObjManager.Instance.startMeasurePoint;
-            GameObject endPoint = ObjManager.Instance.endMeasurePoint;
+            GameObject startPoint = MeshManager.Instance.startMeasurePoint;
+            GameObject endPoint = MeshManager.Instance.endMeasurePoint;
             if (!startPoint.activeSelf)
             {
-                Destroy(GameObject.Find("MeasureLine"));
                 measureStart = cameraRay.direction;
                 startPoint.SetActive(true);
                 startPoint.transform.position = vertexPosition;
@@ -25,16 +25,10 @@ public class MeasureManager : Singleton<MeasureManager>
                 endPoint.transform.position = vertexPosition;
                 measureEnd = cameraRay.direction;
                 // Debug.DrawLine(startPoint.transform.position, endPoint.transform.position, Color.yellow, 2, false);
-                GameObject lineRenderer = new GameObject("MeasureLine");
                 
-                var line = lineRenderer.AddComponent<LineRenderer>();
-                line.useWorldSpace = false;
-                line.material.color = Color.white;
-                line.SetWidth(0.6f, 0.6f);
-                line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 0.5f * ObjManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 0.5f * ObjManager.Instance.objTransform.lossyScale.z });
-                //line.SetPositions(new Vector3[] { startPoint.transform.position, endPoint.transform.position});
-                line.transform.SetParent(ObjManager.Instance.pivotTransform);
+                //line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 0.5f * MeshManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 0.5f * MeshManager.Instance.objTransform.lossyScale.z });
+                ////line.SetPositions(new Vector3[] { startPoint.transform.position, endPoint.transform.position});
+                //line.transform.SetParent(MeshManager.Instance.pivotTransform);
                 distanceStartToEnd = Vector3.Distance(endPoint.transform.position, startPoint.transform.position);
             }
             else
@@ -58,7 +52,7 @@ public class MeasureManager : Singleton<MeasureManager>
         // Debug.Log(worldPositionVertices.Length);
         for (int i = 0; i < triangles.Length; i += 3)
         {
-            if (IntersectionManager.Instance.RayTriangleIntersection(worldPositionVertices[triangles[i]], worldPositionVertices[triangles[i + 1]], worldPositionVertices[triangles[i + 2]], cameraRay, ref intersectionTemp))
+            if (Intersections.RayTriangleIntersection(worldPositionVertices[triangles[i]], worldPositionVertices[triangles[i + 1]], worldPositionVertices[triangles[i + 2]], cameraRay, ref intersectionTemp))
             {
                 float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
                 if (dst_min > dst_temp)

@@ -5,8 +5,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System;
-using SimpleFileBrowser;
 
+#if UNITY_ANDROID
+using SimpleFileBrowser;
+#endif
+
+#if UNITY_STANDALONE_WIN
+using Crosstales.FB;
+#endif
 
 public class ExportMesh : MonoBehaviour
 {
@@ -24,6 +30,26 @@ public class ExportMesh : MonoBehaviour
     public int normalOffset = 0;
     public int uvOffset = 0;
 
+#if UNITY_STANDALONE_WIN
+    public void FileBrowsing()
+    {
+        bool player = playerObject.activeSelf;
+        playerObject.SetActive(false);
+        string path = FileBrowser.SaveFile(extension:"obj");
+        if(path=="")
+        {
+            Debug.Log("저장 안됨");
+        }
+        else
+        {
+            Debug.Log(path);
+            Exporting(path);
+        }
+        playerObject.SetActive(player);
+
+    }
+#endif
+#if UNITY_ANDROID
     IEnumerator ShowSaveDialogCoroutine()
     {
         yield return FileBrowser.WaitForSaveDialog(true, "/storage/emulated/0/hearts", "Save File", "Save");
@@ -34,16 +60,11 @@ public class ExportMesh : MonoBehaviour
             playerObject.SetActive(true);
         }
     }
-
     public void FileBrowsing()
     {
-        //FileBrowser.SetFilters(false, new FileBrowser.Filter("obj files", ".obj"));
-        playerObject.SetActive(false);
         StartCoroutine(ShowSaveDialogCoroutine());
     }
-
-
-
+#endif
 
     string MeshToString(MeshFilter mf, Dictionary<string, ObjMaterial> materialList)
     {
@@ -86,7 +107,7 @@ public class ExportMesh : MonoBehaviour
             for (int i = 0; i < triangles.Length; i += 3)
             {
                 //Because we inverted the x-component, we also needed to alter the triangle winding.
-                sb.Append(string.Format("f {1}/{1}/{1} {0}/{0}/{0} {2}/{2}/{2}\n",
+                sb.Append(string.Format("f {0}/{0}/{0} {1}/{1}/{1} {2}/{2}/{2}\n",
                                        triangles[i] + 1 + vertexOffset, triangles[i + 1] + 1 + normalOffset, triangles[i + 2] + 1 + uvOffset));
             }
         }
@@ -111,14 +132,13 @@ public class ExportMesh : MonoBehaviour
         return new Dictionary<string, ObjMaterial>();
     }
 
-    void MeshToFile(MeshFilter mf, string folder, string filename)
+    void MeshToFile(MeshFilter mf, string path)
     {
         Dictionary<string, ObjMaterial> materialList = PrepareFileWrite();
 
-        using (StreamWriter sw = new StreamWriter(folder + "/" + filename + ".obj"))
+        using (StreamWriter sw = new StreamWriter(path))
         {
-            sw.Write("mtllib ./" + filename + ".mtl\n");
-
+            //sw.Write("mtllib ./" + filename + ".mtl\n");
             sw.Write(MeshToString(mf, materialList));
         }
 
@@ -129,8 +149,8 @@ public class ExportMesh : MonoBehaviour
         Debug.Log(path);
         //여기에 현재 모델 집어 넣으면됨.
         //이름도 지정해서 index줘서 집어넣을까.
-        MeshFilter obj = MeshManager.Instance.heart.GetComponent<MeshFilter>();
-        MeshToFile(obj, path, "ModifiedHeart"+exportCount);
+        MeshFilter obj = MeshManager.Instance.Heart.GetComponent<MeshFilter>();
+        MeshToFile(obj, path);//, "ModifiedHeart"+exportCount);
         exportCount++;
     }
 

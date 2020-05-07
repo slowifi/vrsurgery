@@ -19,16 +19,16 @@ public class ResetMesh : MonoBehaviour
         MeshManager.Instance.mesh.vertices = vertices;
         MeshManager.Instance.mesh.RecalculateNormals();
 
-        for (int i = 0; i < PatchManager.Instance.newPatch.Count; i++)
-        {
-            Destroy(PatchManager.Instance.newPatch[i]);
-            Destroy(GameObject.Find("Patch" + i + "_Inner"));
-        }
-        PatchManager.Instance.Reinitialize();
+        //for (int i = 0; i < PatchManager.Instance.newPatch.Count; i++)
+        //{
+        //    Destroy(PatchManager.Instance.newPatch[i]);
+        //    Destroy(GameObject.Find("Patch" + i + "_Inner"));
+        //}
+        //PatchManager.Instance.Reinitialize();
 
-        ObjManager.Instance.pivotTransform.localPosition = Vector3.zero;
-        ObjManager.Instance.pivotTransform.localScale = Vector3.one;
-        ObjManager.Instance.pivotTransform.localEulerAngles = Vector3.zero;
+        MeshManager.Instance.pivotTransform.localPosition = Vector3.zero;
+        MeshManager.Instance.pivotTransform.localScale = Vector3.one;
+        MeshManager.Instance.pivotTransform.localEulerAngles = Vector3.zero;
 
         Destroy(MakeDoubleFaceMesh.Instance.oppositeObject);
         MakeDoubleFaceMesh.Instance.Reinitialize();
