@@ -108,11 +108,6 @@ public class CGAL
 
     }
 
-
-
-
-
-
     public void Slicer(Vector3 firstPoint, Vector3 lastPoint, Vector3 rayOrigin)
     {
         IntPtr heart = CreateMeshObject();
@@ -488,4 +483,5 @@ public class CGAL
         newMesh.RecalculateNormals();
         return newObject;
     }
+
 }

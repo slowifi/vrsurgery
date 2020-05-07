@@ -10,7 +10,6 @@ public class Player : MonoBehaviour
     private bool boolScaling = true;
     private bool boolTranslation = true;
 
-
     private void Awake()
     {
         EventManager.Instance.Events.OnModeChanged += Events_OnChanged;
@@ -133,7 +132,6 @@ public class Player : MonoBehaviour
             
         }
 
-
         if (Input.touchCount == 2 && boolScaling)
         {
             // Store both touches.
@@ -153,8 +151,6 @@ public class Player : MonoBehaviour
 
             //여기서 조건 두개임. 하나는 그냥 확대고, 하나는 ui에서 스크롤 조절하게.
 
-            // incision임을 안다면 scroll값만 바꾸게 해야되는데 흠...
-            
             MeshManager.Instance.pivotTransform.localScale += Vector3.one * deltaMagnitudeDiff/700;
 
             if (MeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
@@ -189,6 +185,7 @@ public class Player : MonoBehaviour
                 UIManager.Instance.extendBar.value = extendValue;
             return;
         }
+        
 
         if (Input.touchCount == 3 && boolTranslation)
         {

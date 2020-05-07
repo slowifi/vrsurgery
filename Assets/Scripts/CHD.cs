@@ -58,7 +58,8 @@ public class CHD : MonoBehaviour
         {
             if (mode.name == "PatchMode")
             {
-                GameObject patchObject = GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
+                //GameObject patchObject = GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
+                GameObject patchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1];
                 if (patchObject)
                 {
                     MeshRenderer ren = patchObject.GetComponent<MeshRenderer>();
@@ -78,11 +79,13 @@ public class CHD : MonoBehaviour
 
     public void ResetMain()
     {
+
         if (mode != null)
         {
             if (mode.name == "PatchMode")
             {
-                GameObject patchObject = GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
+                // 수정해야됨.
+                GameObject patchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1];//GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
                 if (patchObject)
                 {
                     MeshRenderer ren = patchObject.GetComponent<MeshRenderer>();

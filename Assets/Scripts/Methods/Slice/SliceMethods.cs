@@ -63,6 +63,7 @@ public class SliceMethods
     public GameObject[] Slicing()
     {
         // left right를 각각 뒤집어 씌울 material을 만들고 색을 다르게해서 각각 잘리면 나눠서 색을 입힘. 그다음에 유저가 선택하면 선택한 mesh만 살아남도록. 허공을 누르면 다시 오리지널 메쉬로 넘어가게.
+        AdjacencyList.Instance.ListUpdate();
         IntPtr left = CGAL.CreateMeshObject();
         IntPtr right = CGAL.CreateMeshObject();
         GameObject[] result = new GameObject[2];
