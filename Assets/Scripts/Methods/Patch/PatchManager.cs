@@ -17,7 +17,7 @@ public class PatchManager : MonoBehaviour
     public float patchVerticesIntervalValue;
     public float patchWeight;
 
-    // 아직 손 좀 더 봐야됨.
+    // 갈아 엎어야 함.
 
 
 
@@ -73,11 +73,12 @@ public class PatchManager : MonoBehaviour
     public void UpdateCurve(int patchIndex)
     {
         MeshManager.Instance.PatchList[patchIndex].GetComponent<MeshFilter>().mesh.RecalculateNormals();
-        float heightValue = UIManager.Instance.heightBar.value;
-        float curveValue = UIManager.Instance.curveBar.value;
+        // 0.5를 기준으로 하는게 나을 듯.
+        float heightValue = UIManager.Instance.heightBar.value - 0.5f;
+        float curveValue = UIManager.Instance.curveBar.value - 0.5f;
 
-        patchCenterPos = weightCenterPos + ((heightValue - 0.5f) * 40) * avgNorm;
-        patchWeight = curveValue * 20.0f * MeshManager.Instance.pivotTransform.lossyScale.z;
+        patchCenterPos = weightCenterPos + ((heightValue * MeshManager.Instance.pivotTransform.lossyScale.z * 30f) * avgNorm.normalized);
+        patchWeight = curveValue * MeshManager.Instance.pivotTransform.lossyScale.z * 60f * heightValue;
         RecalculateNormal(patchIndex);
     }
     
@@ -252,7 +253,8 @@ public class PatchManager : MonoBehaviour
         _avgNorm /= mesh.normals.Length;
 
         avgNorm = _avgNorm;
-        patchCenterPos += 10 * _avgNorm;
+        // 맨처음에 노말값으로 위치를 변환시키지 말고 그냥 생성시키자.
+        // patchCenterPos += 10 * _avgNorm;
         Vector3 newCenterPos = patchCenterPos;
         weightCenterPos = newCenterPos;
         Vector3[] patchVertexPosition = mesh.vertices;
@@ -286,7 +288,8 @@ public class PatchManager : MonoBehaviour
         for (int i = 0; i < patchVertexCount; i++)
         {
             Vector3 p1 = _insidePatchVertices[0][i];
-            Vector3 p2 = _insidePatchVertices[2][i] + avgNorm * patchWeight;
+            // 내가 커브라고 규정했던것이 실제로는 중간위치의 포지션 값이니까 커브라고 하면 안되지 않을까.
+            Vector3 p2 = _insidePatchVertices[2][i] + avgNorm.normalized * patchWeight;
             Vector3 p3 = patchCenterPos;
             patchVertexPosition[i + patchVertexCount] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.2f), Vector3.Lerp(p2, p3, 0.2f), 0.2f);
             patchVertexPosition[i + patchVertexCount * 2] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.4f), Vector3.Lerp(p2, p3, 0.4f), 0.4f);

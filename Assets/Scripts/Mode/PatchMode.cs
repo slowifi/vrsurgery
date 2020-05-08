@@ -31,6 +31,7 @@ public class PatchMode : MonoBehaviour
         this.gameObject.AddComponent<PatchManager>();
         patchManager = GetComponent<PatchManager>();
     }
+
     void Update()
     {
         // 패치 방법부터 바꿔야됨.
