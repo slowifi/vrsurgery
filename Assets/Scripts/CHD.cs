@@ -59,15 +59,18 @@ public class CHD : MonoBehaviour
             if (mode.name == "PatchMode")
             {
                 //GameObject patchObject = GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
-                GameObject patchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1];
-                if (patchObject)
+                GameObject outerPatchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].OuterPatch;
+                GameObject innerPatchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].InnerPatch;
+                if (outerPatchObject)
                 {
-                    MeshRenderer ren = patchObject.GetComponent<MeshRenderer>();
-                    if (ren.material.color != new Color32(115, 0, 0, 255))
+                    MeshRenderer outerRen = outerPatchObject.GetComponent<MeshRenderer>();
+                    MeshRenderer innerRen = innerPatchObject.GetComponent<MeshRenderer>();
+                    if (outerRen.material.color != new Color32(115, 0, 0, 255))
                     {
-                        patchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                        MakeDoubleFaceMesh.Instance.MakePatchInnerFace(patchObject);
-                        ren.material.color = new Color32(115, 0, 0, 255);
+                        outerPatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                        innerPatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                        outerRen.material.color = new Color32(115, 0, 0, 255);
+                        innerRen.material.color = new Color32(115, 0, 0, 255);
                     }
                 }
             }
@@ -85,15 +88,18 @@ public class CHD : MonoBehaviour
             if (mode.name == "PatchMode")
             {
                 // 수정해야됨.
-                GameObject patchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1];//GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
-                if (patchObject)
+                GameObject outerPatchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].OuterPatch;
+                GameObject innerPatchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].InnerPatch;
+                if (outerPatchObject)
                 {
-                    MeshRenderer ren = patchObject.GetComponent<MeshRenderer>();
-                    if (ren.material.color != new Color32(115, 0, 0, 255))
+                    MeshRenderer outerRen = outerPatchObject.GetComponent<MeshRenderer>();
+                    MeshRenderer innerRen = innerPatchObject.GetComponent<MeshRenderer>();
+                    if (outerRen.material.color != new Color32(115, 0, 0, 255))
                     {
-                        patchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                        MakeDoubleFaceMesh.Instance.MakePatchInnerFace(patchObject);
-                        ren.material.color = new Color32(115, 0, 0, 255);
+                        outerPatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                        innerPatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                        outerRen.material.color = new Color32(115, 0, 0, 255);
+                        innerRen.material.color = new Color32(115, 0, 0, 255);
                     }
                 }
             }

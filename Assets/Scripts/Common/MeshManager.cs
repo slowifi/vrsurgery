@@ -11,6 +11,12 @@ public class MeshInformation
     public Dictionary<int, HashSet<int>> ConnectedTriangles;
 }
 
+public class Patchs
+{
+    public GameObject OuterPatch;
+    public GameObject InnerPatch;
+}
+
 // 이 instance같은 경우는 이제 import하면 인스턴스가 생성되도록 해야됨.
 public class MeshManager : Singleton<MeshManager>
 {
@@ -18,7 +24,7 @@ public class MeshManager : Singleton<MeshManager>
 
     public Stack<Mesh> MeshList;
 
-    public List<GameObject> PatchList;
+    public List<Patchs> PatchList;
 
     public GameObject Heart;
     public GameObject LeftHeart;
@@ -114,7 +120,8 @@ public class MeshManager : Singleton<MeshManager>
         mesh.RecalculateNormals();
         foreach (var item in PatchList)
         {
-            Destroy(item);
+            Destroy(item.OuterPatch);
+            Destroy(item.InnerPatch);
         }
         PatchList.Clear();
         Debug.Log(mesh.normals.Length);
@@ -135,7 +142,7 @@ public class MeshManager : Singleton<MeshManager>
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         firstMesh = disableHeart.GetComponent<MeshFilter>().mesh;
         Destroy(disableHeart);
-        PatchList = new List<GameObject>();
+        PatchList = new List<Patchs>();
         mesh.RecalculateNormals();
         ChatManager.Instance.GenerateMessage(" " + mesh.normals.Length);
         Debug.Log(mesh.normals.Length);

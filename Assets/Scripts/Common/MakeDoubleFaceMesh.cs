@@ -14,7 +14,7 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
 
     public void MakePatchInnerFace(GameObject patch)
     {
-        GameObject innerPatch = new GameObject(patch.name + "_Inner", typeof(MeshFilter), typeof(MeshRenderer));
+        GameObject innerPatch = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].InnerPatch;
         //innerPatch.GetComponent<MeshFilter>().mesh;
         innerPatch.transform.SetParent(MeshManager.Instance.pivotTransform);
         innerPatch.transform.localPosition = patch.transform.localPosition;
@@ -35,7 +35,25 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
         innerMesh.RecalculateNormals();
 
         MeshRenderer ren = innerPatch.GetComponent<MeshRenderer>();
-        ren.material.color = new Color32(115, 0, 0, 255);
+        ren.material.color = Color.white;
+    }
+
+    public void PatchUpdateInnerFaceVertices(int patchIndex)
+    {
+        Mesh patchMesh = MeshManager.Instance.PatchList[patchIndex].OuterPatch.GetComponent<MeshFilter>().mesh;
+        Mesh innerMesh = MeshManager.Instance.PatchList[patchIndex].InnerPatch.GetComponent<MeshFilter>().mesh;
+
+        Vector3[] vertices = patchMesh.vertices;
+        int[] triangles = patchMesh.triangles;
+        int[] newTriangles = (int[])triangles.Clone();
+        for (int i = 0; i < triangles.Length; i += 3)
+        {
+            newTriangles[i + 1] = triangles[i + 2];
+            newTriangles[i + 2] = triangles[i + 1];
+        }
+        innerMesh.vertices = vertices;
+        innerMesh.triangles = newTriangles;
+        innerMesh.RecalculateNormals();
     }
 
     public void MakeDoubleFace()

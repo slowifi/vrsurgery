@@ -42,7 +42,8 @@ public class PatchManager : MonoBehaviour
 
     public void RemovePatchVariables()
     {
-        Destroy(MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1]);
+        Destroy(MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].OuterPatch);
+        Destroy(MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].InnerPatch);
         MeshManager.Instance.PatchList.RemoveAt(MeshManager.Instance.PatchList.Count - 1);
         avgNorm = Vector3.zero;
         weightCenterPos = Vector3.zero;
@@ -72,7 +73,8 @@ public class PatchManager : MonoBehaviour
 
     public void UpdateCurve(int patchIndex)
     {
-        MeshManager.Instance.PatchList[patchIndex].GetComponent<MeshFilter>().mesh.RecalculateNormals();
+        MeshManager.Instance.PatchList[patchIndex].OuterPatch.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+        MeshManager.Instance.PatchList[patchIndex].InnerPatch.GetComponent<MeshFilter>().mesh.RecalculateNormals();
         // 0.5를 기준으로 하는게 나을 듯.
         float heightValue = UIManager.Instance.heightBar.value - 0.5f;
         float curveValue = UIManager.Instance.curveBar.value - 0.5f;
@@ -98,15 +100,18 @@ public class PatchManager : MonoBehaviour
 
     public void GenerateInit()
     {
-        MeshManager.Instance.PatchList.Add(new GameObject("", typeof(MeshFilter), typeof(MeshRenderer)));
+        Patchs patchs = new Patchs();
+        patchs.OuterPatch = new GameObject("OuterPatch", typeof(MeshFilter), typeof(MeshRenderer));
+        patchs.InnerPatch = new GameObject("InnerPatch", typeof(MeshFilter), typeof(MeshRenderer));
+        MeshManager.Instance.PatchList.Add(patchs);
         patchVerticesIntervalValue = 3.0f;
-        patchWeight = UIManager.Instance.curveBar.value * 20f * MeshManager.Instance.pivotTransform.lossyScale.z;
+        //patchWeight = UIManager.Instance.curveBar.value * 20f * MeshManager.Instance.pivotTransform.lossyScale.z;
 
         _patchVertexPosition = Vector3.zero;
         _patchVertices = new List<Vector3>();
         _insidePatchVertices = new List<Vector3>[5];
         _patchIndex = MeshManager.Instance.PatchList.Count - 1;
-        MeshManager.Instance.PatchList[_patchIndex].name = "Patch";
+        //MeshManager.Instance.PatchList[_patchIndex].name = "Patch";
 
         for (int i = 0; i < 5; i++)
             _insidePatchVertices[i] = new List<Vector3>();
@@ -164,7 +169,7 @@ public class PatchManager : MonoBehaviour
     private void GeneratePatchObj()
     {
         //PatchManager.Instance.newPatch.Add(new GameObject("Patch", typeof(MeshFilter), typeof(MeshRenderer)));
-        GameObject patchObj = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1];
+        GameObject patchObj = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].OuterPatch;
         Mesh mesh = new Mesh();
         patchObj.GetComponent<MeshFilter>().mesh = mesh;
         patchObj.transform.parent = MeshManager.Instance.pivotTransform; //GameObject.Find("HumanHeart").transform;
@@ -242,7 +247,7 @@ public class PatchManager : MonoBehaviour
         patchVerticesCount = _patchVertices.Count;
         insidePatchVertices = _insidePatchVertices;
 
-        Mesh mesh = MeshManager.Instance.PatchList[_patchIndex].GetComponent<MeshFilter>().mesh;
+        Mesh mesh = MeshManager.Instance.PatchList[_patchIndex].OuterPatch.GetComponent<MeshFilter>().mesh;
         mesh.RecalculateNormals();
 
         int tempNum = _patchVertices.Count;
@@ -274,13 +279,14 @@ public class PatchManager : MonoBehaviour
 
         mesh.vertices = patchVertexPosition;
         mesh.RecalculateNormals();
+        MakeDoubleFaceMesh.Instance.MakePatchInnerFace(MeshManager.Instance.PatchList[_patchIndex].OuterPatch);
         return;
     }
 
     // 업데이트용
     public void RecalculateNormal(int patchIndex)
     {
-        Mesh mesh = MeshManager.Instance.PatchList[patchIndex].GetComponent<MeshFilter>().mesh;
+        Mesh mesh = MeshManager.Instance.PatchList[patchIndex].OuterPatch.GetComponent<MeshFilter>().mesh;
         int patchVertexCount = patchVerticesCount;
         List<Vector3>[] _insidePatchVertices = insidePatchVertices;
         Vector3[] patchVertexPosition = mesh.vertices;
@@ -288,7 +294,6 @@ public class PatchManager : MonoBehaviour
         for (int i = 0; i < patchVertexCount; i++)
         {
             Vector3 p1 = _insidePatchVertices[0][i];
-            // 내가 커브라고 규정했던것이 실제로는 중간위치의 포지션 값이니까 커브라고 하면 안되지 않을까.
             Vector3 p2 = _insidePatchVertices[2][i] + avgNorm.normalized * patchWeight;
             Vector3 p3 = patchCenterPos;
             patchVertexPosition[i + patchVertexCount] = Vector3.Lerp(Vector3.Lerp(p1, p2, 0.2f), Vector3.Lerp(p2, p3, 0.2f), 0.2f);
@@ -299,6 +304,7 @@ public class PatchManager : MonoBehaviour
         patchVertexPosition[mesh.normals.Length - 1] = patchCenterPos;
 
         mesh.vertices = patchVertexPosition;
+        MakeDoubleFaceMesh.Instance.PatchUpdateInnerFaceVertices(patchIndex);
     }
 
 
@@ -344,7 +350,7 @@ public class PatchManager : MonoBehaviour
     private void GeneratePatchObjForMeasure()
     {
         //PatchManager.Instance.newPatch.Add(new GameObject("Patch", typeof(MeshFilter), typeof(MeshRenderer)));
-        GameObject patchObj = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1];
+        GameObject patchObj = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].OuterPatch;
         Mesh mesh = new Mesh();
         patchObj.GetComponent<MeshFilter>().mesh = mesh;
         patchObj.transform.parent = MeshManager.Instance.pivotTransform; //GameObject.Find("HumanHeart").transform;
@@ -377,7 +383,7 @@ public class PatchManager : MonoBehaviour
             Vector3 right = points[triangles[i+2]] - points[triangles[i]];
             area += (Vector3.Cross(left, right).magnitude / 2.0f);
         }
-        Destroy(MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count-1]);
+        Destroy(MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count-1].OuterPatch);
         MeshManager.Instance.PatchList.RemoveAt(MeshManager.Instance.PatchList.Count - 1);
         
         float diamterByFaces = Mathf.Sqrt(area / Mathf.PI) * 2 / MeshManager.Instance.objTransform.lossyScale.z;
