@@ -77,7 +77,7 @@ public class PatchManager : MonoBehaviour
         MeshManager.Instance.PatchList[patchIndex].InnerPatch.GetComponent<MeshFilter>().mesh.RecalculateNormals();
         // 0.5를 기준으로 하는게 나을 듯.
         float heightValue = UIManager.Instance.heightBar.value - 0.5f;
-        float curveValue = UIManager.Instance.curveBar.value - 0.5f;
+        float curveValue = UIManager.Instance.curveBar.value * 0.5f;
 
         patchCenterPos = weightCenterPos + ((heightValue * MeshManager.Instance.pivotTransform.lossyScale.z * 30f) * avgNorm.normalized);
         patchWeight = curveValue * MeshManager.Instance.pivotTransform.lossyScale.z * 60f * heightValue;
