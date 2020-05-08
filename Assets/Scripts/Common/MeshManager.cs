@@ -30,6 +30,7 @@ public class MeshManager : Singleton<MeshManager>
     public GameObject LeftHeart;
     public GameObject RightHeart;
 
+    public Camera UICamera;
     public Camera cam;
 
     public Transform objTransform;

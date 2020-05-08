@@ -26,4 +26,18 @@ public class ModeEvents : MonoBehaviour
     {
         OnModeManipulate?.Invoke(action);
     }
+
+    public event UIChangeHandler OnUIChanged;
+    public delegate void UIChangeHandler();
+    public void InvokeUIChanged()
+    {
+        OnUIChanged?.Invoke();
+    }
+
+    public event UIFixedHandler OnUIFixed;
+    public delegate void UIFixedHandler();
+    public void InvokeUIFixed()
+    {
+        OnUIFixed?.Invoke();
+    }
 }

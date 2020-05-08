@@ -57,11 +57,15 @@ public class ExportMesh : MonoBehaviour
         if (FileBrowser.Success)
         {
             Exporting(FileBrowser.Result);
+            EventManager.Instance.Events.InvokeUIChanged();
             playerObject.SetActive(true);
         }
+        
+        EventManager.Instance.Events.InvokeUIFixed();
     }
     public void FileBrowsing()
     {
+        EventManager.Instance.Events.InvokeUIFixed();
         StartCoroutine(ShowSaveDialogCoroutine());
     }
 #endif

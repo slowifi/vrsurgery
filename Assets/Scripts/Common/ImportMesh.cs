@@ -24,6 +24,7 @@ public class ImportMesh : MonoBehaviour
         bool active = playerObject.activeSelf;
         playerObject.SetActive(false);
         string objpath = FileBrowser.OpenSingleFile("obj");
+        EventManager.Instance.Events.InvokeUIChanged();
         if (objpath == "")
         {
             Debug.Log("아무것도 안나옴");
@@ -88,14 +89,17 @@ public class ImportMesh : MonoBehaviour
         if (FileBrowser.Success)
         {
             SetMesh(FileBrowser.Result);
+            EventManager.Instance.Events.InvokeUIChanged();
             playerObject.SetActive(true);
         }
+        
+        EventManager.Instance.Events.InvokeUIFixed();
     }
-
 
     public void FileBrowsing()
     {
         FileBrowser.SetFilters(false, new FileBrowser.Filter("obj files", ".obj"));
+        EventManager.Instance.Events.InvokeUIFixed();
         playerObject.SetActive(false);
         StartCoroutine(ShowLoadDialogCoroutine());
     }

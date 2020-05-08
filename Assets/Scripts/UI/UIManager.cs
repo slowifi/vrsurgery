@@ -33,17 +33,15 @@ public class UIManager : Singleton<UIManager>
     public Button resetPositionScaleButton;
 
 
-
-
-    // 각각에 대한 event handle 부분 설정 필요.
-    public void GetMessage(string name)
+    private void Awake()
     {
-        
 
+#if UNITY_STANDALONE_WIN
+#endif
 
-
-
-
+#if UNITY_ANDROID
+        extendBar.gameObject.SetActive(false);
+#endif
 
 
 

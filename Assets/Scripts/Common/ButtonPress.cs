@@ -16,42 +16,45 @@ public class ButtonPress : Singleton<ButtonPress>
     public Button CutButton;
     public Button SliceButton;
     public Button PatchButton;
-    public Button MeasureButton;
     public Button IncisionButton;
+    public Button MeasureDistanceButton;
     public Button MeasureDiameterButton;
 
-    private Sprite[] cutImage;
-    private Sprite[] sliceImage;
-    private Sprite[] patchImage;
-    private Sprite[] measureImage;
-    private Sprite[] incisionImage;
-
-    //private ColorBlock selectedColorBlock;
-    //private ColorBlock unselectedColorBlock;
-
+    public Sprite[] cutImage;
+    public Sprite[] sliceImage;
+    public Sprite[] patchImage;
+    public Sprite[] incisionImage;
+    public Sprite[] measureDistanceImage;
+    public Sprite[] measureDiameterImage;
+    
     private void Awake()
     {
         EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
         cutImage = new Sprite[2];
         sliceImage = new Sprite[2];
         patchImage = new Sprite[2];
-        measureImage = new Sprite[2];
         incisionImage = new Sprite[2];
+        measureDistanceImage = new Sprite[2];
+        measureDiameterImage = new Sprite[2];
 
-        cutImage[0] = Resources.Load("UI/Icon/Icon_D_0", typeof(Sprite)) as Sprite;
-        cutImage[1] = Resources.Load("UI/Icon/Icon_D_1", typeof(Sprite)) as Sprite;
+        cutImage[0] = Resources.Load("UI/Icon/Icon_Lasso_0", typeof(Sprite)) as Sprite;
+        cutImage[1] = Resources.Load("UI/Icon/Icon_Lasso_1", typeof(Sprite)) as Sprite;
 
-        sliceImage[0] = Resources.Load("UI/Icon/Icon_B_0", typeof(Sprite)) as Sprite;
-        sliceImage[1] = Resources.Load("UI/Icon/Icon_B_1", typeof(Sprite)) as Sprite;
+        sliceImage[0] = Resources.Load("UI/Icon/Icon_Slice_0", typeof(Sprite)) as Sprite;
+        sliceImage[1] = Resources.Load("UI/Icon/Icon_Slice_1", typeof(Sprite)) as Sprite;
 
-        patchImage[0] = Resources.Load("UI/Icon/Icon_C_0", typeof(Sprite)) as Sprite;
-        patchImage[1] = Resources.Load("UI/Icon/Icon_C_1", typeof(Sprite)) as Sprite;
+        patchImage[0] = Resources.Load("UI/Icon/Icon_Patch_0", typeof(Sprite)) as Sprite;
+        patchImage[1] = Resources.Load("UI/Icon/Icon_Patch_1", typeof(Sprite)) as Sprite;
 
-        //measureImage[0].sprite = Resources.Load("UI/Icon/Icon_D_0", typeof(Sprite)) as Sprite;
-        //measureImage[1].sprite = Resources.Load("UI/Icon/Icon_D_1", typeof(Sprite)) as Sprite;
+        measureDistanceImage[0] = Resources.Load("UI/Icon/Icon_Measure_0", typeof(Sprite)) as Sprite;
+        measureDistanceImage[1] = Resources.Load("UI/Icon/Icon_Measure_1", typeof(Sprite)) as Sprite;
 
-        incisionImage[0] = Resources.Load("UI/Icon/Icon_A_0", typeof(Sprite)) as Sprite;
-        incisionImage[1] = Resources.Load("UI/Icon/Icon_A_1", typeof(Sprite)) as Sprite;
+        // 임시
+        measureDiameterImage[0] = Resources.Load("UI/Icon/Icon_Measure_0", typeof(Sprite)) as Sprite;
+        measureDiameterImage[1] = Resources.Load("UI/Icon/Icon_Measure_1", typeof(Sprite)) as Sprite;
+
+        incisionImage[0] = Resources.Load("UI/Icon/Icon_Incision_0", typeof(Sprite)) as Sprite;
+        incisionImage[1] = Resources.Load("UI/Icon/Icon_Incision_1", typeof(Sprite)) as Sprite;
 
         //selectedColorBlock = SliceButton.colors;
         //unselectedColorBlock = SliceButton.colors;
@@ -99,7 +102,8 @@ public class ButtonPress : Singleton<ButtonPress>
         CutButton.image.sprite = cutImage[0];
         PatchButton.image.sprite = patchImage[0];
         IncisionButton.image.sprite = incisionImage[0];
-        //MeasureButton.colors = colorTemp;
+        MeasureDistanceButton.image.sprite = measureDistanceImage[0];
+        MeasureDiameterButton.image.sprite = measureDiameterImage[0];
     }
 
     public void Slicing()
@@ -155,15 +159,15 @@ public class ButtonPress : Singleton<ButtonPress>
 
     public void Measuring()
     {
-        if (MeasureButton.colors.normalColor == new Color32(176, 48, 48, 255))
+        if (MeasureDistanceButton.image.sprite == measureDistanceImage[1])
         {
-            //MeasureButton.colors = unselectedColorBlock;
+            MeasureDistanceButton.image.sprite = measureDistanceImage[0];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
         }
         else
         {
             ResetButton();
-            //MeasureButton.colors = selectedColorBlock;
+            MeasureDistanceButton.image.sprite = measureDistanceImage[1];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
             Events_OnModeChanged("Measure");
         }
@@ -171,21 +175,18 @@ public class ButtonPress : Singleton<ButtonPress>
 
     public void MeasureDiameter()
     {
-        ResetButton();
-        EventManager.Instance.Events.InvokeModeChanged("Exit");
-        Events_OnModeChanged("MeasureDiameter");
-        //if (IncisionButton.image.sprite == incisionImage[1])
-        //{
-        //    IncisionButton.image.sprite = incisionImage[0];
-        //    EventManager.Instance.Events.InvokeModeChanged("Exit");
-        //}
-        //else
-        //{
-        //    ResetButton();
-        //    IncisionButton.image.sprite = incisionImage[1];
-        //    EventManager.Instance.Events.InvokeModeChanged("Exit");
-        //    Events_OnModeChanged("Incision");
-        //}
+        if (MeasureDiameterButton.image.sprite == measureDiameterImage[1])
+        {
+            MeasureDiameterButton.image.sprite = measureDiameterImage[0];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
+        }
+        else
+        {
+            ResetButton();
+            MeasureDiameterButton.image.sprite = measureDiameterImage[1];
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
+            Events_OnModeChanged("MeasureDiameter");
+        }
     }
 
     public void Incisioning()

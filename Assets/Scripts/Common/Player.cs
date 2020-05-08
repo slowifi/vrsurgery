@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IPointerEnterHandler, IPointerUpHandler
 {
     // 행동제어를 아예 player쪽에서 하기.
-
+    public Camera UIcamera;
     private bool boolRotation = true;
     private bool boolScaling = true;
     private bool boolTranslation = true;
+    private bool boolAllStop = false;
 
     private void Awake()
     {
@@ -68,51 +70,74 @@ public class Player : MonoBehaviour
                 break;
         }
     }
+    
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        Debug.Log(eventData.pointerPress.name);
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        Debug.Log(eventData.pointerPress.name + "123123");
+    }
+
 
     void Update()
     {
+        Ray cameraRay = UIcamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(cameraRay, out hit, Mathf.Infinity))
+        {
+            if(hit.collider.gameObject.layer == 5)
+            {
+                boolAllStop = true;
+            }
+            boolAllStop = false;
+            return;
+        }
+        if (!boolAllStop)
+        {
 #if UNITY_STANDALONE_WIN
+            float wheel = Input.GetAxis("Mouse ScrollWheel");
+            if (wheel != 0 && boolScaling)
+            {
+                // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
+                MeshManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
 
-        float wheel = Input.GetAxis("Mouse ScrollWheel");
-        if (wheel!=0 && boolScaling)
-        {
-            // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
-            MeshManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
+                if (MeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
+                    MeshManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
 
-            if (MeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
-                MeshManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
+                AdjacencyList.Instance.WorldPositionUpdate();
+            }
+            else if (Input.GetMouseButton(1) && boolRotation)
+            {
+                // 여기에 UI 추가.
+                float x = Input.GetAxis("Mouse X");
+                float y = Input.GetAxis("Mouse Y");
+                MeshManager.Instance.pivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
+                MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
+                AdjacencyList.Instance.WorldPositionUpdate();
+            }
+            else if (Input.GetMouseButton(2) && boolTranslation)
+            {
+                // 여기에 UI 추가.
+                // 전체 이동.
+                float xPos = Input.GetAxis("Mouse X");
+                float yPos = Input.GetAxis("Mouse Y");
 
-            AdjacencyList.Instance.WorldPositionUpdate();
-        }
-        else if (Input.GetMouseButton(1) && boolRotation)
-        {
-            // 여기에 UI 추가.
-            float x = Input.GetAxis("Mouse X");
-            float y = Input.GetAxis("Mouse Y");
-            MeshManager.Instance.pivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
-            MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
-            AdjacencyList.Instance.WorldPositionUpdate();
-        }
-        else if (Input.GetMouseButton(2) && boolTranslation)
-        {
-            // 여기에 UI 추가.
-            // 전체 이동.
-            float xPos = Input.GetAxis("Mouse X");
-            float yPos = Input.GetAxis("Mouse Y");
-
-            MeshManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
-            MeshManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
-            AdjacencyList.Instance.WorldPositionUpdate();
-        }
-        // 특정 움직임이 있었을 때만 업데이트 하도록 해야됨.
-        // AdjacencyList.Instance.WorldPositionUpdate();
+                MeshManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
+                MeshManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
+                AdjacencyList.Instance.WorldPositionUpdate();
+            }
+            // 특정 움직임이 있었을 때만 업데이트 하도록 해야됨.
+            // AdjacencyList.Instance.WorldPositionUpdate();
 #endif
 
-        // android용은 수정 해야됨.
+            // android용은 수정 해야됨.
 #if UNITY_ANDROID
-        //int fingerCount = 0;
-        
-        Resolution resolutions = Screen.currentResolution;
+            //int fingerCount = 0;
+
+            Resolution resolutions = Screen.currentResolution;
         float XResolution = resolutions.width;
         float YResolution = resolutions.height;
 
@@ -200,6 +225,6 @@ public class Player : MonoBehaviour
             AdjacencyList.Instance.WorldPositionUpdate();
         }
 #endif
-
+        }
     }
 }
