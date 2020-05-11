@@ -36,6 +36,7 @@ public class IncisionMode : MonoBehaviour
         incisionDistance = (GameObject)Instantiate(prefab);
         GameObject newCanvas = GameObject.Find("UICanvas");
         incisionDistance.transform.SetParent(newCanvas.transform);
+        incisionDistance.transform.localScale = Vector3.one;
         rectCanvas = newCanvas.GetComponent<Canvas>();
         incisionDistance.SetActive(false);
     }
@@ -69,12 +70,10 @@ public class IncisionMode : MonoBehaviour
         }
         else if (Input.GetMouseButton(0))
         {
-            // 여기안에 지속적으로 거리계산되는 txt넣는게 좋을듯.
             if (!firstIncision)
             {
                 return;
             }
-            //var line = lineRenderer.GetComponent<LineRenderer>();
 
             if (!checkInside)
             {
@@ -87,16 +86,13 @@ public class IncisionMode : MonoBehaviour
             Vector3 currentPosition = intersectedValues.IntersectedPosition;
             Vector3 curPos = currentPosition;
             Vector3 oldPos = oldPosition;
-            //curPos.z += 1f;
-            //oldPos.z += 1f;
-            //line.material.color = Color.black;
-            //line.SetPositions(new Vector3[] { oldPos, curPos });
-            
+
             Vector2 newRectPos;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(rectCanvas.transform as RectTransform, Input.mousePosition, rectCanvas.worldCamera, out newRectPos);
             incisionDistance.GetComponent<RectTransform>().localPosition = newRectPos;
-            //rectDistance.localPosition = newRectPos;
+            
             incisionDistance.GetComponent<Text>().text = (Vector3.Distance(oldPos, curPos) / MeshManager.Instance.pivotTransform.localScale.z).ToString("N3") + " mm";
+            
             lineRenderer.SetFixedLineRenderer(oldPos, curPos);
         }
         else if (Input.GetMouseButtonUp(0) && firstIncision)

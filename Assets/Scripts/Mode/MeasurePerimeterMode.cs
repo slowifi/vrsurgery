@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class MeasureDiameterMode : MonoBehaviour
+public class MeasurePerimeterMode : MonoBehaviour
 {
     private bool isPatchUpdate;
     private bool isLastPatch;
@@ -32,6 +32,7 @@ public class MeasureDiameterMode : MonoBehaviour
     }
     void Update()
     {
+        // 패치 방법부터 바꿔야됨.
         Ray cameraRay = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
         if (isLastPatch)
         {
@@ -93,13 +94,13 @@ public class MeasureDiameterMode : MonoBehaviour
                 if (Vector3.Distance(firstPosition, intersectedValues.IntersectedPosition) > 1.5f * MeshManager.Instance.pivotTransform.lossyScale.z)
                 {
                     patchManager.AddVertex(intersectedValues.IntersectedPosition);
-                    
+
                     patchCount++;
                     oldPosition = intersectedValues.IntersectedPosition;
                     oldRay = ray;
                     return;
                 }
-                
+
             }
             else
             {

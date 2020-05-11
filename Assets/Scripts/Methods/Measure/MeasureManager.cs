@@ -24,8 +24,10 @@ public class MeasureManager : MonoBehaviour
                 endPoint.SetActive(true);
                 endPoint.transform.position = vertexPosition;
                 measureEnd = cameraRay.direction;
+                CGAL.ThreeDimensionToTwoDimension();
+                //CGAL.GetDiameter(startPoint.transform.position, endPoint.transform.position, cameraRay.origin);
                 // Debug.DrawLine(startPoint.transform.position, endPoint.transform.position, Color.yellow, 2, false);
-                
+
                 //line.SetPositions(new Vector3[] { startPoint.transform.position - measureStart * 0.5f * MeshManager.Instance.objTransform.lossyScale.z, endPoint.transform.position - measureEnd * 0.5f * MeshManager.Instance.objTransform.lossyScale.z });
                 ////line.SetPositions(new Vector3[] { startPoint.transform.position, endPoint.transform.position});
                 //line.transform.SetParent(MeshManager.Instance.pivotTransform);

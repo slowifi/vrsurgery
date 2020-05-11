@@ -67,6 +67,7 @@ public class CGAL
     [DllImport("CGALtest_dll", EntryPoint = "Intersection", CallingConvention = CallingConvention.Cdecl)]
     public static extern void Intersection(IntPtr value, float[] plane);
 
+    // clipper가 mesh면 됨.
     [DllImport("CGALtest_dll", EntryPoint = "CorefineByMesh", CallingConvention = CallingConvention.Cdecl)]
     public static extern int CorefineByMesh(IntPtr clippee, IntPtr clipper);
 
@@ -90,6 +91,102 @@ public class CGAL
 
     [DllImport("CGALtest_dll", EntryPoint = "GetControlVertices", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetControlVertices(IntPtr value);
+
+    public static void ThreeDimensionToTwoDimension()//Vector3 a, Vector3 b, Vector3 c, Vector3 ans)
+    {
+        Vector3 a = new Vector3(1, 1, 1);
+        Vector3 b = new Vector3(2, 1, 1);
+        Vector3 c = new Vector3(1, 1, 2);
+        // 4d로 넣어주는건
+        Vector4 ans = new Vector4(-2, 1, 7, 1);
+
+        Vector3 AB = b - a;
+        Vector3 AC = c - a;
+        Vector3 N = Vector3.Cross(AB, AC).normalized;
+        Vector3 U = Vector3.Normalize(AB);
+
+        Vector3 V = Vector3.Cross(U, Vector3.Normalize(N));
+
+        U = new Vector3(Mathf.Abs(U.x), Mathf.Abs(U.y), Mathf.Abs(U.z));
+        V = new Vector3(Mathf.Abs(V.x), Mathf.Abs(V.y), Mathf.Abs(V.z));
+        N = new Vector3(Mathf.Abs(N.x), Mathf.Abs(N.y), Mathf.Abs(N.z));
+        Vector3 u = a + U;
+        Vector3 v = a + V;
+        Vector3 n = a + N;
+
+        Matrix4x4 S = new Matrix4x4(
+            new Vector4(a.x, a.y, a.z, 1),
+            new Vector4(u.x, u.y, u.z, 1),
+            new Vector4(v.x, v.y, v.z, 1),
+            new Vector4(n.x, n.y, n.z, 1)
+            );
+
+        Debug.Log(S);
+
+        Matrix4x4 D = new Matrix4x4(
+            new Vector4(0, 0, 0, 1),
+            new Vector4(1, 0, 0, 1),
+            new Vector4(0, 1, 0, 1),
+            new Vector4(0, 0, 1, 1)
+            );
+
+        Debug.Log(Matrix4x4.Inverse(S));
+
+        Matrix4x4 M = D * S.inverse;
+
+        Vector3 temp = M * ans;
+        Debug.Log(temp);
+    }
+
+
+
+    public static void GetDiameter(Vector3 firstPoint, Vector3 lastPoint, Vector3 rayOrigin)
+    {
+        AdjacencyList.Instance.ListUpdate();
+
+        GameObject asdf = new GameObject("Triangle", typeof(MeshFilter), typeof(MeshRenderer));
+        Mesh asdf_mesh = asdf.GetComponent<MeshFilter>().mesh;
+        Vector3[] newV = new Vector3[3];
+        newV[0] = asdf.transform.InverseTransformPoint(firstPoint);
+        newV[1] = asdf.transform.InverseTransformPoint(lastPoint);
+        newV[2] = asdf.transform.InverseTransformPoint(rayOrigin);
+
+        int[] newT = new int[3];
+        newT[0] = 0;
+        newT[1] = 1;
+        newT[2] = 2;
+
+        asdf_mesh.vertices = newV;
+        asdf_mesh.triangles = newT;
+        asdf_mesh.RecalculateNormals();
+
+
+        //IntPtr heart = CreateMeshObject();
+
+
+
+
+        //float[] verticesCoordinate = ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
+
+        //if (BuildPolyhedron(heart,
+        //    verticesCoordinate,
+        //    verticesCoordinate.Length / 3,
+        //    MeshManager.Instance.mesh.triangles,
+        //    MeshManager.Instance.mesh.triangles.Length / 3) == -1)
+        //{
+        //    Debug.Log("polyhedron 형성이 안됨.");
+        //    return;
+        //}
+        //Debug.Log(GetNumberOfVertices(heart));
+        //Intersection(heart, GeneratePlane(rayOrigin, firstPoint, lastPoint));
+        ////Debug.Log(GetNumberOfVertices(heart));
+
+
+
+
+    }
+
+
 
     public void RabbitIncision(int centerIndex, float radius)
     {
