@@ -92,14 +92,97 @@ public class CGAL
     [DllImport("CGALtest_dll", EntryPoint = "GetControlVertices", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetControlVertices(IntPtr value);
 
-    public static void ThreeDimensionToTwoDimension()//Vector3 a, Vector3 b, Vector3 c, Vector3 ans)
-    {
-        Vector3 a = new Vector3(1, 1, 1);
-        Vector3 b = new Vector3(2, 1, 1);
-        Vector3 c = new Vector3(1, 1, 2);
-        // 4d로 넣어주는건
-        Vector4 ans = new Vector4(-2, 1, 7, 1);
 
+    public static void GenerateBigTriangle(Vector2 startMousePos, Vector2 endMousePos)
+    {
+        Vector2 newVec = startMousePos - endMousePos;
+        float height = Screen.height;
+        float width = Screen.width;
+        float newHeight = (height - startMousePos.y) / newVec.y;
+        float newWidth = (width - startMousePos.x) / newVec.x;
+        float weight = Mathf.Abs(newHeight) > Mathf.Abs(newWidth) ? newWidth : newHeight;
+
+        Vector2 maximumPos = startMousePos + (newVec * weight);
+
+        newHeight = (0 - startMousePos.y) / newVec.y;
+        newWidth = (0 - startMousePos.x) / newVec.x;
+        weight = Mathf.Abs(newHeight) > Mathf.Abs(newWidth) ? newWidth : newHeight;
+
+        Vector2 minimumPos = startMousePos + (newVec * weight);
+
+        // 각 끝점에서 ray direction 값 가져오고 둘의 중간지점의 origin 값 가져오기.
+
+        Vector3 maxPos = MeshManager.Instance.cam.ScreenPointToRay(maximumPos).direction.normalized * 1000;
+        Vector3 minPos = MeshManager.Instance.cam.ScreenPointToRay(minimumPos).direction.normalized * 1000;
+        Vector3 middlePos = MeshManager.Instance.cam.ScreenPointToRay(Vector2.Lerp(minimumPos, maximumPos, 0.5f)).origin;
+
+
+        IntPtr heart = CreateMeshObject();
+        float[] verticesCoordinate = ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
+
+        if (BuildPolyhedron(heart,
+            verticesCoordinate,
+            verticesCoordinate.Length / 3,
+            MeshManager.Instance.mesh.triangles,
+            MeshManager.Instance.mesh.triangles.Length / 3) == -1)
+        {
+            Debug.Log("polyhedron 형성이 안됨.");
+            return;
+        }
+
+        IntPtr clipper = CreateMeshObject();
+        float[] verticesClipper = {
+            maxPos.x, maxPos.y, maxPos.z,
+            minPos.x, minPos.y, minPos.z,
+            middlePos.x, middlePos.y, middlePos.z
+        };
+        int[] trianglesClipper = {
+            0, 1, 2
+        };
+
+        if (BuildPolyhedron(clipper,
+            verticesClipper,
+            verticesClipper.Length / 3,
+            trianglesClipper,
+            1) == -1)
+        {
+            Debug.Log("polyhedron 형성이 안됨.");
+            return;
+        }
+        CorefineByMesh(heart, clipper);
+        Debug.Log("done corefine");
+
+        // 추가되는 vtx 활용
+        Vector3[] newVertices = ConvertToVector(GetVertices(heart), GetNumberOfVertices(heart), GameObject.Find("PartialModel").transform);
+        int[] newTriangles = ConvertToTriangle(GetFaces(heart), GetNumberOfFaces(heart));
+
+        //AdjacencyList.Instance.worldPositionVertices.cou
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Material heartMaterial = Resources.Load("Materials/Heart", typeof(Material)) as Material;
+        MeshManager.Instance.SetNewObject(CGAL.GenerateNewObject(heart, heartMaterial));
+        MakeDoubleFaceMesh.Instance.Reinitialize();
+
+    }
+    
+    // 평면위의 점 a,b,c
+    public static void ThreeDimensionToTwoDimension(Vector3 a, Vector3 b, Vector3 c, Vector3 ans)
+    {
+        //평면의 노말을 (0, 0, 1)로 변환
         Vector3 AB = b - a;
         Vector3 AC = c - a;
         Vector3 N = Vector3.Cross(AB, AC).normalized;

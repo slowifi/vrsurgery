@@ -11,7 +11,7 @@ public class ModeEvents : MonoBehaviour
     /// 하는 이벤트가 추가로 발생한다. 많은 UI요소들이 이런 이벤트를 받아서 거기에 맞는
     /// 동작을 각자 알아서 하게 된다...로 정리가 되었는데 초기에 만든 애들은
     /// 그냥 막 되어 있는 경우가 있다. 시간 날때? 고치도록 하자.
-    /// 이노핏에서 발췌
+    /// 이노핏에서 펌
     /// </summary>
     public event ModeChangedHandler OnModeChanged;
     public delegate void ModeChangedHandler(string mode);

@@ -29,6 +29,19 @@ public class AdjacencyList : Singleton<AdjacencyList>
         GenerateEdgeList(vertexCount, triangles);
     }
 
+    public void ListUpdateWithoutEdge()
+    {
+        MeshManager.Instance.MeshUpdate();
+        connectedVertices = new Dictionary<int, HashSet<int>>();
+        connectedTriangles = new Dictionary<int, HashSet<int>>();
+
+        int vertexCount = MeshManager.Instance.mesh.vertexCount;
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+
+        worldPositionVertices = LocalToWorldPosition(MeshManager.Instance.mesh);
+        ConnectedVerticesAndTriangles(vertexCount, triangles);
+    }
+
     public void ListUpdateOnlyTriangles()
     {
         MeshManager.Instance.MeshUpdate();

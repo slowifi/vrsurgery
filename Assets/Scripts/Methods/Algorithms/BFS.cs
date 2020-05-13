@@ -167,5 +167,80 @@ public class BFS
         return result;
     }
 
+    public static void DFS(List<int> vertices, Vector3 closestVertex)
+    {
+        AdjacencyList.Instance.ListUpdateWithoutEdge();
+        Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices.ToArray();
+        int closestVertexIndex = -1;
+        float distance = 1000000;
+        for (int i = 0; i < vertices.Count; i++)
+        {
+            float tempDistance = Vector3.Distance(worldPosition[vertices[i]], closestVertex);
+            if (distance > tempDistance)
+            {
+                distance = tempDistance;
+                closestVertexIndex = vertices[i];
+            }
+        }
+
+        List<int> newVertexList = new List<int>();
+        Stack<int> temp = new Stack<int>();
+        HashSet<int> duplicateCheck = new HashSet<int>();
+        newVertexList.Add(closestVertexIndex);
+        duplicateCheck.Add(closestVertexIndex);
+        temp.Push(closestVertexIndex);
+        Dictionary<int, HashSet<int>> connectedVertices = AdjacencyList.Instance.connectedVertices;
+
+        int befIndex = -1;
+
+        while (temp.Count != 0)
+        {
+            int vertexIndex = temp.Pop();
+            
+            foreach (var item in connectedVertices[vertexIndex])
+            {
+                bool dupBool = false;
+
+                foreach (var item2 in vertices)
+                {
+                    if(item == item2)
+                    {
+                        //
+                    }
+                }
+
+                if (item == closestVertexIndex && duplicateCheck.Count > 3)
+                {
+                    continue;
+                }
+
+                if (dupBool)
+                {
+                    bool tempBool = false;
+                    foreach (var dup in duplicateCheck)
+                    {
+                        if (item == dup)
+                        {
+                            tempBool = true;
+                            break;
+                        }
+                    }
+
+                    if(!tempBool)
+                    {
+                        temp.Push(item);
+                        duplicateCheck.Add(item);
+                        newVertexList.Add(item);
+                        befIndex = vertexIndex;
+                        break;
+                    }
+                }
+            }
+        }
+
+    }
+
+
+
 
 }

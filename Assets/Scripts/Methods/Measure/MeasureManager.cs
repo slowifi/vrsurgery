@@ -6,7 +6,9 @@ public class MeasureManager : MonoBehaviour
     private float distanceStartToEnd = 0f;
     private Vector3 measureStart;
     private Vector3 measureEnd;
-    
+    private Vector2 startMousePos;
+    private Vector2 endMousePos;
+
     public float MeasureDistance(Vector3 vertexPosition, Ray cameraRay)
     {
         if (vertexPosition != Vector3.zero)
@@ -15,16 +17,22 @@ public class MeasureManager : MonoBehaviour
             GameObject endPoint = MeshManager.Instance.endMeasurePoint;
             if (!startPoint.activeSelf)
             {
+                
                 measureStart = cameraRay.direction;
+                startMousePos = Input.mousePosition;
                 startPoint.SetActive(true);
                 startPoint.transform.position = vertexPosition;
             }
             else if (!endPoint.activeSelf)
             {
+                endMousePos = Input.mousePosition;
+                
                 endPoint.SetActive(true);
                 endPoint.transform.position = vertexPosition;
                 measureEnd = cameraRay.direction;
-                CGAL.ThreeDimensionToTwoDimension();
+                // 여기서 구해진 두개의 점 가지고 vector를 구해서
+                //CGAL.GenerateBigTriangle(startMousePos, endMousePos);
+                //CGAL.ThreeDimensionToTwoDimension();
                 //CGAL.GetDiameter(startPoint.transform.position, endPoint.transform.position, cameraRay.origin);
                 // Debug.DrawLine(startPoint.transform.position, endPoint.transform.position, Color.yellow, 2, false);
 
