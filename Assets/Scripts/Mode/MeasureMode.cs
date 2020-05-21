@@ -21,7 +21,7 @@ public class MeasureMode : MonoBehaviour
             Vector3 vertexPosition = MeasureManager.vertexPosition(cameraRay);
             float dst = MeasureManager.MeasureDistance(vertexPosition, cameraRay);
             dst = dst / MeshManager.Instance.objTransform.lossyScale.z;
-            UIManager.Instance.distance.text = dst + "mm";
+            UIManager.Instance.Distance.text = dst + "mm";
         }
     }
     void OnDestroy()

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Dummiesman;
-
+using System.IO;
 #if UNITY_ANDROID
 using SimpleFileBrowser;
 #endif
@@ -106,8 +106,13 @@ public class ImportMesh : MonoBehaviour
 
     public void SetMesh(string path)
     {
-
+        string fileName = Path.GetFileName(path);
+        fileName = fileName.Substring(0, fileName.Length - 4);
+        UIManager.Instance.SetFileName(fileName);
+        
+        
         Debug.Log(path);
+        
         //var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
         // 여기에 추가 해야될 것은 새로 읽어들였을 때, 리셋 기능.
 

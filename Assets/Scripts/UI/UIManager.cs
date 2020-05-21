@@ -16,7 +16,9 @@ public class UIManager : Singleton<UIManager>
 
     public Scrollbar extendBar;
 
-    public Text distance;
+    public Text Distance;
+    public Text Diameter;
+    public Text FileName;
 
     public Button controlRotationScaleButton;
 
@@ -32,6 +34,20 @@ public class UIManager : Singleton<UIManager>
     public Button resetButton;
     public Button resetPositionScaleButton;
 
+    public void SetFileName(string arg)
+    {
+        FileName.text = arg;
+    }
+
+    public void SetDistance(float arg)
+    {
+        Distance.text = arg + "mm";
+    }
+
+    public void SetDiameter(float arg)
+    {
+        Diameter.text = arg + "mm";
+    }
 
     private void Awake()
     {
