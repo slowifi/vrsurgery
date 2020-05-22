@@ -4166,6 +4166,7 @@ MonoBehaviour:
   incisionImage: []
   measureDistanceImage: []
   measureDiameterImage: []
+  measurePerimeterImage: []
 --- !u!1 &1363463999
 GameObject:
   m_ObjectHideFlags: 0

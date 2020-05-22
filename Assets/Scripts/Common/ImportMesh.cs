@@ -44,11 +44,13 @@ public class ImportMesh : MonoBehaviour
 
         Debug.Log(path);
         //var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
-        ChatManager.Instance.GenerateMessage(path);
+        string fileName = Path.GetFileName(path);
+        fileName = fileName.Substring(0, fileName.Length - 4);
+        UIManager.Instance.SetFileName(fileName);
         // 여기에 추가 해야될 것은 새로 읽어드렸을 때, 리셋 기능.
 
         //ObjImporter asdf = new ObjImporter();
-        
+
         if (mainObject.activeSelf)
         {
             pivotObject.transform.localPosition = Vector3.zero;

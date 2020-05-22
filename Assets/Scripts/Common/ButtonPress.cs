@@ -26,7 +26,8 @@ public class ButtonPress : Singleton<ButtonPress>
     public Sprite[] incisionImage;
     public Sprite[] measureDistanceImage;
     public Sprite[] measureDiameterImage;
-    
+    public Sprite[] measurePerimeterImage;
+
     private void Awake()
     {
         EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
@@ -34,8 +35,9 @@ public class ButtonPress : Singleton<ButtonPress>
         sliceImage = new Sprite[2];
         patchImage = new Sprite[2];
         incisionImage = new Sprite[2];
-        measureDistanceImage = new Sprite[2];
-        measureDiameterImage = new Sprite[2];
+        measureDistanceImage = new Sprite[3];
+        measureDiameterImage = new Sprite[3];
+        measurePerimeterImage = new Sprite[3];
 
         cutImage[0] = Resources.Load("UI/Icon/Icon_Lasso_0", typeof(Sprite)) as Sprite;
         cutImage[1] = Resources.Load("UI/Icon/Icon_Lasso_1", typeof(Sprite)) as Sprite;
@@ -46,19 +48,21 @@ public class ButtonPress : Singleton<ButtonPress>
         patchImage[0] = Resources.Load("UI/Icon/Icon_Patch_0", typeof(Sprite)) as Sprite;
         patchImage[1] = Resources.Load("UI/Icon/Icon_Patch_1", typeof(Sprite)) as Sprite;
 
-        measureDistanceImage[0] = Resources.Load("UI/Icon/Icon_Measure_0", typeof(Sprite)) as Sprite;
-        measureDistanceImage[1] = Resources.Load("UI/Icon/Icon_Measure_1", typeof(Sprite)) as Sprite;
+        measureDistanceImage[0] = Resources.Load("UI/Icon/Icon_Measure_A_0", typeof(Sprite)) as Sprite;
+        measureDistanceImage[1] = Resources.Load("UI/Icon/Icon_Measure_A_1", typeof(Sprite)) as Sprite;
+        measureDistanceImage[2] = Resources.Load("UI/Icon/Icon_Measure_A_2", typeof(Sprite)) as Sprite;
 
-        // 임시
-        measureDiameterImage[0] = Resources.Load("UI/Icon/Icon_Measure_0", typeof(Sprite)) as Sprite;
-        measureDiameterImage[1] = Resources.Load("UI/Icon/Icon_Measure_1", typeof(Sprite)) as Sprite;
+        measureDiameterImage[0] = Resources.Load("UI/Icon/Icon_Measure_B_0", typeof(Sprite)) as Sprite;
+        measureDiameterImage[1] = Resources.Load("UI/Icon/Icon_Measure_B_1", typeof(Sprite)) as Sprite;
+        measureDiameterImage[1] = Resources.Load("UI/Icon/Icon_Measure_B_2", typeof(Sprite)) as Sprite;
+
+        measurePerimeterImage[0] = Resources.Load("UI/Icon/Icon_Measure_C_0", typeof(Sprite)) as Sprite;
+        measurePerimeterImage[1] = Resources.Load("UI/Icon/Icon_Measure_C_1", typeof(Sprite)) as Sprite;
+        measurePerimeterImage[1] = Resources.Load("UI/Icon/Icon_Measure_C_2", typeof(Sprite)) as Sprite;
 
         incisionImage[0] = Resources.Load("UI/Icon/Icon_Incision_0", typeof(Sprite)) as Sprite;
         incisionImage[1] = Resources.Load("UI/Icon/Icon_Incision_1", typeof(Sprite)) as Sprite;
 
-        //selectedColorBlock = SliceButton.colors;
-        //unselectedColorBlock = SliceButton.colors;
-        //selectedColorBlock.normalColor = new Color32(176, 48, 48, 255);
     }
     
     public void Events_OnModeChanged(string mode)
