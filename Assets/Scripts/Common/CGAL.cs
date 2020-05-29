@@ -649,7 +649,7 @@ public class CGAL
 
         // 새롭게 mesh instance 만들어내는 과정이 필요함. 
         // 그리고 기존것 지우고 뭔가 또 해야됨.
-        GameObject newObject = new GameObject("newHeart", typeof(MeshFilter), typeof(MeshRenderer));
+        GameObject newObject = new GameObject("COLOR____", typeof(MeshFilter), typeof(MeshRenderer));
         newObject.GetComponent<MeshRenderer>().material = material;
 
         newObject.transform.SetParent(GameObject.Find("PartialModel").transform);

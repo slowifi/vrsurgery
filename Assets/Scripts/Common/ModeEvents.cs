@@ -15,9 +15,39 @@ public class ModeEvents : MonoBehaviour
     /// </summary>
     public event ModeChangedHandler OnModeChanged;
     public delegate void ModeChangedHandler(string mode);
+
+    public int PatchNum = 0;
+    public bool Patchenabled = false;
+
     public void InvokeModeChanged(string mode)
     {
         OnModeChanged?.Invoke(mode);
+        if (GameObject.Find("OuterPatch") != null)
+        {
+            Patchenabled = true;
+            if (mode.Equals("Exit"))
+            {
+                GameObject.Find("OuterPatch").name = "OuterPatch" + PatchNum.ToString();
+                GameObject.Find("InnerPatch").name = "InnerPatch" + PatchNum.ToString();
+                PatchNum++;
+            }
+        }
+        else
+        {
+            if (Patchenabled == true)
+            {
+                if (mode.Equals("Exit"))
+                {
+                    GameObject.Find("Undo Button").GetComponent<Undo_Redo>().SaveMeshAtPatch();
+                    Patchenabled = false;
+                }
+            }
+            else
+            {
+                if (mode.Equals("Exit"))
+                    GameObject.Find("Undo Button").GetComponent<Undo_Redo>().SaveMesh();
+            }
+        }
     }
 
     public event ModeManipulateHandler OnModeManipulate;

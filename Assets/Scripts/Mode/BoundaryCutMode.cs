@@ -53,7 +53,7 @@ public class BoundaryCutMode : MonoBehaviour
             CGALCut();
             AdjacencyList.Instance.ListUpdate();
             EventManager.Instance.Events.InvokeModeManipulate("EndAll");
-            EventManager.Instance.Events.InvokeModeChanged("ResetButton");
+            //EventManager.Instance.Events.InvokeModeChanged("ResetButton");
             Destroy(lineRenderer.lineObject);
             Destroy(this);
         }

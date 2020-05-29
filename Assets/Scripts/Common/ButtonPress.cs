@@ -64,7 +64,17 @@ public class ButtonPress : Singleton<ButtonPress>
         incisionImage[1] = Resources.Load("UI/Icon/Icon_Incision_1", typeof(Sprite)) as Sprite;
 
     }
-    
+    public void Start()
+    {
+        GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
+        GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
+        GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
+        GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
+        GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
+        GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
+        GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
+        //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
+    }
     public void Events_OnModeChanged(string mode)
     {
         switch(mode)
@@ -151,12 +161,15 @@ public class ButtonPress : Singleton<ButtonPress>
         {
             PatchButton.image.sprite = patchImage[0];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
+            EventManager.Instance.Events.InvokeModeChanged("Exit");
+            GameObject.Find("Undo Button").GetComponent<Undo_Redo>().SavePatchIndex();
         }
         else
         {
             ResetButton();
             PatchButton.image.sprite = patchImage[1];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
+            GameObject.Find("Undo Button").GetComponent<Undo_Redo>().SavePatchIndex();
             Events_OnModeChanged("Patch");
         }
     }

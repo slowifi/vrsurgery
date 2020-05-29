@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using Dummiesman;
 using System.IO;
@@ -37,6 +38,16 @@ public class ImportMesh : MonoBehaviour
         }
         
         playerObject.SetActive(true);
+
+        GameObject.Find("Undo Button").GetComponent<Undo_Redo>().Undo_Redo_init();
+        GameObject.Find("Incision Button").GetComponent<Button>().interactable = true;
+        GameObject.Find("Slicing Button").GetComponent<Button>().interactable = true;
+        GameObject.Find("Patching Button").GetComponent<Button>().interactable = true;
+        GameObject.Find("Cutting Button").GetComponent<Button>().interactable = true;
+        GameObject.Find("Undo Button").GetComponent<Button>().interactable = true;
+        GameObject.Find("Redo Button").GetComponent<Button>().interactable = true;
+        GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = true;
+        //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = true;
     }
 
     public void SetMesh(string path)

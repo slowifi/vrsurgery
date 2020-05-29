@@ -155,6 +155,7 @@ public class IncisionMode : MonoBehaviour
             MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
             //IncisionManager.TestGenerateCGAL();
             //testbool = true;
+            MeshManager.Instance.mesh.RecalculateNormals();
         }
     }
 }

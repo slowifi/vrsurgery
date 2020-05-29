@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 //using UnityEditor;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class CHD : MonoBehaviour
 {
     private GameObject mode;
-
+    public int Detect_Second = 0;
     public void SliceMode()
     {
         AdjacencyList.Instance.WorldPositionUpdate();
@@ -120,33 +121,97 @@ public class CHD : MonoBehaviour
         {
             case "IncisionMode":
                 IncisionMode();
+                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
+                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
                 Debug.Log("incision 실행");
+                Detect_Second++;
                 break;
             case "CutMode":
                 CutMode();
+                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
+                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
                 Debug.Log("cut 실행");
+                Detect_Second++;
                 break;
             case "PatchMode":
                 PatchMode();
+                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
+                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
                 Debug.Log("patch 실행");
+                Detect_Second++;
                 break;
             case "SliceMode":
                 SliceMode();
+                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
+                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
                 Debug.Log("slice 실행");
+                Detect_Second++;
                 break;
             case "MeasureMode":
                 MeasureMode();
+                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
+                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
                 Debug.Log("measure 실행");
                 break;
             case "MeasureDiameterMode":
                 MeasureDiameterMode();
+                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
+                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
                 Debug.Log("Measure Diameter 실행");
                 break;
             case "Exit":
                 Exit();
+                GameObject.Find("Incision Button").GetComponent<Button>().interactable = true;
+                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = true;
+                GameObject.Find("Patching Button").GetComponent<Button>().interactable = true;
+                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = true;
+                GameObject.Find("Undo Button").GetComponent<Button>().interactable = true;
+                GameObject.Find("Redo Button").GetComponent<Button>().interactable = true;
+                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = true;
+                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = true;
+                Detect_Second++;
                 Debug.Log("Exit");
                 break;
         }
+    }
+
+    public int Detect_Second_ButtonCall()
+    {
+        return Detect_Second;
+    }
+    public void Detect_Second_NumReset()
+    {
+        Detect_Second = 0;
     }
 
     void Awake()
@@ -157,6 +222,8 @@ public class CHD : MonoBehaviour
         AdjacencyList.Instance.Initialize();
         MakeDoubleFaceMesh.Instance.Initialize();
     }
+
+
 
     void Update()
     {
