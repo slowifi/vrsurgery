@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using System.Collections;
 
 public class SliceMethods
 {
@@ -14,6 +15,14 @@ public class SliceMethods
     private List<Vector3> leftWorldPos;
     private List<Vector3> rightWorldPos;
     private Vector3 middlePosition;
+    private IntPtr[] MultiMeshLeft = new IntPtr[MultiMeshManager.Instance.Size];
+    private IntPtr[] MultiMeshRight = new IntPtr[MultiMeshManager.Instance.Size];
+    private GameObject[] LeftHeartPart = new GameObject[MultiMeshManager.Instance.Size];
+    private GameObject[] RightHeartPart = new GameObject[MultiMeshManager.Instance.Size];
+    private GameObject[] LeftResult = new GameObject[MultiMeshManager.Instance.Size];
+    private GameObject[] RightResult = new GameObject[MultiMeshManager.Instance.Size];
+    private GameObject[] TotalResult = new GameObject[MultiMeshManager.Instance.Size * 2];
+    private List<float[]> verticesCoordinates;
 
     public void SetIntersectedValues(string type, Ray value)
     {
@@ -38,9 +47,9 @@ public class SliceMethods
         IntersectedValues valuesRight = Intersections.GetIntersectedValues(ray, rightHeart.GetComponent<MeshFilter>().mesh.triangles, rightWorldPos);
 
         // 돌렸을때 두개다 만져지면 문제임.
-        if(valuesLeft.Intersected && valuesRight.Intersected)
+        if (valuesLeft.Intersected && valuesRight.Intersected)
         {
-            if(valuesLeft.IntersectedPosition.z > valuesRight.IntersectedPosition.z)
+            if (valuesLeft.IntersectedPosition.z > valuesRight.IntersectedPosition.z)
             {
                 result = "left";
             }
@@ -59,17 +68,99 @@ public class SliceMethods
         }
         return result;
     }
+    public GameObject[] MultiMeshSlicing()
+    {
+        int k = 0;
+        MultiMeshAdjacencyList.Instance.ListsUpdate();
 
+        for (int j = 0; j < MultiMeshManager.Instance.Size; j++)
+        {
+            MultiMeshLeft[j] = CGAL.CreateMeshObject();
+            MultiMeshRight[j] = CGAL.CreateMeshObject();
+        }
+
+        middlePosition = Vector3.Lerp(firstRay.origin, secondRay.origin, 0.5f);
+        verticesCoordinates = new List<float[]>();
+        for (int w = 0; w < MultiMeshManager.Instance.Size; w++)
+        {
+            verticesCoordinates.Add(CGAL.ConvertToFloatArray(MultiMeshAdjacencyList.Instance.MultiMeshWorldPositionVertices[w].ToArray()));
+            Debug.Log(verticesCoordinates.Count);
+            if (CGAL.BuildPolyhedron(MultiMeshLeft[w],
+                verticesCoordinates.ElementAt(w),
+                verticesCoordinates.ElementAt(w).Length / 3,
+                MultiMeshManager.Instance.meshes[w].triangles,
+                MultiMeshManager.Instance.meshes[w].triangles.Length / 3) == 0)
+            {
+                Debug.Log("만들어 짐1");
+            }
+            if (CGAL.BuildPolyhedron(MultiMeshRight[w],
+                verticesCoordinates.ElementAt(w),
+                verticesCoordinates.ElementAt(w).Length / 3,
+                MultiMeshManager.Instance.meshes[w].triangles,
+                MultiMeshManager.Instance.meshes[w].triangles.Length / 3) == 0)
+            {
+                Debug.Log("만들어 짐2");
+            }
+        }
+        try
+        {
+            // ClipPolyhedronByPlane 함수 실행중에 에러가 생기는 것같습니다!
+
+            for (int w = 0; w < MultiMeshManager.Instance.Size; w++)
+            {
+                if (
+                    CGAL.ClipPolyhedronByPlane(
+                    MultiMeshLeft[0],
+                    CGAL.GeneratePlane(
+                        middlePosition,
+                        firstRay.origin + firstRay.direction * 10f,
+                        secondRay.origin + secondRay.direction * 10f)) == 0)
+                {
+                    Debug.Log("만들어짐 3");
+                }
+                else Debug.Log("안만들어짐3");
+
+                if (CGAL.ClipPolyhedronByPlane(
+                    MultiMeshRight[0],
+                    CGAL.GeneratePlane(
+                        middlePosition,
+                        secondRay.origin + secondRay.direction * 10f,
+                        firstRay.origin + firstRay.direction * 10f)) == 0)
+                {
+                    Debug.Log("만들어짐 4");
+                }
+                else Debug.Log("안만들어짐4");
+
+                LeftHeartPart[w] = CGAL.GenerateNewObject(MultiMeshLeft[w], leftMaterial, w);
+                RightHeartPart[w] = CGAL.GenerateNewObject(MultiMeshRight[w], rightMaterial, w);
+                MultiMeshManager.Instance.HeartParts[w].SetActive(false);
+
+                Debug.Log("들어짐5");
+                LeftResult[w] = LeftHeartPart[w];
+                RightResult[w] = RightHeartPart[w];
+
+                TotalResult[k++] = LeftHeartPart[w];
+                TotalResult[k++] = RightHeartPart[w];
+            }
+        }
+        catch(Exception e)
+        {
+            Debug.Log(e);
+        }
+        return TotalResult;
+    }
     public GameObject[] Slicing()
     {
         // left right를 각각 뒤집어 씌울 material을 만들고 색을 다르게해서 각각 잘리면 나눠서 색을 입힘. 그 다음에 유저가 선택하면 선택한 mesh만 지워지도록. 허공을 누르면 다시 오리지널 메쉬로 넘어가게.
+
+        
         AdjacencyList.Instance.ListUpdate();
         IntPtr left = CGAL.CreateMeshObject();
         IntPtr right = CGAL.CreateMeshObject();
         GameObject[] result = new GameObject[2];
 
         float[] verticesCoordinate = CGAL.ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
-
+        
         middlePosition = Vector3.Lerp(firstRay.origin, secondRay.origin, 0.5f);
 
         if (CGAL.BuildPolyhedron(left,

@@ -9,35 +9,40 @@ public class CHD : MonoBehaviour
     public int Detect_Second = 0;
     public void SliceMode()
     {
-        AdjacencyList.Instance.WorldPositionUpdate();
+        //AdjacencyList.Instance.WorldPositionUpdate();
+        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("SliceMode");
         mode.AddComponent<SliceMode>();
-    }
+    }   
 
     public void CutMode()
     {
-        AdjacencyList.Instance.WorldPositionUpdate();
+        //AdjacencyList.Instance.WorldPositionUpdate();
+        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("CutMode");
         mode.AddComponent<BoundaryCutMode>();
     }
 
     public void PatchMode()
     {
-        AdjacencyList.Instance.WorldPositionUpdate();
+        //AdjacencyList.Instance.WorldPositionUpdate();
+        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("PatchMode");
         mode.AddComponent<PatchMode>();
     }
 
     public void MeasureMode()
     {
-        AdjacencyList.Instance.WorldPositionUpdate();
+        //AdjacencyList.Instance.WorldPositionUpdate();
+        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("MeasureMode");
         mode.AddComponent<MeasureMode>();
     }
 
     public void IncisionMode()
     {
-        AdjacencyList.Instance.WorldPositionUpdate();
+        //AdjacencyList.Instance.WorldPositionUpdate();
+        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("IncisionMode");
         mode.AddComponent<IncisionMode>();
         UIManager.Instance.extendBar.value = 0.1f;
@@ -45,7 +50,8 @@ public class CHD : MonoBehaviour
 
     public void MeasureDiameterMode()
     {
-        AdjacencyList.Instance.WorldPositionUpdate();
+        //AdjacencyList.Instance.WorldPositionUpdate();
+        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("MeasureDiameterMode");
         mode.AddComponent<MeasureDiameterMode>();
     }
@@ -53,7 +59,7 @@ public class CHD : MonoBehaviour
     public void Exit()
     {
         EventManager.Instance.Events.InvokeModeManipulate("EndAll");
-        MeshManager.Instance.SaveCurrentMesh();
+        //MeshManager.Instance.SaveCurrentMesh();
 
         if (mode != null)
         {
@@ -77,8 +83,10 @@ public class CHD : MonoBehaviour
             }
             Destroy(mode);
         }
-        MeshManager.Instance.startMeasurePoint.SetActive(false);
-        MeshManager.Instance.endMeasurePoint.SetActive(false);
+        //MeshManager.Instance.startMeasurePoint.SetActive(false);
+        //MeshManager.Instance.endMeasurePoint.SetActive(false);
+        MultiMeshManager.Instance.MultiMeshStartMeasurePoint.SetActive(false);
+        MultiMeshManager.Instance.MultiMeshEndMeasurePoint.SetActive(false);
     }
 
     public void ResetMain()
@@ -107,12 +115,19 @@ public class CHD : MonoBehaviour
             Destroy(mode);
         }
 
-        MeshManager.Instance.ObjUpdate();
-        MeshManager.Instance.Reinitialize();
-        AdjacencyList.Instance.ListUpdate();
-        MakeDoubleFaceMesh.Instance.Reinitialize();
-        MeshManager.Instance.startMeasurePoint.SetActive(false);
-        MeshManager.Instance.endMeasurePoint.SetActive(false);
+        //MeshManager.Instance.ObjUpdate();
+        //AdjacencyList.Instance.ListUpdate();
+        //MeshManager.Instance.Reinitialize();
+        //MakeDoubleFaceMesh.Instance.Reinitialize();
+        //MeshManager.Instance.startMeasurePoint.SetActive(false);
+        //MeshManager.Instance.endMeasurePoint.SetActive(false);
+
+        MultiMeshManager.Instance.ObjsUpdate();
+        MultiMeshAdjacencyList.Instance.ListsUpdate();
+        MultiMeshManager.Instance.Reinitialize();
+        MultiMeshMakeDoubleFace.Instance.Reinitialize();
+        MultiMeshManager.Instance.MultiMeshStartMeasurePoint.SetActive(false);
+        MultiMeshManager.Instance.MultiMeshEndMeasurePoint.SetActive(false);
     }
 
     private void Events_OnModeChanged(string mode)
@@ -217,12 +232,17 @@ public class CHD : MonoBehaviour
     void Awake()
     {
         EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
-        MeshManager.Instance.ObjUpdate();
-        MeshManager.Instance.Initialize();
-        AdjacencyList.Instance.Initialize();
-        MakeDoubleFaceMesh.Instance.Initialize();
-    }
 
+        //MeshManager.Instance.ObjUpdate();
+        //MeshManager.Instance.Initialize();
+        //AdjacencyList.Instance.Initialize();
+        //MakeDoubleFaceMesh.Instance.Initialize();
+
+        MultiMeshManager.Instance.Invoke("ObjsUpdate", 0.1f);
+        MultiMeshManager.Instance.Invoke("Initialize", 0.1f);
+        MultiMeshAdjacencyList.Instance.Invoke("Initialize", 0.1f);
+        MultiMeshMakeDoubleFace.Instance.Invoke("Initialize", 0.1f);
+    }
 
 
     void Update()

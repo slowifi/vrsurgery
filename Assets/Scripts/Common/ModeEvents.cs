@@ -22,6 +22,7 @@ public class ModeEvents : MonoBehaviour
     public void InvokeModeChanged(string mode)
     {
         OnModeChanged?.Invoke(mode);
+        /*
         if (GameObject.Find("OuterPatch") != null)
         {
             Patchenabled = true;
@@ -47,7 +48,7 @@ public class ModeEvents : MonoBehaviour
                 if (mode.Equals("Exit"))
                     GameObject.Find("Undo Button").GetComponent<Undo_Redo>().SaveMesh();
             }
-        }
+        }*/
     }
 
     public event ModeManipulateHandler OnModeManipulate;

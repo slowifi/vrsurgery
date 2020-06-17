@@ -46,19 +46,14 @@ public class MeshManager : Singleton<MeshManager>
     public Mesh oldMesh;
     public Mesh firstMesh;
 
-
-
-    public void Awake()
-    {
-        
-    }
+            
     public void ObjUpdate()
     {
         objTransform = objTransform.GetComponent<Transform>();
         //objTransform = GameObject.Find("PartialModel").transform;
         pivotTransform = pivotTransform.GetComponent<Transform>();
     }
-    public void SetMeshInfo()
+    public void SetMeshInfo() // none
     {
         // 주소값 전달해서 추후에는 같이 변환되게 해야됨.
         MeshInfo = new MeshInformation();
@@ -78,14 +73,14 @@ public class MeshManager : Singleton<MeshManager>
         Heart.GetComponent<MeshRenderer>().material = material;
     }
 
-    public void MeshUpdate()
+    public void MeshUpdate() // Only called AdjacencyList -> ListUpdate
     {
         // heart = GameObject.Find("heart_2");
         mesh = Heart.GetComponent<MeshFilter>().mesh;
         mesh.RecalculateNormals();
     }
 
-    public void SaveCurrentMesh()
+    public void SaveCurrentMesh() // none
     {
         disableHeart = Instantiate(Heart);
         oldMesh = disableHeart.GetComponent<MeshFilter>().mesh;
@@ -98,7 +93,7 @@ public class MeshManager : Singleton<MeshManager>
         oldMesh.vertices = vertices;
     }
 
-    public void LoadOldMesh()
+    public void LoadOldMesh() // none
     {
         int[] triangles = (int[])oldMesh.triangles.Clone();
         Vector3[] vertices = (Vector3[])oldMesh.vertices.Clone();
@@ -129,7 +124,7 @@ public class MeshManager : Singleton<MeshManager>
         Debug.Log(mesh.vertexCount);
     }
 
-    protected override void InitializeChild()
+    protected override void InitializeChild() //maybe none
     {
         Renderer mat = Heart.GetComponent<Renderer>();
         mat.material = material;
@@ -149,4 +144,5 @@ public class MeshManager : Singleton<MeshManager>
         Debug.Log(mesh.normals.Length);
         Debug.Log(mesh.vertexCount);
     }
+
 }

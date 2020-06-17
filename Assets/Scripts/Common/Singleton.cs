@@ -3,6 +3,7 @@ using UnityEngine;
 
 public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
+    public bool IsInitializeds { get; private set; }
     public bool IsInitialized { get; private set; }
     private static T _instance = null;
     private static object _syncobj = new object();
@@ -19,7 +20,6 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             {
                 if (_instance == null)
                 {
-                    
                     T[] objs = FindObjectsOfType<T>();
                     if (objs.Length > 0)
                         _instance = objs[0];
@@ -59,7 +59,7 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         if (IsInitialized) return;
         InitializeChild<P>(param);
         IsInitialized = true;
-    }                            
+    }                 
 
     protected virtual void InitializeChild() { }
     protected virtual void InitializeChild<P>(P arg) where P : class{ }

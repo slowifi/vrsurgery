@@ -22,6 +22,13 @@ public class IntersectedValues
 
 public class Intersections
 {
+    public static IntersectedValues MultiMeshGetIntersectedValues(int i)
+    {
+        Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        int[] triangles = MultiMeshManager.Instance.meshes[i].triangles;
+        List<Vector3> worldPosition = MultiMeshAdjacencyList.Instance.MultiMeshWorldPositionVertices[i];
+        return GetIntersectedValues(ray, triangles, worldPosition);
+    }
     public static IntersectedValues GetIntersectedValues()
     {
         Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);

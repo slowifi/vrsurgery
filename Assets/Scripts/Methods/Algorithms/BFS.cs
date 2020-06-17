@@ -15,7 +15,7 @@ public class BFS
     /// <returns></returns>
 
 
-    public static bool Boundary(int vertex, List<int> boundaryList)
+    public static bool Boundary(int vertex, List<int> boundaryList) //none
     {
         // start point부터 end point까지 겹치는 point들 전부가 boundary list에 들어가야됨.
         // 일단 incision에서 사용한 기능부터 만들어 보고
@@ -108,6 +108,7 @@ public class BFS
     /// <param name="startPoint"></param>
     /// <param name="endPoint"></param>
     /// <param name="isLeft"></param>
+    /// IncisionManager
     public static List<int> Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, float zMin, float zMax, int currentIndex, int firstOuterVertexIndex, int lastOuterVertexIndex)
     {
         List<int> result = new List<int>();
@@ -167,7 +168,7 @@ public class BFS
         return result;
     }
 
-    public static void DFS(List<int> vertices, Vector3 closestVertex)
+    public static void DFS(List<int> vertices, Vector3 closestVertex) //none
     {
         AdjacencyList.Instance.ListUpdateWithoutEdge();
         Vector3[] worldPosition = AdjacencyList.Instance.worldPositionVertices.ToArray();

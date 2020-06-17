@@ -134,7 +134,7 @@ public class IncisionMode : MonoBehaviour
             AdjacencyList.Instance.ListUpdate();
             IncisionManager.GenerateIncisionList();
             MakeDoubleFaceMesh.Instance.MeshUpdateInnerFaceVertices();
-            MeshManager.Instance.SaveCurrentMesh();
+            //MeshManager.Instance.SaveCurrentMesh();
             IncisionManager.currentIndex++;
             MeshManager.Instance.mesh.RecalculateNormals();
             // chatmanager 대신 popup manager에서 팝업 호출하기.

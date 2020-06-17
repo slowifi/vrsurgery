@@ -15,6 +15,7 @@ public class BoundaryCutMode : MonoBehaviour
     private Ray firstRay;
     private List<Ray> rayList;
     private List<Vector3> intersectedVerticesPos;
+    private List<Vector3>[] MultiMeshintersectedVerticesPos;
 
     // 라인렌더러는 한곳에서 관리하는게 나을지도 모르겠음.
     private LineRendererManipulate lineRenderer;
@@ -23,6 +24,7 @@ public class BoundaryCutMode : MonoBehaviour
 
     void Awake()
     {
+        MultiMeshintersectedVerticesPos = new List<Vector3>[MultiMeshManager.Instance.Size];
         lineRenderer = new LineRendererManipulate(transform);
         intersectedVerticesPos = new List<Vector3>();
         rayList = new List<Ray>();
@@ -42,8 +44,9 @@ public class BoundaryCutMode : MonoBehaviour
         if (isFirst)
         {
             Debug.Log("Boundary cut 실행");
-            MeshManager.Instance.SaveCurrentMesh();
-            AdjacencyList.Instance.ListUpdate();
+            //MeshManager.Instance.SaveCurrentMesh();
+            //AdjacencyList.Instance.ListUpdate();
+            MultiMeshAdjacencyList.Instance.ListsUpdate();
             isFirst = false;
             boundaryCount = 0;
             return;
@@ -60,21 +63,38 @@ public class BoundaryCutMode : MonoBehaviour
         else if(Input.GetMouseButtonDown(0))
         {
             EventManager.Instance.Events.InvokeModeManipulate("StopAll");
-            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
+            //Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            IntersectedValues[] intersectedValues = new IntersectedValues[MultiMeshManager.Instance.Size];
+            for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+            {
+                intersectedValues[i] = Intersections.MultiMeshGetIntersectedValues(i);
 
-            rayList.Add(ray);
-            oldRay = ray;
-            firstRay = ray;
-            boundaryCount++;
-            if (intersectedValues.Intersected)
-            {
-                intersectedVerticesPos.Add(intersectedValues.IntersectedPosition);
+                rayList.Add(ray);
+                oldRay = ray;
+                firstRay = ray;
+                boundaryCount++;
+
+                if (intersectedValues[i].Intersected)
+                    intersectedVerticesPos.Add(intersectedValues[i].IntersectedPosition);
+                else
+                    isIntersected = false;
+
             }
-            else
-            {
-                isIntersected = false;
-            }
+            //ntersectedValues intersectedValues = Intersections.GetIntersectedValues();
+            
+            //rayList.Add(ray);
+            //oldRay = ray;
+            //firstRay = ray;
+            //boundaryCount++;
+
+            //if (intersectedValues.Intersected)
+            //{
+            //    intersectedVerticesPos.Add(intersectedValues.IntersectedPosition);
+            //}
+            //else
+            //{
+            //    isIntersected = false;
         }
         else if(Input.GetMouseButton(0))
         {
@@ -102,7 +122,6 @@ public class BoundaryCutMode : MonoBehaviour
                     isIntersected = false;
                 }
             }
-            
         }
         else if(Input.GetMouseButtonUp(0))
         {

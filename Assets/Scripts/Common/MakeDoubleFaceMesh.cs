@@ -56,7 +56,7 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
         innerMesh.RecalculateNormals();
     }
 
-    public void MakeDoubleFace()
+    public void MakeDoubleFace() // none
     {
         originalMesh = MeshManager.Instance.mesh;
         oppositeMesh = oppositeObject.GetComponent<MeshFilter>().mesh;
@@ -122,7 +122,7 @@ public class MakeDoubleFaceMesh : Singleton<MakeDoubleFaceMesh>
         originalMesh = MeshManager.Instance.mesh;
         oppositeObject = new GameObject("Heart_Inner", typeof(MeshFilter), typeof(MeshRenderer));
         oppositeObject.GetComponent<MeshRenderer>().material = MeshManager.Instance.Heart.GetComponent<MeshRenderer>().material;
-        
+
         oppositeObject.transform.SetParent(GameObject.Find("PartialModel").transform);
         oppositeObject.transform.localRotation = Quaternion.identity;
         oppositeObject.transform.localPosition = Vector3.zero;
