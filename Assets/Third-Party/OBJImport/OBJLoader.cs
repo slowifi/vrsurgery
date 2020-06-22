@@ -221,9 +221,6 @@ namespace Dummiesman
 							}
 						}
 
-                        normalIndex = int.MinValue;
-                        uvIndex = int.MinValue;
-                        
                         //"postprocess" indices
                         if (vertexIndex > int.MinValue)
                         {
@@ -231,18 +228,18 @@ namespace Dummiesman
                                 vertexIndex = Vertices.Count - vertexIndex;
                             vertexIndex--;
                         }
-                        //if (normalIndex > int.MinValue)
-                        //{
-                        //    if (normalIndex < 0)
-                        //        normalIndex = Normals.Count - normalIndex;
-                        //    normalIndex--;
-                        //}
-                        //if (uvIndex > int.MinValue)
-                        //{
-                        //    if (uvIndex < 0)
-                        //        uvIndex = UVs.Count - uvIndex;
-                        //    uvIndex--;
-                        //}
+                        if (normalIndex > int.MinValue)
+                        {
+                            if (normalIndex < 0)
+                                normalIndex = Normals.Count - normalIndex;
+                            normalIndex--;
+                        }
+                        if (uvIndex > int.MinValue)
+                        {
+                            if (uvIndex < 0)
+                                uvIndex = UVs.Count - uvIndex;
+                            uvIndex--;
+                        }
 
                         //set array values
                         vertexIndices.Add(vertexIndex);
