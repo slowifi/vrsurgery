@@ -68,6 +68,7 @@ public class ImportMesh : MonoBehaviour
             PartialModel = new GameObject();
             PartialModel.name = "PartialModel";
             PartialModel.transform.SetParent(GameObject.Find("HumanHeart").transform);
+            
 
             for (int i = 0; i < length; i++)
                 SetMultiMeshes(objspath[i]);

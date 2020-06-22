@@ -13,11 +13,11 @@ public class MultiMeshAdjacencyList : Singleton<MultiMeshAdjacencyList>
     public List<Edge>[] MultiMeshEdgeList;
     public List<Vector3>[] MultiMeshWorldPositionVertices;
     public List<int[]> MultiMeshTriangles = new List<int[]>();
-
     public int[] MultiMeshVertexCount;
 
     public void ListsUpdate()
     {
+        MultiMeshTriangles.Clear();
         MultiMeshConnectedVertices = new Dictionary<int, HashSet<int>>[MultiMeshManager.Instance.Size];
         MultiMeshConnectedTriangles = new Dictionary<int, HashSet<int>>[MultiMeshManager.Instance.Size];
         MultiMeshEdgeList = new List<Edge>[MultiMeshManager.Instance.Size];
@@ -33,9 +33,10 @@ public class MultiMeshAdjacencyList : Singleton<MultiMeshAdjacencyList>
 
             MultiMeshVertexCount[i] = MultiMeshManager.Instance.meshes[i].vertexCount;
             MultiMeshTriangles.Add(MultiMeshManager.Instance.meshes[i].triangles);
-            
+            //Debug.Log("VertexCount : " + MultiMeshVertexCount.Length);
+            //Debug.Log("MultiMeshTrianglesCount : " + MultiMeshTriangles.Count);
             MultiMeshWorldPositionVertices[i] = LocalToWorldPosition(MultiMeshManager.Instance.meshes[i], i);
-            ConnectedVerticesAndTriangles(MultiMeshVertexCount[i], MultiMeshTriangles.ElementAt(i), i);
+            ConnectedVerticesAndTriangles(MultiMeshVertexCount[i], MultiMeshTriangles[i], i);
             GenerateEdgeList(MultiMeshVertexCount[i], MultiMeshTriangles.ElementAt(i), i);
         }
     }
@@ -50,7 +51,6 @@ public class MultiMeshAdjacencyList : Singleton<MultiMeshAdjacencyList>
         Transform objTransform = MultiMeshManager.Instance.objsTransform[i];
         for (int j = 0; j < worldposition.Count; j++)
             worldposition[j] = objTransform.TransformPoint(worldposition[j]);
-
         return worldposition;
     }
     private void ConnectedVerticesAndTriangles(int verticesLength, int[] triangles, int k)

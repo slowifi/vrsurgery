@@ -13,9 +13,6 @@ public class SliceMode : MonoBehaviour
     private string mode;
     private SliceMethods sliceMethods;
 
-    private GameObject[] MultiMeshLeftHeart = new GameObject[MultiMeshManager.Instance.Size];
-    private GameObject[] MultiMeshRightHeart = new GameObject[MultiMeshManager.Instance.Size];
-    private int SliceResultIndex = 0;
     private void Awake()
     {
         mode = "slice";
@@ -27,46 +24,14 @@ public class SliceMode : MonoBehaviour
         switch (mode)
         {
             case "slice":
-                //handleSlice();
-                MultiMeshHandleSlice();
+                handleSlice();
                 break;
             case "select":
                 handleSelect();
                 break;
         }
     }
-    private void MultiMeshHandleSlice()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            lineRenderer = new LineRendererManipulate(transform);
-            Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-            oldRay = ray;
-            sliceMethods.SetIntersectedValues("first", ray);
-            EventManager.Instance.Events.InvokeModeManipulate("StopAll");
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            EventManager.Instance.Events.InvokeModeManipulate("EndAll");
-            Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-            sliceMethods.SetIntersectedValues("second", ray);
-
-            GameObject[] SliceResult = sliceMethods.MultiMeshSlicing();
-
-            for(int i=0;i<MultiMeshManager.Instance.Size;i++)
-            {
-                MultiMeshLeftHeart[i] = SliceResult[SliceResultIndex++];
-                MultiMeshRightHeart[i] = SliceResult[SliceResultIndex++];
-            }
-            mode = "select";
-            Destroy(lineRenderer.lineObject);
-        }
-        else if (Input.GetMouseButton(0))
-        {
-            Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-            lineRenderer.SetFixedLineRenderer(oldRay.origin + oldRay.direction * 100f, ray.origin + ray.direction * 100f);
-        }
-    }
+    
     private void handleSlice()
     {
         if (Input.GetMouseButtonDown(0))

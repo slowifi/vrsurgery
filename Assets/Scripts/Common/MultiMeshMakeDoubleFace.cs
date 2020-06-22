@@ -21,6 +21,7 @@ public class MultiMeshMakeDoubleFace : Singleton<MultiMeshMakeDoubleFace>
         {
             originalMeshes[i] = MultiMeshManager.Instance.meshes[i];
             GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).name = GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer";
+            GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
             oppositeObjects[i] = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Inner", typeof(MeshFilter), typeof(MeshRenderer));
             oppositeObjects[i].GetComponent<MeshRenderer>().material = MultiMeshManager.Instance.HeartParts[i].GetComponent<MeshRenderer>().material;
 
@@ -52,6 +53,7 @@ public class MultiMeshMakeDoubleFace : Singleton<MultiMeshMakeDoubleFace>
         {
             originalMeshes[i] = MultiMeshManager.Instance.meshes[i];
             GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).name = GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer";
+            GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
             oppositeObjects[i] = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Inner", typeof(MeshFilter), typeof(MeshRenderer));
             oppositeObjects[i].GetComponent<MeshRenderer>().material = MultiMeshManager.Instance.HeartParts[i].GetComponent<MeshRenderer>().material;
             
@@ -73,5 +75,19 @@ public class MultiMeshMakeDoubleFace : Singleton<MultiMeshMakeDoubleFace>
             oppositeMeshes[i].triangles = newTriangles;
             oppositeMeshes[i].RecalculateNormals();
         }
+    }
+    public void MeshUpdateInnerFaceVertices(int MeshIndex)
+    {
+        Vector3[] vertices = MultiMeshManager.Instance.meshes[MeshIndex].vertices;
+        int[] triangles = MultiMeshManager.Instance.meshes[MeshIndex].triangles;
+        int[] newTriangles = (int[])triangles.Clone();
+        for (int i = 0; i < triangles.Length; i += 3)
+        {
+            newTriangles[i + 1] = triangles[i + 2];
+            newTriangles[i + 2] = triangles[i + 1];
+        }
+        oppositeMeshes[MeshIndex].vertices = vertices;
+        oppositeMeshes[MeshIndex].triangles = newTriangles;
+        oppositeMeshes[MeshIndex].RecalculateNormals();
     }
 }

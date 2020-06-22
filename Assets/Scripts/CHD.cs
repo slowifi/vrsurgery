@@ -12,7 +12,7 @@ public class CHD : MonoBehaviour
         //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("SliceMode");
-        mode.AddComponent<SliceMode>();
+        mode.AddComponent<MultiMeshSliceMode>();
     }   
 
     public void CutMode()
@@ -20,7 +20,8 @@ public class CHD : MonoBehaviour
         //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("CutMode");
-        mode.AddComponent<BoundaryCutMode>();
+        //mode.AddComponent<BoundaryCutMode>();
+        mode.AddComponent<MultiMeshBoundaryCutMode>();
     }
 
     public void PatchMode()
@@ -28,6 +29,7 @@ public class CHD : MonoBehaviour
         //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("PatchMode");
+        //mode.AddComponent<MultiMeshPatchMode>();
         mode.AddComponent<PatchMode>();
     }
 
@@ -44,7 +46,7 @@ public class CHD : MonoBehaviour
         //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("IncisionMode");
-        mode.AddComponent<IncisionMode>();
+        mode.AddComponent<MultiMeshIncisionMode>();
         UIManager.Instance.extendBar.value = 0.1f;
     }
 

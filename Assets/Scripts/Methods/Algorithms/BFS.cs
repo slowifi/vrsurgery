@@ -167,6 +167,64 @@ public class BFS
         }
         return result;
     }
+    public static List<int> Circle(int vertex_num, Vector3 startPoint, Vector3 endPoint, float zMin, float zMax, int currentIndex, int firstOuterVertexIndex, int lastOuterVertexIndex, int MeshIndex)
+    {
+        List<int> result = new List<int>();
+        Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
+        float dst = Vector2.Distance(startPoint, endPoint) / 2;
+        List<Vector3> worldVertices = MultiMeshAdjacencyList.Instance.MultiMeshWorldPositionVertices.ElementAt(MeshIndex);
+
+        Debug.Log(currentIndex);
+        // vertex_num
+        Queue<int> temp = new Queue<int>();
+        HashSet<int> duplicateCheck = new HashSet<int>();
+        duplicateCheck.Add(vertex_num);
+        duplicateCheck.Add(firstOuterVertexIndex);
+        duplicateCheck.Add(lastOuterVertexIndex);
+
+        temp.Enqueue(vertex_num);
+        int exceptionalErrorCheck = 0;
+        while (temp.Count != 0)
+        {
+            exceptionalErrorCheck++;
+            if (exceptionalErrorCheck == 4000)
+            {
+                ChatManager.Instance.GenerateMessage(" BFS 에러");
+                return result;
+                //여기에 다른 초기화 함수들 다시 넣고 다 해야됨.
+            }
+            foreach (int item in MultiMeshAdjacencyList.Instance.MultiMeshConnectedVertices.ElementAt(MeshIndex)[temp.Dequeue()])
+            {
+                bool temp_check = false;
+                // vtx에서 다른거로 어떻게 넘어갈까 흠..
+                foreach (int check in duplicateCheck)
+                {
+                    if (check == item)
+                    {
+                        temp_check = true;
+                        break;
+                    }
+                }
+                if (temp_check)
+                    continue;
+                // 원에 포함된다면
+                // perpendicular vector를 추가로 더해줘서 안쪽에 포함 안되도록
+
+                if (Vector2.Distance(center, worldVertices[item]) < dst)
+                {
+                    duplicateCheck.Add(item);
+                    //여기서 depth관련된 조건을 하나 넣어주는식으로 해야됨.
+                    if (worldVertices[item].z < zMax && worldVertices[item].z > zMin)
+                    {
+                        temp.Enqueue(item);
+                        result.Add(item);
+
+                    }
+                }
+            }
+        }
+        return result;
+    }
 
     public static void DFS(List<int> vertices, Vector3 closestVertex) //none
     {

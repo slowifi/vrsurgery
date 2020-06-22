@@ -625,6 +625,49 @@ public class CGAL
             newTriangles[newCount++] = ++newVertexCount;
         }
     }
+    public static void MultiMeshGenerateStampWithHeart(List<Vector3> verticesPos, List<Ray> rayList, ref Vector3[] newVertices, ref int[] newTriangles,int k)
+    {
+        int vertexCount = rayList.Count;
+
+        int newCount = 0;
+
+        for (int i = 0; i < rayList.Count * 2; i++)
+        {
+            if (i >= vertexCount)
+            {
+                // vertex들 넣어줘야됨.
+                newVertices[i] = verticesPos[newCount] + (Vector3.Normalize(rayList[newCount++].direction) * MultiMeshManager.Instance.objsTransform[k].lossyScale.z * 8);
+            }
+            else
+            {
+                newVertices[i] = rayList[i].origin + rayList[i].direction * 1f;
+            }
+        }
+
+        newCount = 0;
+        int newVertexCount = vertexCount;
+        for (int i = 0; i < vertexCount; i++)
+        {
+            if (i == vertexCount - 1)
+            {
+                newTriangles[newCount++] = i;
+                newTriangles[newCount++] = newVertexCount;
+                newTriangles[newCount++] = 0;
+
+                newTriangles[newCount++] = 0;
+                newTriangles[newCount++] = newVertexCount;
+                newTriangles[newCount++] = vertexCount;
+                break;
+            }
+            newTriangles[newCount++] = i;
+            newTriangles[newCount++] = newVertexCount;
+            newTriangles[newCount++] = i + 1;
+
+            newTriangles[newCount++] = i + 1;
+            newTriangles[newCount++] = newVertexCount;
+            newTriangles[newCount++] = ++newVertexCount;
+        }
+    }
 
     public static float[] GeneratePlane(Vector3 v1, Vector3 v2, Vector3 v3)
     {
@@ -672,7 +715,52 @@ public class CGAL
         // 그리고 기존것 지우고 뭔가 또 해야됨.
         GameObject newObject = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer", typeof(MeshFilter), typeof(MeshRenderer));
         newObject.GetComponent<MeshRenderer>().material = material;
+        newObject.AddComponent<MeshCollider>();
+        newObject.GetComponent<MeshCollider>().sharedMesh = newObject.GetComponent<MeshFilter>().mesh;
+        newObject.transform.SetParent(GameObject.Find(GameObject.Find("PartialModel").transform.GetChild(i).name).transform);
+        newObject.transform.localPosition = Vector3.zero;
+        newObject.transform.localRotation = Quaternion.identity;
+        newObject.transform.localScale = Vector3.one;
+        Mesh newMesh = newObject.GetComponent<MeshFilter>().mesh;
 
+        newMesh.vertices = newVertices;
+        newMesh.triangles = newTriangles;
+        newMesh.RecalculateNormals();
+        return newObject;
+    }
+    public static GameObject GenerateLeftNewObject(IntPtr heart, Material material, int i)
+    {
+        Vector3[] newVertices = ConvertToVector(GetVertices(heart), GetNumberOfVertices(heart), GameObject.Find(GameObject.Find("PartialModel").transform.GetChild(i).name).transform);
+        int[] newTriangles = ConvertToTriangle(GetFaces(heart), GetNumberOfFaces(heart));
+
+        // 새롭게 mesh instance 만들어내는 과정이 필요함. 
+        // 그리고 기존것 지우고 뭔가 또 해야됨.
+        GameObject newObject = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer_Left", typeof(MeshFilter), typeof(MeshRenderer));
+        newObject.GetComponent<MeshRenderer>().material = material;
+        newObject.AddComponent<MeshCollider>();
+        newObject.GetComponent<MeshCollider>().sharedMesh = newObject.GetComponent<MeshFilter>().mesh;
+        newObject.transform.SetParent(GameObject.Find(GameObject.Find("PartialModel").transform.GetChild(i).name).transform);
+        newObject.transform.localPosition = Vector3.zero;
+        newObject.transform.localRotation = Quaternion.identity;
+        newObject.transform.localScale = Vector3.one;
+        Mesh newMesh = newObject.GetComponent<MeshFilter>().mesh;
+
+        newMesh.vertices = newVertices;
+        newMesh.triangles = newTriangles;
+        newMesh.RecalculateNormals();
+        return newObject;
+    }
+    public static GameObject GenerateRightNewObject(IntPtr heart, Material material, int i)
+    {
+        Vector3[] newVertices = ConvertToVector(GetVertices(heart), GetNumberOfVertices(heart), GameObject.Find(GameObject.Find("PartialModel").transform.GetChild(i).name).transform);
+        int[] newTriangles = ConvertToTriangle(GetFaces(heart), GetNumberOfFaces(heart));
+
+        // 새롭게 mesh instance 만들어내는 과정이 필요함. 
+        // 그리고 기존것 지우고 뭔가 또 해야됨.
+        GameObject newObject = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer_Right", typeof(MeshFilter), typeof(MeshRenderer));
+        newObject.GetComponent<MeshRenderer>().material = material;
+        newObject.AddComponent<MeshCollider>();
+        newObject.GetComponent<MeshCollider>().sharedMesh = newObject.GetComponent<MeshFilter>().mesh;
         newObject.transform.SetParent(GameObject.Find(GameObject.Find("PartialModel").transform.GetChild(i).name).transform);
         newObject.transform.localPosition = Vector3.zero;
         newObject.transform.localRotation = Quaternion.identity;

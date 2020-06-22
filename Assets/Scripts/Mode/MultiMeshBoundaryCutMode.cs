@@ -1,11 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEditor;
 using System.Linq;
 
-public class BoundaryCutMode : MonoBehaviour
+public class MultiMeshBoundaryCutMode : MonoBehaviour
 {
     private bool isLast;
     private int boundaryCount;
@@ -21,6 +20,9 @@ public class BoundaryCutMode : MonoBehaviour
     private LineRendererManipulate lineRenderer;
 
     private Material heartMaterial;
+    private GameObject FirstHitObject;
+    private GameObject SecondHitObject;
+    private int HitOBJIndex;
 
     void Awake()
     {
@@ -31,7 +33,7 @@ public class BoundaryCutMode : MonoBehaviour
         boundaryCount = 0;
 
         isFirst = true;
-        
+
         isLast = false;
         isIntersected = true;
 
@@ -43,26 +45,39 @@ public class BoundaryCutMode : MonoBehaviour
         if (isFirst)
         {
             Debug.Log("Boundary cut 실행");
-            MeshManager.Instance.SaveCurrentMesh();
-            AdjacencyList.Instance.ListUpdate();
+            MultiMeshAdjacencyList.Instance.ListsUpdate();
             isFirst = false;
             boundaryCount = 0;
             return;
         }
         else if (isLast)
         {
-            CGALCut();
-            AdjacencyList.Instance.ListUpdate();
+            MultiMeshCGALCut();
+            MultiMeshAdjacencyList.Instance.ListsUpdate();
             EventManager.Instance.Events.InvokeModeManipulate("EndAll");
-            //EventManager.Instance.Events.InvokeModeChanged("ResetButton");
             Destroy(lineRenderer.lineObject);
             Destroy(this);
         }
         else if (Input.GetMouseButtonDown(0))
         {
             EventManager.Instance.Events.InvokeModeManipulate("StopAll");
-            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
+            RaycastHit FirstHit;
+            Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out FirstHit, 1000f))
+                FirstHitObject = FirstHit.collider.gameObject;
+            else
+            { 
+                Debug.Log("빈공간입니다.");
+                return;
+            }
+            
+            for (int i=0;i<MultiMeshManager.Instance.Size;i++)
+            {
+                if (FirstHitObject.name == GameObject.Find("PartialModel").transform.GetChild(i).name+"_Outer")
+                    HitOBJIndex = i;
+            }
+            //Debug.Log("name : " + FirstHitObject.name + " HitIndex : " + HitOBJIndex);
+            IntersectedValues intersectedValues = Intersections.MultiMeshGetIntersectedValues(HitOBJIndex);
 
             rayList.Add(ray);
             oldRay = ray;
@@ -80,10 +95,31 @@ public class BoundaryCutMode : MonoBehaviour
         }
         else if (Input.GetMouseButton(0))
         {
-            Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-            IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
+            Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit SecondHit;
+            
+            if (Physics.Raycast(ray, out SecondHit, 1000f))
+                SecondHitObject = SecondHit.collider.gameObject;
+            else
+            {
+                Debug.Log("영역을 이탈했습니다.");
+                Destroy(lineRenderer.lineObject);
+                Destroy(this);
+                return;
+            }
+            Debug.Log("name : " + SecondHitObject.name);
+            if (SecondHitObject.name != FirstHitObject.name)
+            {
+                Debug.Log("영역을 이탈했습니다.");
+                Destroy(lineRenderer.lineObject);
+                Destroy(this);
+                return;
+            }
+
+            IntersectedValues intersectedValues = Intersections.MultiMeshGetIntersectedValues(HitOBJIndex);
 
             lineRenderer.SetFixedLineRenderer(oldRay.origin + oldRay.direction * 100f, ray.origin + ray.direction * 100f);
+
             if (boundaryCount > 8 && Vector3.Distance(firstRay.origin, ray.origin) < 0.01f)
             {
                 lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100f, firstRay.origin + firstRay.direction * 100f);
@@ -97,6 +133,7 @@ public class BoundaryCutMode : MonoBehaviour
                 rayList.Add(ray);
                 if (intersectedValues.Intersected)
                 {
+                    Debug.Log("intersectedVerticesPosCount : " + intersectedVerticesPos.Count);
                     intersectedVerticesPos.Add(intersectedValues.IntersectedPosition);
                 }
                 else
@@ -107,25 +144,26 @@ public class BoundaryCutMode : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            Debug.Log("MouseUP");
             lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100f, firstRay.origin + firstRay.direction * 100f);
             isLast = true;
         }
     }
-    private void CGALCut()
+    private void MultiMeshCGALCut()
     {
         if (isIntersected)
         {
-            AdjacencyList.Instance.ListUpdate();
+            MultiMeshAdjacencyList.Instance.ListsUpdate();
             Debug.Log("intersected true");
-            IntPtr heart = CGAL.CreateMeshObject();
+            IntPtr HeartPart = CGAL.CreateMeshObject();
             IntPtr stamp = CGAL.CreateMeshObject();
-            float[] verticesCoordinate = CGAL.ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
+            float[] verticesCoordinate = CGAL.ConvertToFloatArray(MultiMeshAdjacencyList.Instance.MultiMeshWorldPositionVertices[HitOBJIndex].ToArray());
 
-            if (CGAL.BuildPolyhedron(heart,
+            if (CGAL.BuildPolyhedron(HeartPart,
                 verticesCoordinate,
                 verticesCoordinate.Length / 3,
-                MeshManager.Instance.mesh.triangles,
-                MeshManager.Instance.mesh.triangles.Length / 3) == -1)
+                MultiMeshManager.Instance.meshes[HitOBJIndex].triangles,
+                MultiMeshManager.Instance.meshes[HitOBJIndex].triangles.Length / 3) == -1)
             {
                 Debug.Log(" 만들어지지 않음");
                 return;
@@ -133,7 +171,7 @@ public class BoundaryCutMode : MonoBehaviour
 
             Vector3[] newVertices = new Vector3[rayList.Count * 2];
             int[] newTriangles = new int[rayList.Count * 6];
-            CGAL.GenerateStampWithHeart(intersectedVerticesPos, rayList, ref newVertices, ref newTriangles);
+            CGAL.MultiMeshGenerateStampWithHeart(intersectedVerticesPos, rayList, ref newVertices, ref newTriangles, HitOBJIndex);
 
 
             float[] newVerticesCoordinate = CGAL.ConvertToFloatArray(newVertices);
@@ -148,34 +186,34 @@ public class BoundaryCutMode : MonoBehaviour
                 Debug.Log(" 만들어지지 않음");
                 return;
             }
-            if(CGAL.FillHole(stamp)== -1)
+            if (CGAL.FillHole(stamp) == -1)
             {
                 Debug.Log("fillhole error");
                 return;
             }
 
-            if (CGAL.ClipPolyhedronByMesh(heart, stamp) == -1)
+            if (CGAL.ClipPolyhedronByMesh(HeartPart, stamp) == -1)
             {
                 Debug.Log("Clip error");
                 return;
             }
-            MeshManager.Instance.SetNewObject(CGAL.GenerateNewObject(heart, heartMaterial));
-            MakeDoubleFaceMesh.Instance.Reinitialize();
+            MultiMeshManager.Instance.SetNewObjects(CGAL.GenerateNewObject(HeartPart, heartMaterial,HitOBJIndex),HitOBJIndex);
+            MultiMeshMakeDoubleFace.Instance.Reinitialize();
             ////CGAL.GenerateNewObject(stamp, leftMaterial);
             //// 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
             ////MeshManager.Instance.Heart.SetActive(false);
         }
         else
         {
-            IntPtr heart = CGAL.CreateMeshObject();
+            IntPtr HeartPart = CGAL.CreateMeshObject();
             IntPtr stamp = CGAL.CreateMeshObject();
-            float[] verticesCoordinate = CGAL.ConvertToFloatArray(AdjacencyList.Instance.worldPositionVertices.ToArray());
+            float[] verticesCoordinate = CGAL.ConvertToFloatArray(MultiMeshAdjacencyList.Instance.MultiMeshWorldPositionVertices[HitOBJIndex].ToArray());
 
-            if (CGAL.BuildPolyhedron(heart,
+            if (CGAL.BuildPolyhedron(HeartPart,
                 verticesCoordinate,
                 verticesCoordinate.Length / 3,
-                MeshManager.Instance.mesh.triangles,
-                MeshManager.Instance.mesh.triangles.Length / 3) == -1)
+                MultiMeshManager.Instance.meshes[HitOBJIndex].triangles,
+                MultiMeshManager.Instance.meshes[HitOBJIndex].triangles.Length / 3) == -1)
             {
                 Debug.Log(" 만들어지지 않음");
                 return;
@@ -204,13 +242,13 @@ public class BoundaryCutMode : MonoBehaviour
                 return;
             }
 
-            if (CGAL.ClipPolyhedronByMesh(heart, stamp) == -1)
+            if (CGAL.ClipPolyhedronByMesh(HeartPart, stamp) == -1)
             {
                 Debug.Log("Clip error");
                 return;
             }
-            MeshManager.Instance.SetNewObject(CGAL.GenerateNewObject(heart, heartMaterial));
-            MakeDoubleFaceMesh.Instance.Reinitialize();
+            MultiMeshManager.Instance.SetNewObjects(CGAL.GenerateNewObject(HeartPart, heartMaterial,HitOBJIndex),HitOBJIndex);
+            MultiMeshMakeDoubleFace.Instance.Reinitialize();
             //// 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
 
             ////MeshManager.Instance.Heart.SetActive(false);
