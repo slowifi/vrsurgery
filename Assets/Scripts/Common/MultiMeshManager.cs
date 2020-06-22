@@ -11,6 +11,9 @@ public class MultiPatchs
 }
 public class MultiMeshManager : Singleton<MultiMeshManager>
 {
+
+    public List<MultiPatchs> PatchList;
+
     public GameObject MultiMeshStartMeasurePoint;
     public GameObject MultiMeshEndMeasurePoint;
     public GameObject[] HeartParts;
@@ -66,7 +69,7 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
             mat[i] = HeartParts[i].GetComponent<Renderer>();
             mat[i].material = HeartPartMaterial;
             meshes[i] = HeartParts[i].GetComponent<MeshFilter>().mesh;
-
+            PatchList.Clear();
             meshes[i].RecalculateNormals();
 
             //Check Path need reinitialize !!!
@@ -80,7 +83,7 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
             mat[i] = HeartParts[i].GetComponent<Renderer>();
             mat[i].material = HeartPartMaterial;
             meshes[i] = HeartParts[i].GetComponent<MeshFilter>().mesh;
-
+            PatchList = new List<MultiPatchs>();
             meshes[i].RecalculateNormals();
         }
     }

@@ -30,7 +30,7 @@ public class CHD : MonoBehaviour
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("PatchMode");
         //mode.AddComponent<MultiMeshPatchMode>();
-        mode.AddComponent<PatchMode>();
+        mode.AddComponent<MultiMeshPatchMode>();
     }
 
     public void MeasureMode()
@@ -38,7 +38,7 @@ public class CHD : MonoBehaviour
         //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("MeasureMode");
-        mode.AddComponent<MeasureMode>();
+        mode.AddComponent<MultiMeshMeasureMode>();
     }
 
     public void IncisionMode()
@@ -67,9 +67,10 @@ public class CHD : MonoBehaviour
         {
             if (mode.name == "PatchMode")
             {
+                Debug.Log("aaaa");
                 //GameObject patchObject = GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
-                GameObject outerPatchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].OuterPatch;
-                GameObject innerPatchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].InnerPatch;
+                GameObject outerPatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].OuterPatch;
+                GameObject innerPatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].InnerPatch;
                 if (outerPatchObject)
                 {
                     MeshRenderer outerRen = outerPatchObject.GetComponent<MeshRenderer>();

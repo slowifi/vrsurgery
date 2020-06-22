@@ -22,6 +22,16 @@ public class ModeEvents : MonoBehaviour
     public void InvokeModeChanged(string mode)
     {
         OnModeChanged?.Invoke(mode);
+        if(GameObject.Find("OuterPathch")!=null)
+        {
+            Patchenabled = true;
+            if(mode.Equals("Exit"))
+            {
+                GameObject.Find("OuterPatch").name = "OuterPatch" + PatchNum.ToString();
+                GameObject.Find("InnerPatch").name = "InnerPatch" + PatchNum.ToString();
+                PatchNum++;
+            }
+        }
         /*
         if (GameObject.Find("OuterPatch") != null)
         {

@@ -8,6 +8,49 @@ public class MultiMeshMakeDoubleFace : Singleton<MultiMeshMakeDoubleFace>
     public Mesh[] originalMeshes;
     public Mesh[] oppositeMeshes;
 
+    public void MakePatchInnerFace(GameObject patch)
+    {
+        GameObject innerPatch = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].InnerPatch;
+        //innerPatch.GetComponent<MeshFilter>().mesh;
+        innerPatch.transform.SetParent(MultiMeshManager.Instance.pivotTransform);
+        innerPatch.transform.localPosition = patch.transform.localPosition;
+        innerPatch.transform.localRotation = patch.transform.localRotation;
+        innerPatch.transform.localScale = patch.transform.localScale;
+        Mesh innerMesh = innerPatch.GetComponent<MeshFilter>().mesh;
+
+        int[] triangles = (int[])patch.GetComponent<MeshFilter>().mesh.triangles.Clone();
+        innerMesh.vertices = patch.GetComponent<MeshFilter>().mesh.vertices;
+        int[] newTriangles = (int[])triangles.Clone();
+
+        for (int i = 0; i < triangles.Length; i += 3)
+        {
+            newTriangles[i + 1] = triangles[i + 2];
+            newTriangles[i + 2] = triangles[i + 1];
+        }
+        innerMesh.triangles = newTriangles;
+        innerMesh.RecalculateNormals();
+
+        MeshRenderer ren = innerPatch.GetComponent<MeshRenderer>();
+        ren.material.color = Color.white;
+    }
+    public void PatchUpdateInnerFaceVertices(int patchIndex)
+    {
+        Mesh patchMesh = MultiMeshManager.Instance.PatchList[patchIndex].OuterPatch.GetComponent<MeshFilter>().mesh;
+        Mesh innerMesh = MultiMeshManager.Instance.PatchList[patchIndex].InnerPatch.GetComponent<MeshFilter>().mesh;
+
+        Vector3[] vertices = patchMesh.vertices;
+        int[] triangles = patchMesh.triangles;
+        int[] newTriangles = (int[])triangles.Clone();
+        for (int i = 0; i < triangles.Length; i += 3)
+        {
+            newTriangles[i + 1] = triangles[i + 2];
+            newTriangles[i + 2] = triangles[i + 1];
+        }
+        innerMesh.vertices = vertices;
+        innerMesh.triangles = newTriangles;
+        innerMesh.RecalculateNormals();
+    }
+
     public void Reinitialize()
     {
         for (int i = 0; i < MultiMeshManager.Instance.Size; i++)

@@ -162,14 +162,12 @@ public class ButtonPress : Singleton<ButtonPress>
             PatchButton.image.sprite = patchImage[0];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
             EventManager.Instance.Events.InvokeModeChanged("Exit");
-            GameObject.Find("Undo Button").GetComponent<Undo_Redo>().SavePatchIndex();
         }
         else
         {
             ResetButton();
             PatchButton.image.sprite = patchImage[1];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
-            GameObject.Find("Undo Button").GetComponent<Undo_Redo>().SavePatchIndex();
             Events_OnModeChanged("Patch");
         }
     }
