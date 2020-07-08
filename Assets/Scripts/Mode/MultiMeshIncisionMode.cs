@@ -73,7 +73,7 @@ public class MultiMeshIncisionMode : MonoBehaviour
                 }
                 for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
                 {
-                    if (FirstHitObject.name == GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer")
+                    if (FirstHitObject.name == GameObject.Find("PartialModel").transform.GetChild(i).name)
                         HitOBJIndex = i;
                 }
 
@@ -161,7 +161,7 @@ public class MultiMeshIncisionMode : MonoBehaviour
             IncisionManager.ExecuteDividing(HitOBJIndex);
             MultiMeshAdjacencyList.Instance.ListsUpdate();
             IncisionManager.GenerateIncisionList(HitOBJIndex);
-            MultiMeshMakeDoubleFace.Instance.MeshUpdateInnerFaceVertices(HitOBJIndex);
+            //MultiMeshMakeDoubleFace.Instance.MeshUpdateInnerFaceVertices(HitOBJIndex);
             //MeshManager.Instance.SaveCurrentMesh();
             IncisionManager.currentIndex++;
             MultiMeshManager.Instance.meshes[HitOBJIndex].RecalculateNormals();
@@ -184,7 +184,7 @@ public class MultiMeshIncisionMode : MonoBehaviour
         {
             IncisionManager.Extending(IncisionManager.currentIndex - 1, UIManager.Instance.extendBar.value, oldExtendValue, HitOBJIndex);
             oldExtendValue = UIManager.Instance.extendBar.value;
-            MultiMeshMakeDoubleFace.Instance.MeshUpdateInnerFaceVertices(HitOBJIndex);
+            //MultiMeshMakeDoubleFace.Instance.MeshUpdateInnerFaceVertices(HitOBJIndex);
             //IncisionManager.TestGenerateCGAL();
             //testbool = true;
             MultiMeshManager.Instance.meshes[HitOBJIndex].RecalculateNormals();

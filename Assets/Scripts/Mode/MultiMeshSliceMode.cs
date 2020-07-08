@@ -99,7 +99,7 @@ public class MultiMeshSliceMode : MonoBehaviour
         }
         else if(Input.GetMouseButtonUp(0))
         {
-            MultiMeshMakeDoubleFace.Instance.Reinitialize();
+            //MultiMeshMakeDoubleFace.Instance.Reinitialize();
             Destroy(this);
         }
     }

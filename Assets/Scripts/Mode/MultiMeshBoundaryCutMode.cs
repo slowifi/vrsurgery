@@ -74,7 +74,7 @@ public class MultiMeshBoundaryCutMode : MonoBehaviour
             
             for (int i=0;i<MultiMeshManager.Instance.Size;i++)
             {
-                if (FirstHitObject.name == GameObject.Find("PartialModel").transform.GetChild(i).name+"_Outer")
+                if (FirstHitObject.name == GameObject.Find("PartialModel").transform.GetChild(i).name)
                     HitOBJIndex = i;
             }
 
@@ -202,7 +202,8 @@ public class MultiMeshBoundaryCutMode : MonoBehaviour
                 return;
             }
             MultiMeshManager.Instance.SetNewObjects(CGAL.GenerateNewObject(HeartPart, heartMaterial, HitOBJIndex), HitOBJIndex);
-            MultiMeshMakeDoubleFace.Instance.Reinitialize();            
+            MultiMeshManager.Instance.InitSingleFace();
+            //MultiMeshMakeDoubleFace.Instance.Reinitialize();            
         }
         else
         {
@@ -249,7 +250,8 @@ public class MultiMeshBoundaryCutMode : MonoBehaviour
                 return;
             }
             MultiMeshManager.Instance.SetNewObjects(CGAL.GenerateNewObject(HeartPart, heartMaterial,HitOBJIndex),HitOBJIndex);
-            MultiMeshMakeDoubleFace.Instance.Reinitialize();
+            MultiMeshManager.Instance.InitSingleFace();
+            //MultiMeshMakeDoubleFace.Instance.Reinitialize();
             //// 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
 
             ////MeshManager.Instance.Heart.SetActive(false);

@@ -30,6 +30,11 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
     
     public int Size;
 
+    public Shader newShader;
+    void Awake()
+    {
+        newShader = Resources.Load("Shaders/CulloffShader", typeof(Shader)) as Shader;
+    }
     public void GetObjsSize()
     {
         Size = GameObject.Find("ImportButton").GetComponent<ImportMesh>().length;
@@ -52,7 +57,8 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
         objsTransform[i] = HeartParts[i].transform;
         meshes[i] = HeartParts[i].GetComponent<MeshFilter>().mesh;
         HeartParts[i].GetComponent<MeshRenderer>().material = HeartPartMaterial;
-        HeartParts[i].name = GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer";
+        HeartParts[i].GetComponent<MeshRenderer>().material.shader = newShader;
+        HeartParts[i].name = GameObject.Find("PartialModel").transform.GetChild(i).name;
     }
     //Should Check Making Heart array is right?!
     public void MeshesUpdate()
@@ -92,5 +98,13 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
             GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().OriginalMesh.Add(Instantiate(meshes[i]));
         }
     }
-
+    public void InitSingleFace()
+    {
+        for(int i=0;i<Size;i++)
+        {
+            GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).name = GameObject.Find("PartialModel").transform.GetChild(i).name;
+            GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
+            GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.shader = newShader;
+        }
+    }
 }

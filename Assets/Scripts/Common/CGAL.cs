@@ -716,7 +716,7 @@ public class CGAL
 
         // 새롭게 mesh instance 만들어내는 과정이 필요함. 
         // 그리고 기존것 지우고 뭔가 또 해야됨.
-        GameObject newObject = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer", typeof(MeshFilter), typeof(MeshRenderer));
+        GameObject newObject = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name, typeof(MeshFilter), typeof(MeshRenderer));
         newObject.GetComponent<MeshRenderer>().material = material;
         newObject.AddComponent<MeshCollider>();
         newObject.GetComponent<MeshCollider>().sharedMesh = newObject.GetComponent<MeshFilter>().mesh;
@@ -738,7 +738,7 @@ public class CGAL
 
         // 새롭게 mesh instance 만들어내는 과정이 필요함. 
         // 그리고 기존것 지우고 뭔가 또 해야됨.
-        GameObject newObject = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer_Left", typeof(MeshFilter), typeof(MeshRenderer));
+        GameObject newObject = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Left", typeof(MeshFilter), typeof(MeshRenderer));
         newObject.GetComponent<MeshRenderer>().material = material;
         newObject.AddComponent<MeshCollider>();
         newObject.GetComponent<MeshCollider>().sharedMesh = newObject.GetComponent<MeshFilter>().mesh;
@@ -760,7 +760,7 @@ public class CGAL
 
         // 새롭게 mesh instance 만들어내는 과정이 필요함. 
         // 그리고 기존것 지우고 뭔가 또 해야됨.
-        GameObject newObject = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer_Right", typeof(MeshFilter), typeof(MeshRenderer));
+        GameObject newObject = new GameObject(GameObject.Find("PartialModel").transform.GetChild(i).name + "_Right", typeof(MeshFilter), typeof(MeshRenderer));
         newObject.GetComponent<MeshRenderer>().material = material;
         newObject.AddComponent<MeshCollider>();
         newObject.GetComponent<MeshCollider>().sharedMesh = newObject.GetComponent<MeshFilter>().mesh;
