@@ -7,6 +7,4 @@ public class EventManager : Singleton<EventManager>
     public ModeEvents Events;
 
 
-
-     
 }

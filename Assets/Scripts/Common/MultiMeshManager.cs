@@ -11,9 +11,10 @@ public class MultiPatchs
 }
 public class MultiMeshManager : Singleton<MultiMeshManager>
 {
-
+    
     public List<MultiPatchs> PatchList;
 
+    public GameObject ListButton;
     public GameObject MultiMeshStartMeasurePoint;
     public GameObject MultiMeshEndMeasurePoint;
     public GameObject[] HeartParts;
@@ -43,6 +44,7 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
             objsTransform[i] = objsTransform[i].GetComponent<Transform>();
         pivotTransform = pivotTransform.GetComponent<Transform>();
     }
+
     public void SetNewObjects(GameObject newHeartPart, int i)
     {
         Destroy(HeartParts[i]);
@@ -63,6 +65,7 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
     }
     public void Reinitialize()
     {
+        GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().Initialize();
         Renderer[] mat = new Renderer[Size];
         for(int i=0;i<Size;i++)
         {
@@ -71,12 +74,13 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
             meshes[i] = HeartParts[i].GetComponent<MeshFilter>().mesh;
             PatchList.Clear();
             meshes[i].RecalculateNormals();
-
+            GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().OriginalMesh.Add(Instantiate(meshes[i]));
             //Check Path need reinitialize !!!
         }
     }
     protected override void InitializeChild()
     {
+        GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().Initialize();
         Renderer[] mat = new Renderer[Size];
         for (int i = 0; i < Size; i++)
         {
@@ -85,6 +89,8 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
             meshes[i] = HeartParts[i].GetComponent<MeshFilter>().mesh;
             PatchList = new List<MultiPatchs>();
             meshes[i].RecalculateNormals();
+            GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().OriginalMesh.Add(Instantiate(meshes[i]));
         }
     }
+
 }

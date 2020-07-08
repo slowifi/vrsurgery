@@ -5,7 +5,13 @@ using UnityEngine.UI;
 
 public class CHD : MonoBehaviour
 {
+    public bool CutModeState = false;
+    public bool SliceModeState = false;
+    public bool PatchModeState = false;
+    public bool IncisionModeSate = false;
+    public int MeshIndex;
     private GameObject mode;
+    private int PatchNum = 0;
     public int Detect_Second = 0;
     public void SliceMode()
     {
@@ -13,6 +19,7 @@ public class CHD : MonoBehaviour
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("SliceMode");
         mode.AddComponent<MultiMeshSliceMode>();
+        SliceModeState = true;
     }   
 
     public void CutMode()
@@ -22,6 +29,8 @@ public class CHD : MonoBehaviour
         mode = new GameObject("CutMode");
         //mode.AddComponent<BoundaryCutMode>();
         mode.AddComponent<MultiMeshBoundaryCutMode>();
+        CutModeState = true;
+
     }
 
     public void PatchMode()
@@ -31,6 +40,7 @@ public class CHD : MonoBehaviour
         mode = new GameObject("PatchMode");
         //mode.AddComponent<MultiMeshPatchMode>();
         mode.AddComponent<MultiMeshPatchMode>();
+        PatchModeState = true;
     }
 
     public void MeasureMode()
@@ -48,6 +58,7 @@ public class CHD : MonoBehaviour
         mode = new GameObject("IncisionMode");
         mode.AddComponent<MultiMeshIncisionMode>();
         UIManager.Instance.extendBar.value = 0.1f;
+        IncisionModeSate = true;
     }
 
     public void MeasureDiameterMode()
@@ -67,7 +78,12 @@ public class CHD : MonoBehaviour
         {
             if (mode.name == "PatchMode")
             {
-                Debug.Log("aaaa");
+                if(GameObject.Find("OuterPatch")!=null)
+                {
+                    GameObject.Find("OuterPatch").name = "OuterPatch" + PatchNum.ToString();
+                    GameObject.Find("InnerPatch").name = "InnerPatch" + PatchNum.ToString();
+                    PatchNum++;
+                }
                 //GameObject patchObject = GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
                 GameObject outerPatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].OuterPatch;
                 GameObject innerPatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].InnerPatch;
@@ -219,6 +235,26 @@ public class CHD : MonoBehaviour
                 //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = true;
                 Detect_Second++;
                 Debug.Log("Exit");
+                if (CutModeState == true)
+                {
+                    GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SaveIncisionBoundaryMode(MeshIndex);
+                    CutModeState = false;
+                }
+                else if(SliceModeState == true)
+                {
+                    GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SaveSliceMode();
+                    SliceModeState = false;
+                }
+                else if(PatchModeState == true)
+                {
+                    GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SavePatchMode();
+                    PatchModeState = false;
+                }
+                else if(IncisionModeSate == true)
+                {
+                    GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SaveIncisionBoundaryMode(MeshIndex);
+                    IncisionModeSate = false;
+                }
                 break;
         }
     }

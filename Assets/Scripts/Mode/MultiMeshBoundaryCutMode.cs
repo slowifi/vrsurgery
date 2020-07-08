@@ -24,6 +24,7 @@ public class MultiMeshBoundaryCutMode : MonoBehaviour
     private GameObject SecondHitObject;
     private int HitOBJIndex;
 
+
     void Awake()
     {
         lineRenderer = new LineRendererManipulate(transform);
@@ -76,7 +77,9 @@ public class MultiMeshBoundaryCutMode : MonoBehaviour
                 if (FirstHitObject.name == GameObject.Find("PartialModel").transform.GetChild(i).name+"_Outer")
                     HitOBJIndex = i;
             }
-            //Debug.Log("name : " + FirstHitObject.name + " HitIndex : " + HitOBJIndex);
+
+            GameObject.Find("Main").GetComponent<CHD>().MeshIndex = HitOBJIndex;  // Save index
+
             IntersectedValues intersectedValues = Intersections.MultiMeshGetIntersectedValues(HitOBJIndex);
 
             rayList.Add(ray);
@@ -146,9 +149,11 @@ public class MultiMeshBoundaryCutMode : MonoBehaviour
         {
             Debug.Log("MouseUP");
             lineRenderer.SetLineRenderer(oldRay.origin + oldRay.direction * 100f, firstRay.origin + firstRay.direction * 100f);
+            
             isLast = true;
         }
     }
+    
     private void MultiMeshCGALCut()
     {
         if (isIntersected)
@@ -158,7 +163,7 @@ public class MultiMeshBoundaryCutMode : MonoBehaviour
             IntPtr HeartPart = CGAL.CreateMeshObject();
             IntPtr stamp = CGAL.CreateMeshObject();
             float[] verticesCoordinate = CGAL.ConvertToFloatArray(MultiMeshAdjacencyList.Instance.MultiMeshWorldPositionVertices[HitOBJIndex].ToArray());
-
+        
             if (CGAL.BuildPolyhedron(HeartPart,
                 verticesCoordinate,
                 verticesCoordinate.Length / 3,
@@ -191,17 +196,13 @@ public class MultiMeshBoundaryCutMode : MonoBehaviour
                 Debug.Log("fillhole error");
                 return;
             }
-
             if (CGAL.ClipPolyhedronByMesh(HeartPart, stamp) == -1)
             {
                 Debug.Log("Clip error");
                 return;
             }
-            MultiMeshManager.Instance.SetNewObjects(CGAL.GenerateNewObject(HeartPart, heartMaterial,HitOBJIndex),HitOBJIndex);
-            MultiMeshMakeDoubleFace.Instance.Reinitialize();
-            ////CGAL.GenerateNewObject(stamp, leftMaterial);
-            //// 여기에 이제 잘리고나서 작업 넣어줘야됨. 새로운 메쉬로 바꾸고 정리하는 형태가 되어야함.
-            ////MeshManager.Instance.Heart.SetActive(false);
+            MultiMeshManager.Instance.SetNewObjects(CGAL.GenerateNewObject(HeartPart, heartMaterial, HitOBJIndex), HitOBJIndex);
+            MultiMeshMakeDoubleFace.Instance.Reinitialize();            
         }
         else
         {

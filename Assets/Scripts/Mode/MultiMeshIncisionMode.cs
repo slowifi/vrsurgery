@@ -76,6 +76,9 @@ public class MultiMeshIncisionMode : MonoBehaviour
                     if (FirstHitObject.name == GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer")
                         HitOBJIndex = i;
                 }
+
+                GameObject.Find("Main").GetComponent<CHD>().MeshIndex = HitOBJIndex;
+
                 once = false;
             }
         }
@@ -168,6 +171,10 @@ public class MultiMeshIncisionMode : MonoBehaviour
             mode = "extand";
             EventManager.Instance.Events.InvokeModeManipulate("EndWithoutScaling");
         }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SaveIncisionBoundaryMode(HitOBJIndex);
+        //}
     }
     private void handleExtand()
     {

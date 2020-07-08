@@ -75,7 +75,6 @@ public class ImportMesh : MonoBehaviour
             PartIndex = 0;
             playerObject.SetActive(true);
         }
-        GameObject.Find("Undo Button").GetComponent<Undo_Redo>().Undo_Redo_init();
         GameObject.Find("Incision Button").GetComponent<Button>().interactable = true;
         GameObject.Find("Slicing Button").GetComponent<Button>().interactable = true;
         GameObject.Find("Patching Button").GetComponent<Button>().interactable = true;

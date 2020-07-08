@@ -5,6 +5,7 @@ using UnityEngine;
 public class MultiMeshSliceMode : MonoBehaviour
 {
     private Ray oldRay;
+    private bool saveonce = true;
 
     private LineRendererManipulate lineRenderer;
     private string mode;

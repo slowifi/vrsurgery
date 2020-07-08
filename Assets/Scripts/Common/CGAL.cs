@@ -92,6 +92,9 @@ public class CGAL
     [DllImport("CGALtest_dll", EntryPoint = "GetControlVertices", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetControlVertices(IntPtr value);
 
+    //[DllImport("CGALtest_dll", EntryPoint = "CorefineAndIntersection", CallingConvention = CallingConvention.Cdecl)]
+    //public static extern int CorefineAndIntersection(IntPtr value, IntPtr value2, IntPtr value3);
+
 
     public static void GenerateBigTriangle(Vector2 startMousePos, Vector2 endMousePos) //none
     {
