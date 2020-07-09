@@ -36,6 +36,8 @@ public class ImportMesh : MonoBehaviour
         
         string[] objspath = FileBrowser.OpenFiles("obj");
         length = objspath.Length;
+        for (int i = 0; i < length; i++)
+            Debug.Log(objspath[i]);
         MultiMeshManager.Instance.GetObjsSize();
         EventManager.Instance.Events.InvokeUIChanged();
 

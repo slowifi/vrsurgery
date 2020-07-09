@@ -65,23 +65,23 @@ public class Undo_Redo : MonoBehaviour
         }
 
         // when click button first time save current model mesh...1
-        if (GameObject.Find("Main").GetComponent<CHD>().Detect_Second_ButtonCall() == First_Button_Called_Value)
-        {
-            InnerHeartArray.Add(Instantiate(GameObject.Find("Heart_Inner").GetComponent<MeshFilter>().mesh));
-            newHeartArray.Add(Instantiate(GameObject.Find("COLOR____").GetComponent<MeshFilter>().mesh));
-        }
-        else // when click button second time, Save model mesh that did some action...2
-        {
-            InnerHeartArray.Add(Instantiate(GameObject.Find("Heart_Inner").GetComponent<MeshFilter>().mesh));
-            newHeartArray.Add(Instantiate(GameObject.Find("COLOR____").GetComponent<MeshFilter>().mesh));
-            if (currentIndex > Except_first) // After perfoming the above operation1,2 once, the mesh saved twice, So delete overlapped mesh
-            {
-                InnerHeartArray.RemoveAt(currentIndex - Except_first);
-                newHeartArray.RemoveAt(currentIndex - Except_first);
-                currentIndex--;
-            }
-        }
-        GameObject.Find("Main").GetComponent<CHD>().Detect_Second_NumReset();
+        //if (GameObject.Find("Main").GetComponent<CHD>().Detect_Second_ButtonCall() == First_Button_Called_Value)
+        //{
+        //    InnerHeartArray.Add(Instantiate(GameObject.Find("Heart_Inner").GetComponent<MeshFilter>().mesh));
+        //    newHeartArray.Add(Instantiate(GameObject.Find("COLOR____").GetComponent<MeshFilter>().mesh));
+        //}
+        //else // when click button second time, Save model mesh that did some action...2
+        //{
+        //    InnerHeartArray.Add(Instantiate(GameObject.Find("Heart_Inner").GetComponent<MeshFilter>().mesh));
+        //    newHeartArray.Add(Instantiate(GameObject.Find("COLOR____").GetComponent<MeshFilter>().mesh));
+        //    if (currentIndex > Except_first) // After perfoming the above operation1,2 once, the mesh saved twice, So delete overlapped mesh
+        //    {
+        //        InnerHeartArray.RemoveAt(currentIndex - Except_first);
+        //        newHeartArray.RemoveAt(currentIndex - Except_first);
+        //        currentIndex--;
+        //    }
+        //}
+        //GameObject.Find("Main").GetComponent<CHD>().Detect_Second_NumReset();
         currentIndex++;
         maxIndex = currentIndex;
 
@@ -101,7 +101,7 @@ public class Undo_Redo : MonoBehaviour
         PatchIndex--;
         currentIndex--;
         maxIndex = currentIndex;
-        GameObject.Find("Main").GetComponent<CHD>().Detect_Second_NumReset();
+        //GameObject.Find("Main").GetComponent<CHD>().Detect_Second_NumReset();
     }
 
     public void UndoMesh()

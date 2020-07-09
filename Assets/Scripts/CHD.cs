@@ -5,17 +5,21 @@ using UnityEngine.UI;
 
 public class CHD : MonoBehaviour
 {
+    public GameObject[] Buttons = new GameObject[8];
+
+    private GameObject mode;
+
     public bool CutModeState = false;
     public bool SliceModeState = false;
     public bool PatchModeState = false;
     public bool IncisionModeSate = false;
+
+    public int BtnIndex;
     public int MeshIndex;
-    private GameObject mode;
-    private int PatchNum = 0;
-    public int Detect_Second = 0;
+    private int PatchNum = 0; // 수정해야 됨 
+
     public void SliceMode()
     {
-        //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("SliceMode");
         mode.AddComponent<MultiMeshSliceMode>();
@@ -24,10 +28,8 @@ public class CHD : MonoBehaviour
 
     public void CutMode()
     {
-        //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("CutMode");
-        //mode.AddComponent<BoundaryCutMode>();
         mode.AddComponent<MultiMeshBoundaryCutMode>();
         CutModeState = true;
 
@@ -35,17 +37,14 @@ public class CHD : MonoBehaviour
 
     public void PatchMode()
     {
-        //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("PatchMode");
-        //mode.AddComponent<MultiMeshPatchMode>();
         mode.AddComponent<MultiMeshPatchMode>();
         PatchModeState = true;
     }
 
     public void MeasureMode()
     {
-        //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("MeasureMode");
         mode.AddComponent<MultiMeshMeasureMode>();
@@ -53,7 +52,6 @@ public class CHD : MonoBehaviour
 
     public void IncisionMode()
     {
-        //AdjacencyList.Instance.WorldPositionUpdate();
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("IncisionMode");
         mode.AddComponent<MultiMeshIncisionMode>();
@@ -61,18 +59,9 @@ public class CHD : MonoBehaviour
         IncisionModeSate = true;
     }
 
-    public void MeasureDiameterMode()
-    {
-        //AdjacencyList.Instance.WorldPositionUpdate();
-        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
-        mode = new GameObject("MeasureDiameterMode");
-        mode.AddComponent<MeasureDiameterMode>();
-    }
-
     public void Exit()
     {
         EventManager.Instance.Events.InvokeModeManipulate("EndAll");
-        //MeshManager.Instance.SaveCurrentMesh();
 
         if (mode != null)
         {
@@ -80,11 +69,11 @@ public class CHD : MonoBehaviour
             {
                 if(GameObject.Find("OuterPatch")!=null)
                 {
+                    //수정해야됨!
                     GameObject.Find("OuterPatch").name = "OuterPatch" + PatchNum.ToString();
                     GameObject.Find("InnerPatch").name = "InnerPatch" + PatchNum.ToString();
                     PatchNum++;
                 }
-                //GameObject patchObject = GameObject.Find("Patch");// + (PatchManager.Instance.newPatch.Count - 1));
                 GameObject outerPatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].OuterPatch;
                 GameObject innerPatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].InnerPatch;
                 if (outerPatchObject)
@@ -102,8 +91,6 @@ public class CHD : MonoBehaviour
             }
             Destroy(mode);
         }
-        //MeshManager.Instance.startMeasurePoint.SetActive(false);
-        //MeshManager.Instance.endMeasurePoint.SetActive(false);
         MultiMeshManager.Instance.MultiMeshStartMeasurePoint.SetActive(false);
         MultiMeshManager.Instance.MultiMeshEndMeasurePoint.SetActive(false);
     }
@@ -134,13 +121,6 @@ public class CHD : MonoBehaviour
             Destroy(mode);
         }
 
-        //MeshManager.Instance.ObjUpdate();
-        //AdjacencyList.Instance.ListUpdate();
-        //MeshManager.Instance.Reinitialize();
-        //MakeDoubleFaceMesh.Instance.Reinitialize();
-        //MeshManager.Instance.startMeasurePoint.SetActive(false);
-        //MeshManager.Instance.endMeasurePoint.SetActive(false);
-
         MultiMeshManager.Instance.ObjsUpdate();
         MultiMeshAdjacencyList.Instance.ListsUpdate();
         MultiMeshManager.Instance.Reinitialize();
@@ -149,91 +129,57 @@ public class CHD : MonoBehaviour
         MultiMeshManager.Instance.MultiMeshEndMeasurePoint.SetActive(false);
     }
 
+    private void ButtonInteractable(string ButtonName)
+    {
+        for(int i=0;i<Buttons.Length;i++)
+        {
+            if (ButtonName == Buttons[i].name)
+                BtnIndex = i;
+        }
+
+        for(int i=0;i<Buttons.Length;i++)
+        {
+            if (i != BtnIndex)
+                Buttons[i].GetComponent<Button>().interactable = false;
+        }
+    }
+    private void AllButtonInteractable()
+    {
+        for (int i = 0; i < Buttons.Length; i++)
+            Buttons[i].GetComponent<Button>().interactable = true;
+    }
     private void Events_OnModeChanged(string mode)
     {
         switch (mode)
         {
             case "IncisionMode":
                 IncisionMode();
-                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
-                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
+                ButtonInteractable("Incision Button");
                 Debug.Log("incision 실행");
-                Detect_Second++;
                 break;
             case "CutMode":
                 CutMode();
-                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
-                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
+                ButtonInteractable("Cutting Button");
                 Debug.Log("cut 실행");
-                Detect_Second++;
                 break;
             case "PatchMode":
                 PatchMode();
-                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
-                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
+                ButtonInteractable("Patching Button");
                 Debug.Log("patch 실행");
-                Detect_Second++;
                 break;
             case "SliceMode":
                 SliceMode();
-                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
-                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
+                ButtonInteractable("Slicing Button");
                 Debug.Log("slice 실행");
-                Detect_Second++;
                 break;
             case "MeasureMode":
                 MeasureMode();
-                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
-                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
+                ButtonInteractable("Extended Measure Distance Button");
                 Debug.Log("measure 실행");
-                break;
-            case "MeasureDiameterMode":
-                MeasureDiameterMode();
-                GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
-                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
-                Debug.Log("Measure Diameter 실행");
                 break;
             case "Exit":
                 Exit();
-                GameObject.Find("Incision Button").GetComponent<Button>().interactable = true;
-                GameObject.Find("Slicing Button").GetComponent<Button>().interactable = true;
-                GameObject.Find("Patching Button").GetComponent<Button>().interactable = true;
-                GameObject.Find("Cutting Button").GetComponent<Button>().interactable = true;
-                GameObject.Find("Undo Button").GetComponent<Button>().interactable = true;
-                GameObject.Find("Redo Button").GetComponent<Button>().interactable = true;
-                GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = true;
-                //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = true;
-                Detect_Second++;
+                AllButtonInteractable();
                 Debug.Log("Exit");
                 if (CutModeState == true)
                 {
@@ -258,45 +204,22 @@ public class CHD : MonoBehaviour
                 break;
         }
     }
-
-    public int Detect_Second_ButtonCall()
-    {
-        return Detect_Second;
-    }
-    public void Detect_Second_NumReset()
-    {
-        Detect_Second = 0;
-    }
-
     void Awake()
     {
         EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
-
-        //MeshManager.Instance.ObjUpdate();
-        //MeshManager.Instance.Initialize();
-        //AdjacencyList.Instance.Initialize();
-        //MakeDoubleFaceMesh.Instance.Initialize();
 
         MultiMeshManager.Instance.Invoke("ObjsUpdate", 0.1f);
         MultiMeshManager.Instance.Invoke("Initialize", 0.1f);
         MultiMeshAdjacencyList.Instance.Invoke("Initialize", 0.1f);
         //MultiMeshMakeDoubleFace.Instance.Invoke("Initialize", 0.1f);
         MultiMeshManager.Instance.Invoke("InitSingleFace", 0.1f);
+
+        InitButtons();
     }
-
-
-    void Update()
+    public void InitButtons()
     {
-        
-        //// 여기서는 아예 update를 안돌려도 될 듯. 
-        //if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))
-        //{
-        //    AdjacencyList.Instance.WorldPositionUpdate();
-        //    IntersectedValues intersectedValues = Intersections.GetIntersectedValues();
-        //    bool checkInside = intersectedValues.Intersected;
-        //    if (!checkInside)
-        //        return;
-        //}
-        
+        for (int i = 1; i < 9; i++)
+            Buttons[i-1] = GameObject.Find("Methods").transform.GetChild(i).gameObject;
     }
+
 }

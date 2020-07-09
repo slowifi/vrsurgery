@@ -1,35 +1,71 @@
-﻿using Boo.Lang;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
-using UnityEditorInternal;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class VZMListOnOff : MonoBehaviour
 {
-    private GameObject test;
-    public GameObject Content;
-    public GameObject List;
-    public GameObject ContentParent;
     public GameObject[] HeartPart;
-    public Button[] PartButton;
-    public int State = 0;
-    public bool SetOnce = true;
-    public bool ClickState = true;
+
+    public GameObject List;
+    public GameObject Content;
+    public GameObject HitButton;
+
+    public int ButtonState = 0;
     public int index;
-    public bool Once = false;
-    public bool end = false;
-    public void SetList()
+
+    public bool Operate = false;
+    public bool ButtonClicked = false;
+
+    void Awake()
     {
-        State++;
+        List.SetActive(false);
     }
-    
+
+    void Update()
+    {
+        if (Operate == true)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = GameObject.Find("UICamera").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit, 1000f))
+                {
+                    HitButton = hit.collider.gameObject;
+                    ButtonClicked = true;
+                }
+            }
+        }
+
+        if (ButtonClicked == true)
+        {
+            if (HitButton.name == "Active Button")
+            {
+                for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+                    HeartPart[i].SetActive(true);
+
+                ButtonClicked = false;
+            }
+            else if (HitButton.name == "DeActive Button")
+            {
+                for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+                    HeartPart[i].SetActive(false);
+
+                ButtonClicked = false;
+            }
+            else
+            {
+                SetObject(HitButton.transform.GetChild(0).GetComponent<Text>().text);
+
+                ButtonClicked = false;
+            }
+        }
+    }
+
     public void SetMember()
     {
         int Size = MultiMeshManager.Instance.Size;
 
-        PartButton = new Button[Size];
         HeartPart = new GameObject[Size];
 
         for (int i = 0; i < Size; i++)
@@ -50,6 +86,7 @@ public class VZMListOnOff : MonoBehaviour
         GameObject.Find("Active Button").transform.GetChild(0).GetComponent<Text>().text = "Active All";
         GameObject.Find("DeActive Button").transform.GetChild(0).GetComponent<Text>().text = "DeActive All";
     }
+
     public void SetObject(string name)
     {
         for(int i=0;i<MultiMeshManager.Instance.Size;i++)
@@ -63,74 +100,30 @@ public class VZMListOnOff : MonoBehaviour
         else if (HeartPart[index].activeSelf == false)
             HeartPart[index].SetActive(true);
     }
-
-    void Update()
+    
+    public void ListOnOff()
     {
-        if (State == 0)
+        ButtonState++; // Change Button State When Clicked
+
+        if (ButtonState == 0)
+        {
             List.SetActive(false);
-        else if (State == 1)
+        }
+        else if (ButtonState == 1)
         {
             List.SetActive(true);
             
-            if (SetOnce == true)
-            {
-                if (Content.transform.childCount != 0)
-                {
-                    for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
-                        Destroy(Content.transform.GetChild(i).transform.gameObject);
-                }
+            if(Content.transform.childCount == 0) // 제일 처음에만 실행함
                 SetMember();
-                SetOnce = false;
-            }
 
-            if (Input.GetMouseButtonDown(0))
-            {
-                Ray ray = GameObject.Find("UICamera").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit, 1000f))
-                {
-                    test = hit.collider.gameObject;
-                    Once = true;
-                    Debug.Log(test.name);
-                }
-                else
-                    Debug.Log("none");
-
-                if (Once == true)
-                {
-                    if (test != null)
-                    {
-                        if (test.name == "Active Button")
-                        {
-                            for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
-                                HeartPart[i].SetActive(true);
-                        }
-                        else if (test.name == "DeActive Button")
-                        {
-                            for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
-                                HeartPart[i].SetActive(false);
-                        }
-                        else
-                        {
-                            SetObject(test.transform.GetChild(0).GetComponent<Text>().text);
-                            Once = false;
-                        }
-                    }
-                }
-            }
+            Operate = true;
         }
         else
         {
-            State = 0;
-            if (State == 0)
-                end = true;
-            if(end == true)
-            {
-                for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
-                    HeartPart[i].SetActive(true);
-                end = false;
-            }
-            SetOnce = true;
+            Operate = false;
+            ButtonState = 0;
+            List.SetActive(false);
         }
     }
+    
 }
