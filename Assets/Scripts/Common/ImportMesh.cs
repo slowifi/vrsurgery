@@ -33,8 +33,20 @@ public class ImportMesh : MonoBehaviour
     {
         active = playerObject.activeSelf;
         playerObject.SetActive(false);
+
+        string folderPath = FileBrowser.OpenSingleFolder();
         
-        string[] objspath = FileBrowser.OpenFiles("obj");
+        int tempCount = 0;
+        var info = new DirectoryInfo(folderPath);
+        var fileInfo = info.GetFiles();
+        string[] objspath = new string[fileInfo.Length];
+        foreach (var item in fileInfo)
+        {
+             objspath[tempCount++] = item.FullName;
+        }
+        
+        //string[] objspath = FileBrowser.;
+
         length = objspath.Length;
         for (int i = 0; i < length; i++)
             Debug.Log(objspath[i]);
