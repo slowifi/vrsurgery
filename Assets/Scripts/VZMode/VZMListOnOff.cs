@@ -38,30 +38,30 @@ public class VZMListOnOff : MonoBehaviour
             }
         }
 
-        if (ButtonClicked == true)
-        {
-            if (HitButton.name == "Active Button")
-            {
-                for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
-                    HeartPart[i].SetActive(true);
+        //if (ButtonClicked == true)
+        //{
+        //    if (HitButton.name == "Active Button")
+        //    {
+        //        for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+        //            HeartPart[i].SetActive(true);
 
-                ButtonClicked = false;
-            }
-            else if (HitButton.name == "DeActive Button")
-            {
-                for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
-                    HeartPart[i].SetActive(false);
+        //        ButtonClicked = false;
+        //    }
+        //    else if (HitButton.name == "DeActive Button")
+        //    {
+        //        for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+        //            HeartPart[i].SetActive(false);
 
-                ButtonClicked = false;
-            }
-            else
-            {
-                if(HitButton.name != "Viewport")
-                    SetObject(HitButton.transform.GetChild(0).GetComponent<Text>().text);
+        //        ButtonClicked = false;
+        //    }
+        //    else
+        //    {
+        //        if(HitButton.name != "Viewport")
+        //            SetObject(HitButton.transform.GetChild(0).GetComponent<Text>().text);
 
-                ButtonClicked = false;
-            }
-        }
+        //        ButtonClicked = false;
+        //    }
+        //}
     }
 
     public void SetMember()
@@ -103,6 +103,8 @@ public class VZMListOnOff : MonoBehaviour
             HeartPart[index].SetActive(true);
     }
     
+    
+
     public void ListOnOff()
     {
         ButtonState++; // Change Button State When Clicked

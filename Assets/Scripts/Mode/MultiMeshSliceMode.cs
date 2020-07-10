@@ -35,6 +35,7 @@ public class MultiMeshSliceMode : MonoBehaviour
                 break;
         }
     }
+
     private void MultiMeshHandleSlice()
     {
         if (Input.GetMouseButtonDown(0))
@@ -67,6 +68,7 @@ public class MultiMeshSliceMode : MonoBehaviour
             lineRenderer.SetFixedLineRenderer(oldRay.origin + oldRay.direction * 100f, ray.origin + ray.direction * 100f);
         }
     }
+
     private void MultiMeshHeartPartSelect()
     {
         if (Input.GetMouseButtonDown(0))
