@@ -40,6 +40,9 @@ public class ImportMesh : MonoBehaviour
         ///////////////////////////////
 
         FolderPath = FileBrowser.OpenSingleFolder();
+        if (FolderPath == "")
+            return;
+
         var info = new DirectoryInfo(FolderPath);
         var fileInfo = info.GetFiles();
         ObjsPath = new string[fileInfo.Length];
