@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using Dummiesman;
 using System.IO;
-using UnityEngine.WSA;
 #if UNITY_ANDROID
 using SimpleFileBrowser;
 #endif

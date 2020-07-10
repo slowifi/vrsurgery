@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 // Check SetMeshInfo need?
@@ -109,9 +108,13 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
     {
         for(int i=0;i<Size;i++)
         {
-            GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).name = GameObject.Find("PartialModel").transform.GetChild(i).name;
-            GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
-            GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material.shader = newShader;
+            GetHeartPartChild(i).name = GameObject.Find("PartialModel").transform.GetChild(i).name;
+            GetHeartPartChild(i).gameObject.AddComponent<MeshCollider>();
+            GetHeartPartChild(i).gameObject.GetComponent<MeshRenderer>().material.shader = newShader;
         }
+    }
+    public Transform GetHeartPartChild(int i)
+    {
+        return GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0);
     }
 }
