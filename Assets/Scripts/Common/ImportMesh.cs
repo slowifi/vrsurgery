@@ -13,185 +13,124 @@ using Crosstales.FB;
 
 public class ImportMesh : MonoBehaviour
 {
-    public GameObject mainObject;
-    public GameObject playerObject;
-    public GameObject pivotObject;
-    public GameObject buttonPressScript;
-
-    public GameObject[] HeartParts;
+    public GameObject PlayerObject;
+    public GameObject MainObject;
+    public GameObject HumanHeart;
+    public GameObject PivotObject;
+    public GameObject ButtonPress;
     public GameObject PartialModel;
-    
-    public int length;
-    public int k = 0;
-    public int PartIndex = 0;
 
-    public bool active;
-    public bool MainState = false;
-       
+    public int Length;
+
+    private bool Active;
+
+    private string[] ObjsPath;
+
+    private string FolderPath;
+    
 
 #if UNITY_STANDALONE_WIN
-
     public void FilesBrowsing()
     {
-        active = playerObject.activeSelf;
-        playerObject.SetActive(false);
-
-        string folderPath = FileBrowser.OpenSingleFolder();
-        
         int tempCount = 0;
-        var info = new DirectoryInfo(folderPath);
-        var fileInfo = info.GetFiles();
-        string[] objspath = new string[fileInfo.Length];
-        foreach (var item in fileInfo)
-        {
-             objspath[tempCount++] = item.FullName;
-        }
+        Active = PlayerObject.activeSelf;
         
-        //string[] objspath = FileBrowser.;
+        // 이부분 필요한지 체크하기//////
+        PlayerObject.SetActive(false);
+        ///////////////////////////////
 
-        length = objspath.Length;
-        MultiMeshManager.Instance.GetObjsSize();
+        FolderPath = FileBrowser.OpenSingleFolder();
+        var info = new DirectoryInfo(FolderPath);
+        var fileInfo = info.GetFiles();
+        ObjsPath = new string[fileInfo.Length];
+
+        foreach (var item in fileInfo)
+            ObjsPath[tempCount++] = item.FullName;
+
+        Length = ObjsPath.Length;
+        MultiMeshManager.Instance.InitObjSize();
         EventManager.Instance.Events.InvokeUIChanged();
 
-        if (MainState == true)
+        if(ObjsPath[0] == "")
         {
-            DestroyImmediate(PartialModel);
-            PartialModel = new GameObject();
-            PartialModel.name = "PartialModel";
-            PartialModel.transform.SetParent(GameObject.Find("HumanHeart").transform);
-
-            pivotObject.transform.localPosition = Vector3.zero;
-            pivotObject.transform.localScale = Vector3.one;
-            pivotObject.transform.localEulerAngles = Vector3.zero;
-
-            for (int i = 0; i < length; i++)
-                SetMultiMeshes(objspath[i]);
-
-            PartIndex = 0;
-            mainObject.SendMessage("ResetMain");
-            buttonPressScript.SendMessage("ResetButton");
-            playerObject.SetActive(true);
-
-            return;
-        }
-        else
-        {
-            if(PartialModel != null)
-                DestroyImmediate(PartialModel);
-
-            PartialModel = new GameObject();
-            PartialModel.name = "PartialModel";
-            PartialModel.transform.SetParent(GameObject.Find("HumanHeart").transform);
-            
-
-            for (int i = 0; i < length; i++)
-                SetMultiMeshes(objspath[i]);
-            PartIndex = 0;
-            playerObject.SetActive(true);
-        }
-        mainObject.GetComponent<CHD>().AllButtonInteractable();
-    }
-    public void SetMultiMeshes(string MultiObjsPath)
-    {
-        if (MultiObjsPath == "")
-        {
-            Debug.Log("아무것도 나오지 않음");
-            playerObject.SetActive(active);
-            MainState = false;
-            return;
-        }
-        else
-        {
-            string[] filesname = new string[length];
-            filesname[PartIndex] = Path.GetFileNameWithoutExtension(MultiObjsPath);
-            HeartParts[PartIndex] = new OBJLoader().Load(MultiObjsPath);
-            HeartParts[PartIndex].name = filesname[PartIndex];
-            HeartParts[PartIndex].transform.SetParent(GameObject.Find("PartialModel").transform);
-            HeartParts[PartIndex].transform.localScale = Vector3.one;
-            MultiMeshManager.Instance.HeartParts[PartIndex] = HeartParts[PartIndex].transform.GetChild(0).gameObject;
-            MultiMeshManager.Instance.HeartParts[PartIndex].transform.localPosition = Vector3.zero;
-            MultiMeshManager.Instance.objsTransform[PartIndex] = MultiMeshManager.Instance.HeartParts[PartIndex].transform;
-            mainObject.SetActive(true);
-            MainState = mainObject.activeSelf;
-            PartIndex++;
-        }
-    }
-    public void FileBrowsing()
-    {
-        bool active = playerObject.activeSelf;
-        playerObject.SetActive(false);
-        string objpath = FileBrowser.OpenSingleFile("obj");
-        EventManager.Instance.Events.InvokeUIChanged();
-        if (objpath == "")
-        {
-            Debug.Log("아무것도 안나옴");
-            //playerObject.transform one setting해줘야함
+            //playerObject.transform.localScale = Vector3.one setting해줘야함
             //두가지 고려해야함
             // 1. 이미 메쉬가 불려저 있는 경우
             // 2. 메쉬가 불려서 있지 않은 경우
-            playerObject.SetActive(active);
+            // 두번째 Import 할때부터 발생하는 문제
+            // 첫번째 메쉬 Import후 Heart 확대한 다음
+            // 두번째 메쉬 Import 이후부터 PivotTransform Scale이 확대된 상태에서 Scale이 기준이 되어버림
+            Debug.Log("아무것도 안나옴");
+            ChatManager.Instance.GenerateMessage("아무것도 안나옴");
+            PlayerObject.SetActive(Active);
             return;
         }
         else
         {
-            SetMesh(objpath);
+            SetMeshes(ObjsPath);
         }
 
-        playerObject.SetActive(true);
-
-        GameObject.Find("Undo Button").GetComponent<Undo_Redo>().Undo_Redo_init();
-        GameObject.Find("Incision Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Slicing Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Patching Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Cutting Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Undo Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Redo Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = true;
-        //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = true;
+        PlayerObject.SetActive(true);
+        MainObject.GetComponent<CHD>().AllButtonInteractable();
     }
-    
-    public void SetMesh(string path)
+
+    public void SetMeshes(string[] Paths)
     {
-        Debug.Log(path);
-        //var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
-        //string fileName = Path.GetFileName(path);
-        //fileName = fileName.Substring(0, fileName.Length - 4);
-        string fileName = Path.GetFileNameWithoutExtension(path);
-        UIManager.Instance.SetFileName(fileName);
-        // 여기에 추가 해야될 것은 새로 읽어드렸을 때, 리셋 기능.
+        string[] FilesName = new string[Length];
+        GameObject[] HeartPart = new GameObject[Length];
 
-        //ObjImporter asdf = new ObjImporter();
+        for (int i = 0; i < Length; i++)
+            FilesName[i] = Path.GetFileNameWithoutExtension(Paths[i]);
 
-        if (mainObject.activeSelf)
+        ///////// 이부분도 확인 ////////////////////
+        //UIManager.Instance.SetFileName(FilesName);
+        ///////////////////////////////////////////
+        ///
+        if (MainObject.activeSelf)
         {
-            pivotObject.transform.localPosition = Vector3.zero;
-            pivotObject.transform.localScale = Vector3.one;
-            pivotObject.transform.localEulerAngles = Vector3.zero;
-            
-            Destroy(GameObject.Find("PartialModel"));
-            GameObject newLocalHeart = new OBJLoader().Load(path);
-            newLocalHeart.name = "PartialModel";
-            newLocalHeart.transform.SetParent(GameObject.Find("HumanHeart").transform);
-            newLocalHeart.transform.localScale = Vector3.one;
-            MeshManager.Instance.Heart = newLocalHeart.transform.GetChild(0).gameObject;
-            MeshManager.Instance.Heart.transform.localPosition = Vector3.zero;
-            MeshManager.Instance.objTransform = MeshManager.Instance.Heart.transform;
-            mainObject.SendMessage("ResetMain");
-            buttonPressScript.SendMessage("ResetButton");
+            DestroyImmediate(PartialModel);
+            PartialModel = new GameObject("PartialModel");
+            PartialModel.transform.SetParent(HumanHeart.transform);
+
+            PivotObject.transform.localPosition = Vector3.zero;
+            PivotObject.transform.localScale = Vector3.one;
+            PivotObject.transform.localEulerAngles = Vector3.zero;
+
+            for (int i = 0; i < Length; i++)
+            {
+                HeartPart[i] = new OBJLoader().Load(Paths[i]);
+                HeartPart[i].name = FilesName[i];
+                HeartPart[i].transform.SetParent(PartialModel.transform);
+                HeartPart[i].transform.localScale = Vector3.one;
+            }
+            MainObject.SendMessage("ResetMain");
+            ButtonPress.SendMessage("ResetButton");
+            SetMeshManagerMember(HeartPart);
             return;
         }
-        
-        GameObject newHeart = new OBJLoader().Load(path);
 
-        newHeart.name = "PartialModel";
-        ChatManager.Instance.GenerateMessage(newHeart.name);
-        newHeart.transform.SetParent(GameObject.Find("HumanHeart").transform);
-        newHeart.transform.localScale = Vector3.one;
-        MeshManager.Instance.Heart = newHeart.transform.GetChild(0).gameObject;
-        MeshManager.Instance.Heart.transform.localPosition = Vector3.zero;
-        MeshManager.Instance.objTransform = MeshManager.Instance.Heart.transform;
-        
-        mainObject.SetActive(true);
+        PartialModel = new GameObject("PartialModel");
+        PartialModel.transform.SetParent(HumanHeart.transform);
+
+        for (int i=0;i<Length;i++)
+        {
+            HeartPart[i] = new OBJLoader().Load(Paths[i]);
+            HeartPart[i].name = FilesName[i];
+            HeartPart[i].transform.SetParent(PartialModel.transform);
+            HeartPart[i].transform.localScale = Vector3.one;
+        }
+
+        SetMeshManagerMember(HeartPart);
+        MainObject.SetActive(true);
+    }
+    public void SetMeshManagerMember(GameObject[] HeartPart)
+    {
+        for (int i = 0; i < Length; i++)
+        {
+            MultiMeshManager.Instance.HeartParts[i] = HeartPart[i].transform.GetChild(0).gameObject;
+            MultiMeshManager.Instance.HeartParts[i].transform.localPosition = Vector3.zero;
+            MultiMeshManager.Instance.objsTransform[i] = MultiMeshManager.Instance.HeartParts[i].transform;
+        } 
     }
 #endif
 #if UNITY_ANDROID

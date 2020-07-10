@@ -35,9 +35,16 @@ public class MultiMeshManager : Singleton<MultiMeshManager>
     {
         newShader = Resources.Load("Shaders/CulloffShader", typeof(Shader)) as Shader;
     }
+    public void InitObjSize()
+    {
+        Size = GameObject.Find("ImportButton").GetComponent<ImportMesh>().Length;
+        objsTransform = new Transform[Size];
+        meshes = new Mesh[Size];
+        HeartParts = new GameObject[Size];
+    }
     public void GetObjsSize()
     {
-        Size = GameObject.Find("ImportButton").GetComponent<ImportMesh>().length;
+        Size = GameObject.Find("ImportButton").GetComponent<ImportMesh>().Length;
         objsTransform = new Transform[Size];
         meshes = new Mesh[Size];
         HeartParts = new GameObject[Size];

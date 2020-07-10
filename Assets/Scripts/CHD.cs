@@ -125,9 +125,15 @@ public class CHD : MonoBehaviour
             Destroy(mode);
         }
 
-        MultiMeshManager.Instance.ObjsUpdate();
-        MultiMeshAdjacencyList.Instance.ListsUpdate();
-        MultiMeshManager.Instance.Reinitialize();
+        MultiMeshManager.Instance.Invoke("ObjsUpdate", 0.1f);
+        MultiMeshAdjacencyList.Instance.Invoke("ListsUpdate", 0.1f);
+        MultiMeshManager.Instance.Invoke("Reinitialize", 0.1f);
+        //MultiMeshMakeDoubleFace.Instance.Invoke("Initialize", 0.1f);
+        MultiMeshManager.Instance.Invoke("InitSingleFace", 0.1f);
+
+        //MultiMeshManager.Instance.ObjsUpdate();
+        //MultiMeshAdjacencyList.Instance.ListsUpdate();
+        //MultiMeshManager.Instance.Reinitialize();
         //MultiMeshMakeDoubleFace.Instance.Reinitialize();
         MultiMeshManager.Instance.MultiMeshStartMeasurePoint.SetActive(false);
         MultiMeshManager.Instance.MultiMeshEndMeasurePoint.SetActive(false);
