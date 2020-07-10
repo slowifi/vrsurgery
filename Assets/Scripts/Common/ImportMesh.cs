@@ -37,7 +37,8 @@ public class ImportMesh : MonoBehaviour
         playerObject.SetActive(false);
 
         string folderPath = FileBrowser.OpenSingleFolder();
-        
+        if (folderPath == "")
+            return;
         int tempCount = 0;
         var info = new DirectoryInfo(folderPath);
         var fileInfo = info.GetFiles();
