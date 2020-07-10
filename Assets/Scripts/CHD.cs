@@ -8,6 +8,10 @@ public class CHD : MonoBehaviour
     public GameObject[] Buttons = new GameObject[8];
 
     private GameObject mode;
+    public GameObject ExtendBar;
+    public GameObject HeightBar;
+    public GameObject CurveBar;
+    public GameObject PatchText;
 
     public bool CutModeState = false;
     public bool SliceModeState = false;
@@ -142,11 +146,30 @@ public class CHD : MonoBehaviour
             if (i != BtnIndex)
                 Buttons[i].GetComponent<Button>().interactable = false;
         }
+
+        if(ButtonName == "Incision Button")
+            ExtendBar.SetActive(true);
+        else if(ButtonName == "Patching Button")
+            SetPatchUI(true);
     }
-    private void AllButtonInteractable()
+    public void AllButtonInteractable()
     {
         for (int i = 0; i < Buttons.Length; i++)
             Buttons[i].GetComponent<Button>().interactable = true;
+    }
+    public void AllButtonInteractableFalse()
+    {
+        for (int i = 0; i < Buttons.Length; i++)
+            Buttons[i].GetComponent<Button>().interactable = false;
+
+        ExtendBar.SetActive(false);
+        SetPatchUI(false);
+    }
+    public void SetPatchUI(bool State)
+    {
+        HeightBar.SetActive(State);
+        CurveBar.SetActive(State);
+        PatchText.SetActive(State);
     }
     private void Events_OnModeChanged(string mode)
     {
@@ -198,6 +221,7 @@ public class CHD : MonoBehaviour
                 }
                 else if(IncisionModeSate == true)
                 {
+                    ExtendBar.SetActive(false);
                     GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SaveIncisionBoundaryMode(MeshIndex);
                     IncisionModeSate = false;
                 }
@@ -213,8 +237,6 @@ public class CHD : MonoBehaviour
         MultiMeshAdjacencyList.Instance.Invoke("Initialize", 0.1f);
         //MultiMeshMakeDoubleFace.Instance.Invoke("Initialize", 0.1f);
         MultiMeshManager.Instance.Invoke("InitSingleFace", 0.1f);
-
-        InitButtons();
     }
     public void InitButtons()
     {

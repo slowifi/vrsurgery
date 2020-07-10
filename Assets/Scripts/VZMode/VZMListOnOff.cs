@@ -32,6 +32,7 @@ public class VZMListOnOff : MonoBehaviour
                 if (Physics.Raycast(ray, out hit, 1000f))
                 {
                     HitButton = hit.collider.gameObject;
+                    Debug.Log(HitButton);
                     ButtonClicked = true;
                 }
             }
@@ -55,7 +56,8 @@ public class VZMListOnOff : MonoBehaviour
             }
             else
             {
-                SetObject(HitButton.transform.GetChild(0).GetComponent<Text>().text);
+                if(HitButton.name != "Viewport")
+                    SetObject(HitButton.transform.GetChild(0).GetComponent<Text>().text);
 
                 ButtonClicked = false;
             }

@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using Dummiesman;
 using System.IO;
+using UnityEngine.WSA;
 #if UNITY_ANDROID
 using SimpleFileBrowser;
 #endif
@@ -27,8 +27,10 @@ public class ImportMesh : MonoBehaviour
 
     public bool active;
     public bool MainState = false;
+       
 
 #if UNITY_STANDALONE_WIN
+
     public void FilesBrowsing()
     {
         active = playerObject.activeSelf;
@@ -48,8 +50,6 @@ public class ImportMesh : MonoBehaviour
         //string[] objspath = FileBrowser.;
 
         length = objspath.Length;
-        for (int i = 0; i < length; i++)
-            Debug.Log(objspath[i]);
         MultiMeshManager.Instance.GetObjsSize();
         EventManager.Instance.Events.InvokeUIChanged();
 
@@ -89,13 +89,7 @@ public class ImportMesh : MonoBehaviour
             PartIndex = 0;
             playerObject.SetActive(true);
         }
-        GameObject.Find("Incision Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Slicing Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Patching Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Cutting Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Undo Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Redo Button").GetComponent<Button>().interactable = true;
-        GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = true;
+        mainObject.GetComponent<CHD>().AllButtonInteractable();
     }
     public void SetMultiMeshes(string MultiObjsPath)
     {
@@ -131,6 +125,10 @@ public class ImportMesh : MonoBehaviour
         if (objpath == "")
         {
             Debug.Log("아무것도 안나옴");
+            //playerObject.transform one setting해줘야함
+            //두가지 고려해야함
+            // 1. 이미 메쉬가 불려저 있는 경우
+            // 2. 메쉬가 불려서 있지 않은 경우
             playerObject.SetActive(active);
             return;
         }

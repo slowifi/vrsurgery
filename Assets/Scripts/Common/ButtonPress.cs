@@ -66,14 +66,8 @@ public class ButtonPress : Singleton<ButtonPress>
     }
     public void Start()
     {
-        GameObject.Find("Incision Button").GetComponent<Button>().interactable = false;
-        GameObject.Find("Slicing Button").GetComponent<Button>().interactable = false;
-        GameObject.Find("Patching Button").GetComponent<Button>().interactable = false;
-        GameObject.Find("Cutting Button").GetComponent<Button>().interactable = false;
-        GameObject.Find("Undo Button").GetComponent<Button>().interactable = false;
-        GameObject.Find("Redo Button").GetComponent<Button>().interactable = false;
-        GameObject.Find("Extended Measure Distance Button").GetComponent<Button>().interactable = false;
-        //GameObject.Find("Measure Diameter Button").GetComponent<Button>().interactable = false;
+        MainManager.GetComponent<CHD>().InitButtons();
+        MainManager.GetComponent<CHD>().AllButtonInteractableFalse();
     }
     public void Events_OnModeChanged(string mode)
     {
