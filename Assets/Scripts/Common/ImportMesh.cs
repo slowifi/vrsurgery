@@ -107,6 +107,7 @@ public class ImportMesh : MonoBehaviour
             MainObject.SendMessage("ResetMain");
             ButtonPress.SendMessage("ResetButton");
             SetMeshManagerMember(HeartPart);
+            VZMManager.Instance.SetMember();
             return;
         }
 
@@ -123,6 +124,7 @@ public class ImportMesh : MonoBehaviour
 
         SetMeshManagerMember(HeartPart);
         MainObject.SetActive(true);
+        VZMManager.Instance.SetMember();
     }
     public void SetMeshManagerMember(GameObject[] HeartPart)
     {

@@ -6,13 +6,14 @@ public class InitVZMList : MonoBehaviour
     public GameObject _HeartPart;
     public Transform _Content;
 
-    public void AddHeartParts(int Num)
+    public GameObject AddHeartParts(int Num)
     {
         var Instance = Instantiate(_HeartPart);
         Instance.name = "HeartPart" + Num;
         Instance.transform.SetParent(_Content);
         Instance.transform.localPosition = Vector3.zero;
         Instance.transform.localScale = Vector3.one;
+        return Instance;
     }
     public void AddOnAllParts()
     {
