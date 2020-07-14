@@ -44,8 +44,8 @@ public class VZMListOnOff : MonoBehaviour
             for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
             {
                 MultiMeshManager.Instance.HeartParts[i].SetActive(true);
-                ColorBlock tempColorBlock = VZMManager.Instance.HeartButtons[i].colors;
-                VZMManager.Instance.HeartButtons[i].colors = SetUnselectedColor(tempColorBlock);
+                ColorBlock tempColorBlock = VZMManager.Instance.HeartButtons[i].GetComponent<Button>().colors;
+                VZMManager.Instance.HeartButtons[i].GetComponent<Button>().colors = SetUnselectedColor(tempColorBlock);
             }
         }
         else if (objectName == "Deactive All")
@@ -53,8 +53,8 @@ public class VZMListOnOff : MonoBehaviour
             for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
             {
                 MultiMeshManager.Instance.HeartParts[i].SetActive(false);
-                ColorBlock tempColorBlock = VZMManager.Instance.HeartButtons[i].colors;
-                VZMManager.Instance.HeartButtons[i].colors = SetSelectedColor(tempColorBlock);
+                ColorBlock tempColorBlock = VZMManager.Instance.HeartButtons[i].GetComponent<Button>().colors;
+                VZMManager.Instance.HeartButtons[i].GetComponent<Button>().colors = SetSelectedColor(tempColorBlock);
             }
             //this.GetComponent<Button>().colors = SetSelectedColor(this.GetComponent<Button>().colors);
         }
