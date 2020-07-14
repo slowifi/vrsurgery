@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 7876125903297408302}
   - component: {fileID: -7726051041183621692}
   - component: {fileID: 1418641375897768592}
-  - component: {fileID: 7543235211098342043}
+  - component: {fileID: 3094202587122380843}
   m_Layer: 5
   m_Name: HeartPart0
   m_TagString: Untagged
@@ -200,8 +200,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7543235211098342043}
-        m_MethodName: OnClick
+      - m_Target: {fileID: 3094202587122380843}
+        m_MethodName: OnButtonClicked_Parts
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -244,7 +244,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 180, y: 100, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7543235211098342043
+--- !u!114 &3094202587122380843
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -253,6 +253,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 4632429930226738715}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef890601815dc3428bc5109cb063e09, type: 3}
+  m_Script: {fileID: 11500000, guid: 7736565e62a42ed47bf4a6cef708fdd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
