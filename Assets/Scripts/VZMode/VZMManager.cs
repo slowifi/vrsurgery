@@ -49,7 +49,7 @@ public class VZMManager : Singleton<VZMManager>
     public void SetMember()
     {
         RemoveMembers();
-        GameObject[] HeartParts = MultiMeshManager.Instance.HeartParts;
+        GameObject[] HeartParts = MultiMeshManager.Instance.Parts;
         int size = HeartParts.Length;
         HeartButtons = new GameObject[size+2];
         for (int i = 0; i < size; i++)

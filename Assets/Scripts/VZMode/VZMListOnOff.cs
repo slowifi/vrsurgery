@@ -23,9 +23,9 @@ public class VZMListOnOff : MonoBehaviour
         string objectName = this.GetComponentInChildren<Text>().text;
         for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
         {
-            if (objectName == MultiMeshManager.Instance.HeartParts[i].name)
+            if (objectName == MultiMeshManager.Instance.Parts[i].name)
             {
-                if (MultiMeshManager.Instance.HeartParts[i].activeSelf)
+                if (MultiMeshManager.Instance.Parts[i].activeSelf)
                 {
                     ColorBlock tempColorBlock = this.GetComponent<Button>().colors;
                     this.GetComponent<Button>().colors = SetSelectedColor(tempColorBlock);
@@ -35,7 +35,7 @@ public class VZMListOnOff : MonoBehaviour
                     ColorBlock tempColorBlock = this.GetComponent<Button>().colors;
                     this.GetComponent<Button>().colors = SetUnselectedColor(tempColorBlock);
                 }
-                MultiMeshManager.Instance.HeartParts[i].SetActive(!MultiMeshManager.Instance.HeartParts[i].activeSelf);
+                MultiMeshManager.Instance.Parts[i].SetActive(!MultiMeshManager.Instance.Parts[i].activeSelf);
             }
         }
         //active all, deactive all 일때 버튼 색 조정 아직
@@ -43,7 +43,7 @@ public class VZMListOnOff : MonoBehaviour
         {
             for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
             {
-                MultiMeshManager.Instance.HeartParts[i].SetActive(true);
+                MultiMeshManager.Instance.Parts[i].SetActive(true);
                 ColorBlock tempColorBlock = VZMManager.Instance.HeartButtons[i].GetComponent<Button>().colors;
                 VZMManager.Instance.HeartButtons[i].GetComponent<Button>().colors = SetUnselectedColor(tempColorBlock);
             }
@@ -52,7 +52,7 @@ public class VZMListOnOff : MonoBehaviour
         {
             for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
             {
-                MultiMeshManager.Instance.HeartParts[i].SetActive(false);
+                MultiMeshManager.Instance.Parts[i].SetActive(false);
                 ColorBlock tempColorBlock = VZMManager.Instance.HeartButtons[i].GetComponent<Button>().colors;
                 VZMManager.Instance.HeartButtons[i].GetComponent<Button>().colors = SetSelectedColor(tempColorBlock);
             }
