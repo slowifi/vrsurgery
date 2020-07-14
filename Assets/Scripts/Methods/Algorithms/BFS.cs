@@ -172,7 +172,7 @@ public class BFS
         List<int> result = new List<int>();
         Vector3 center = Vector3.Lerp(startPoint, endPoint, 0.5f);
         float dst = Vector2.Distance(startPoint, endPoint) / 2;
-        List<Vector3> worldVertices = MultiMeshAdjacencyList.Instance.MultiMeshWorldPositionVertices.ElementAt(MeshIndex);
+        List<Vector3> worldVertices = MultiMeshAdjacencyList.Instance.WorldPositionVertices.ElementAt(MeshIndex);
 
         Debug.Log(currentIndex);
         // vertex_num
@@ -193,7 +193,7 @@ public class BFS
                 return result;
                 //여기에 다른 초기화 함수들 다시 넣고 다 해야됨.
             }
-            foreach (int item in MultiMeshAdjacencyList.Instance.MultiMeshConnectedVertices.ElementAt(MeshIndex)[temp.Dequeue()])
+            foreach (int item in MultiMeshAdjacencyList.Instance.ConnectedVertices.ElementAt(MeshIndex)[temp.Dequeue()])
             {
                 bool temp_check = false;
                 // vtx에서 다른거로 어떻게 넘어갈까 흠..

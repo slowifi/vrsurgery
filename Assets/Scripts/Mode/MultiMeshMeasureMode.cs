@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MultiMeshMeasureMode : MonoBehaviour
 {
@@ -12,7 +10,7 @@ public class MultiMeshMeasureMode : MonoBehaviour
 
     void Awake()
     {
-        MeasureManager = new MultiMeshMeasureManager();
+        MeasureManager = this.gameObject.AddComponent<MultiMeshMeasureManager>();
         lineRenderer = new LineRendererManipulate(transform);
     }
     void Update()
@@ -23,34 +21,27 @@ public class MultiMeshMeasureMode : MonoBehaviour
             {
                 Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
                 RaycastHit FirstHit;
+
                 if (Physics.Raycast(ray, out FirstHit, 1000f))
                     FirstHitObject = FirstHit.collider.gameObject;
                 else
-                {
-                    Debug.Log("빈공간입니다.");
                     return;
-                }
+
                 for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
-                {
-                    if (FirstHitObject.name == GameObject.Find("PartialModel").transform.GetChild(i).name + "_Outer")
+                    if (FirstHitObject.name == GameObject.Find("PartialModel").transform.GetChild(i).name)
                         HitOBJIndex = i;
-                }
+
                 once = false;
             }
         }
+
         if (Input.GetMouseButtonDown(0))
         {
             Ray cameraRay = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             Vector3 vertexPosition = MeasureManager.vertexPosition(cameraRay, HitOBJIndex);
             float dst = MeasureManager.MeasureDistance(vertexPosition, cameraRay);
-            dst = dst / MultiMeshManager.Instance.objsTransform[HitOBJIndex].lossyScale.z;
+            dst = dst / MultiMeshManager.Instance.Transforms[HitOBJIndex].lossyScale.z;
             UIManager.Instance.Distance.text = dst + "mm";
         }
-    }
-    void OnDestroy()
-    {
-        Destroy(MeasureManager);
-        //EventManager.Instance.Events.InvokeModeChanged("ResetButton");
-        Destroy(GameObject.Find("MeasureLine"));
     }
 }

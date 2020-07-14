@@ -20,162 +20,45 @@ public class CHD : MonoBehaviour
 
     public int BtnIndex;
     public int MeshIndex;
-    private int PatchNum = 0; // 수정해야 됨 
 
+    void Awake()
+    {
+        EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
+
+        MultiMeshManager.Instance.Invoke("Initialize", 0.1f);
+        MultiMeshAdjacencyList.Instance.Invoke("Initialize", 0.1f);
+        GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().Invoke("Initialize", 0.1f);
+    }
     public void SliceMode()
     {
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("SliceMode");
         mode.AddComponent<MultiMeshSliceMode>();
-        SliceModeState = true;
-    }   
-
-    public void CutMode()
-    {
-        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
-        mode = new GameObject("CutMode");
-        mode.AddComponent<MultiMeshBoundaryCutMode>();
-        CutModeState = true;
-
     }
-
-    public void PatchMode()
-    {
-        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
-        mode = new GameObject("PatchMode");
-        mode.AddComponent<MultiMeshPatchMode>();
-        PatchModeState = true;
-    }
-
-    public void MeasureMode()
-    {
-        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
-        mode = new GameObject("MeasureMode");
-        mode.AddComponent<MultiMeshMeasureMode>();
-    }
-
     public void IncisionMode()
     {
         MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
         mode = new GameObject("IncisionMode");
         mode.AddComponent<MultiMeshIncisionMode>();
         UIManager.Instance.extendBar.value = 0.1f;
-        IncisionModeSate = true;
     }
-
-    public void Exit()
+    public void CutMode()
     {
-        EventManager.Instance.Events.InvokeModeManipulate("EndAll");
-
-        if (mode != null)
-        {
-            if (mode.name == "PatchMode")
-            {
-                if(GameObject.Find("OuterPatch")!=null)
-                {
-                    //수정해야됨!
-                    GameObject.Find("OuterPatch").name = "OuterPatch" + PatchNum.ToString();
-                    GameObject.Find("InnerPatch").name = "InnerPatch" + PatchNum.ToString();
-                    PatchNum++;
-                }
-                GameObject outerPatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].OuterPatch;
-                GameObject innerPatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].InnerPatch;
-                if (outerPatchObject)
-                {
-                    MeshRenderer outerRen = outerPatchObject.GetComponent<MeshRenderer>();
-                    MeshRenderer innerRen = innerPatchObject.GetComponent<MeshRenderer>();
-                    if (outerRen.material.color != new Color32(115, 0, 0, 255))
-                    {
-                        outerPatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                        innerPatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                        outerRen.material.color = new Color32(115, 0, 0, 255);
-                        innerRen.material.color = new Color32(115, 0, 0, 255);
-                    }
-                }
-            }
-            Destroy(mode);
-        }
-        MultiMeshManager.Instance.MultiMeshStartMeasurePoint.SetActive(false);
-        MultiMeshManager.Instance.MultiMeshEndMeasurePoint.SetActive(false);
+        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
+        mode = new GameObject("CutMode");
+        mode.AddComponent<MultiMeshBoundaryCutMode>();
     }
-
-    public void ResetMain()
+    public void PatchMode()
     {
-
-        if (mode != null)
-        {
-            if (mode.name == "PatchMode")
-            {
-                // 수정해야됨.
-                GameObject outerPatchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].OuterPatch;
-                GameObject innerPatchObject = MeshManager.Instance.PatchList[MeshManager.Instance.PatchList.Count - 1].InnerPatch;
-                if (outerPatchObject)
-                {
-                    MeshRenderer outerRen = outerPatchObject.GetComponent<MeshRenderer>();
-                    MeshRenderer innerRen = innerPatchObject.GetComponent<MeshRenderer>();
-                    if (outerRen.material.color != new Color32(115, 0, 0, 255))
-                    {
-                        outerPatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                        innerPatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
-                        outerRen.material.color = new Color32(115, 0, 0, 255);
-                        innerRen.material.color = new Color32(115, 0, 0, 255);
-                    }
-                }
-            }
-            Destroy(mode);
-        }
-
-        MultiMeshManager.Instance.Invoke("ObjsUpdate", 0.1f);
-        MultiMeshAdjacencyList.Instance.Invoke("ListsUpdate", 0.1f);
-        MultiMeshManager.Instance.Invoke("Reinitialize", 0.1f);
-        //MultiMeshMakeDoubleFace.Instance.Invoke("Initialize", 0.1f);
-        MultiMeshManager.Instance.Invoke("InitSingleFace", 0.1f);
-
-        //MultiMeshManager.Instance.ObjsUpdate();
-        //MultiMeshAdjacencyList.Instance.ListsUpdate();
-        //MultiMeshManager.Instance.Reinitialize();
-        //MultiMeshMakeDoubleFace.Instance.Reinitialize();
-        MultiMeshManager.Instance.MultiMeshStartMeasurePoint.SetActive(false);
-        MultiMeshManager.Instance.MultiMeshEndMeasurePoint.SetActive(false);
+        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
+        mode = new GameObject("PatchMode");
+        mode.AddComponent<MultiMeshPatchMode>();
     }
-
-    private void ButtonInteractable(string ButtonName)
+    public void MeasureMode()
     {
-        for(int i=0;i<Buttons.Length;i++)
-        {
-            if (ButtonName == Buttons[i].name)
-                BtnIndex = i;
-        }
-
-        for(int i=0;i<Buttons.Length;i++)
-        {
-            if (i != BtnIndex)
-                Buttons[i].GetComponent<Button>().interactable = false;
-        }
-
-        if(ButtonName == "Incision Button")
-            ExtendBar.SetActive(true);
-        else if(ButtonName == "Patching Button")
-            SetPatchUI(true);
-    }
-    public void AllButtonInteractable()
-    {
-        for (int i = 0; i < Buttons.Length; i++)
-            Buttons[i].GetComponent<Button>().interactable = true;
-    }
-    public void AllButtonInteractableFalse()
-    {
-        for (int i = 0; i < Buttons.Length; i++)
-            Buttons[i].GetComponent<Button>().interactable = false;
-
-        ExtendBar.SetActive(false);
-        SetPatchUI(false);
-    }
-    public void SetPatchUI(bool State)
-    {
-        HeightBar.SetActive(State);
-        CurveBar.SetActive(State);
-        PatchText.SetActive(State);
+        MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
+        mode = new GameObject("MeasureMode");
+        mode.AddComponent<MultiMeshMeasureMode>();
     }
     private void Events_OnModeChanged(string mode)
     {
@@ -210,44 +93,97 @@ public class CHD : MonoBehaviour
                 Exit();
                 AllButtonInteractable();
                 Debug.Log("Exit");
-                if (CutModeState == true)
-                {
-                    GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SaveIncisionBoundaryMode(MeshIndex);
-                    CutModeState = false;
-                }
-                else if(SliceModeState == true)
-                {
-                    GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SaveSliceMode();
-                    SliceModeState = false;
-                }
-                else if(PatchModeState == true)
-                {
-                    GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SavePatchMode();
-                    PatchModeState = false;
-                }
-                else if(IncisionModeSate == true)
-                {
-                    ExtendBar.SetActive(false);
-                    GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SaveIncisionBoundaryMode(MeshIndex);
-                    IncisionModeSate = false;
-                }
                 break;
         }
     }
-    void Awake()
+    public void Exit()
     {
-        EventManager.Instance.Events.OnModeChanged += Events_OnModeChanged;
+        EventManager.Instance.Events.InvokeModeManipulate("EndAll");
 
-        MultiMeshManager.Instance.Invoke("ObjsUpdate", 0.1f);
-        MultiMeshManager.Instance.Invoke("Initialize", 0.1f);
+        if (mode != null)
+        {
+            if (mode.name == "PatchMode")
+            {
+                GameObject PatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].Patch;
+                if (PatchObject)
+                {
+                    MeshRenderer outerRen = PatchObject.GetComponent<MeshRenderer>();
+                    if (outerRen.material.color != new Color32(115, 0, 0, 255))
+                    {
+                        PatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                        outerRen.material.color = new Color32(115, 0, 0, 255);
+                    }
+                }
+            }
+            Destroy(mode);
+        }
+        MultiMeshManager.Instance.StartMeasurePoint.SetActive(false);
+        MultiMeshManager.Instance.EndMeasurePoint.SetActive(false);
+    }
+    public void ResetMain()
+    {
+        if (mode != null)
+        {
+            if (mode.name == "PatchMode")
+            {
+                // 수정해야됨.
+                GameObject PatchObject = MultiMeshManager.Instance.PatchList[MultiMeshManager.Instance.PatchList.Count - 1].Patch;
+
+                if (PatchObject)
+                {
+                    MeshRenderer Ren = PatchObject.GetComponent<MeshRenderer>();
+
+                    if (Ren.material.color != new Color32(115, 0, 0, 255))
+                    {
+                        PatchObject.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+                        Ren.material.color = new Color32(115, 0, 0, 255);
+                    }
+                }
+            }
+            Destroy(mode);
+        }
+        MultiMeshManager.Instance.Invoke("ReInitialize", 0.1f);
         MultiMeshAdjacencyList.Instance.Invoke("Initialize", 0.1f);
-        //MultiMeshMakeDoubleFace.Instance.Invoke("Initialize", 0.1f);
-        MultiMeshManager.Instance.Invoke("InitSingleFace", 0.1f);
+        MultiMeshManager.Instance.StartMeasurePoint.SetActive(false);
+        MultiMeshManager.Instance.EndMeasurePoint.SetActive(false);
+    }
+    private void ButtonInteractable(string ButtonName)
+    {
+        for(int i=0;i<Buttons.Length;i++)
+            if (ButtonName == Buttons[i].name)
+                BtnIndex = i;
+
+        for(int i=0;i<Buttons.Length;i++)
+            if (i != BtnIndex)
+                Buttons[i].GetComponent<Button>().interactable = false;
+
+        if(ButtonName == "Incision Button")
+            ExtendBar.SetActive(true);
+        else if(ButtonName == "Patching Button")
+            SetPatchUI(true);
+    }
+    public void AllButtonInteractable()
+    {
+        for (int i = 0; i < Buttons.Length; i++)
+            Buttons[i].GetComponent<Button>().interactable = true;
+    }
+    public void AllButtonInteractableFalse()
+    {
+        for (int i = 0; i < Buttons.Length; i++)
+            Buttons[i].GetComponent<Button>().interactable = false;
+
+        ExtendBar.SetActive(false);
+        SetPatchUI(false);
+    }
+    public void SetPatchUI(bool State)
+    {
+        HeightBar.SetActive(State);
+        CurveBar.SetActive(State);
+        PatchText.SetActive(State);
     }
     public void InitButtons()
     {
         for (int i = 1; i < 9; i++)
             Buttons[i-1] = GameObject.Find("Methods").transform.GetChild(i).gameObject;
     }
-
 }

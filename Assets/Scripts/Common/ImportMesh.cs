@@ -49,7 +49,8 @@ public class ImportMesh : MonoBehaviour
             ObjsPath[tempCount++] = item.FullName;
 
         Length = ObjsPath.Length;
-        MultiMeshManager.Instance.InitObjSize();
+        MultiMeshManager.Instance.InitSize();
+        MultiMeshAdjacencyList.Instance.InitSize();
         EventManager.Instance.Events.InvokeUIChanged();
 
         if(ObjsPath[0] == "")
@@ -128,9 +129,9 @@ public class ImportMesh : MonoBehaviour
     {
         for (int i = 0; i < Length; i++)
         {
-            MultiMeshManager.Instance.HeartParts[i] = HeartPart[i].transform.GetChild(0).gameObject;
-            MultiMeshManager.Instance.HeartParts[i].transform.localPosition = Vector3.zero;
-            MultiMeshManager.Instance.objsTransform[i] = MultiMeshManager.Instance.HeartParts[i].transform;
+            MultiMeshManager.Instance.Parts[i] = HeartPart[i].transform.GetChild(0).gameObject;
+            MultiMeshManager.Instance.Parts[i].transform.localPosition = Vector3.zero;
+            MultiMeshManager.Instance.Transforms[i] = MultiMeshManager.Instance.Parts[i].transform;
         } 
     }
 #endif

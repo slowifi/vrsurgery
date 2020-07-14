@@ -5,60 +5,70 @@ using UnityEngine;
 public class MultiMeshSliceMode : MonoBehaviour
 {
     private Ray oldRay;
-    private bool saveonce = true;
 
     private LineRendererManipulate lineRenderer;
-    private string mode;
-    private MultiMeshSliceMethod sliceMethods;
 
-    private GameObject[] MultiMeshLeftHeart = new GameObject[MultiMeshManager.Instance.Size];
-    private GameObject[] MultiMeshRightHeart = new GameObject[MultiMeshManager.Instance.Size];
+    private MultiMeshSliceMethod SliceMethods;
+
+    private GameObject[] LeftHeart;
+    private GameObject[] RightHeart;
+
     private GameObject HitGameObject;
-    private int SliceResultIndex = 0;
+
+    private string mode;
     private string SelectHeart;
 
-    private void Awake()
-    {
-        mode = "slice";
-        sliceMethods = new MultiMeshSliceMethod();
-    }
+    private int SliceResultIndex = 0;
+    private int Size = MultiMeshManager.Instance.Size;
 
+    void Awake()
+    {
+        Initialize();
+    }
     private void Update()
     {
         switch (mode)
         {
             case "slice":
-                MultiMeshHandleSlice();
+                HandleSlice();
                 break;
             case "select":
-                MultiMeshHeartPartSelect();
+                HeartSelect();
                 break;
         }
     }
-
-    private void MultiMeshHandleSlice()
+    public void Initialize()
+    {
+        mode = "slice";
+        SliceMethods = new MultiMeshSliceMethod();
+        LeftHeart = new GameObject[Size];
+        RightHeart = new GameObject[Size];
+        SliceMethods.Initialize();
+    }
+    private void HandleSlice()
     {
         if (Input.GetMouseButtonDown(0))
         {
             lineRenderer = new LineRendererManipulate(transform);
             Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             oldRay = ray;
-            sliceMethods.SetIntersectedValues("first", ray);
+            SliceMethods.SetIntersectedValue("first", ray);
             EventManager.Instance.Events.InvokeModeManipulate("StopAll");
         }
         else if (Input.GetMouseButtonUp(0))
         {
             EventManager.Instance.Events.InvokeModeManipulate("EndAll");
             Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-            sliceMethods.SetIntersectedValues("second", ray);
+            SliceMethods.SetIntersectedValue("second", ray);
 
-            GameObject[] SliceResult = sliceMethods.MultiMeshSlicing();
+            GameObject[] SliceResult = SliceMethods.Slicing();
 
-            for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+            for (int i = 0; i < Size; i++)
             {
-                MultiMeshLeftHeart[i] = SliceResult[SliceResultIndex++];
-                MultiMeshRightHeart[i] = SliceResult[SliceResultIndex++];
+                LeftHeart[i] = SliceResult[SliceResultIndex++];
+                RightHeart[i] = SliceResult[SliceResultIndex++];
             }
+
             mode = "select";
             Destroy(lineRenderer.lineObject);
         }
@@ -68,60 +78,61 @@ public class MultiMeshSliceMode : MonoBehaviour
             lineRenderer.SetFixedLineRenderer(oldRay.origin + oldRay.direction * 100f, ray.origin + ray.direction * 100f);
         }
     }
-
-    private void MultiMeshHeartPartSelect()
+    private void HeartSelect()
     {
         if (Input.GetMouseButtonDown(0))
         {
             Ray SelectRay = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit Hitobj;
+
             if (Physics.Raycast(SelectRay, out Hitobj, 1000f)) // Clicked Object
                 HitGameObject = Hitobj.collider.gameObject;
             else // Clicked Empthy place
             {
-                for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+                for (int i = 0; i < Size; i++)
                 {
-                    DestroyImmediate(MultiMeshLeftHeart[i]);
-                    DestroyImmediate(MultiMeshRightHeart[i]);
+                    DestroyImmediate(LeftHeart[i]);
+                    DestroyImmediate(RightHeart[i]);
                     GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0).gameObject.SetActive(true);
                 }
                 Debug.Log("빈 공간 입니다.");
                 return;
             }
-            Debug.Log(HitGameObject.name);
-            for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+
+            for (int i = 0; i < Size; i++)
             {
-                if (HitGameObject.name == MultiMeshLeftHeart[i].name)
+                if (HitGameObject.name == LeftHeart[i].name)
                     SelectHeart = "Left";
 
-                if (HitGameObject.name == MultiMeshRightHeart[i].name)
+                if (HitGameObject.name == RightHeart[i].name)
                     SelectHeart = "Right";
             }
-            MultiMeshDestroySelectedHeart(SelectHeart);
+            DestroySelectedHeart(SelectHeart);
         }
-        else if(Input.GetMouseButtonUp(0))
+        else if (Input.GetMouseButtonUp(0))
         {
-            //MultiMeshMakeDoubleFace.Instance.Reinitialize();
+            EventManager.Instance.Events.InvokeModeChanged("ResetButton");
+            GameObject.Find("Main").GetComponent<CHD>().AllButtonInteractable();
             Destroy(this);
+            GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().SliceSave();
         }
     }
-    private void MultiMeshDestroySelectedHeart(string SelectHeart)
+    private void DestroySelectedHeart(string SelectHeart)
     {
-        Debug.Log(SelectHeart);
-        if(SelectHeart == "Left")
+        if (SelectHeart == "Left")
         {
-            for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+            for (int i = 0; i < Size; i++)
             {
-                DestroyImmediate(MultiMeshLeftHeart[i]);
-                MultiMeshManager.Instance.SetNewObjects(MultiMeshRightHeart[i], i);
+                DestroyImmediate(LeftHeart[i]);
+                MultiMeshManager.Instance.SetNewObject(RightHeart[i], i);
             }
         }
         else if (SelectHeart == "Right")
         {
-            for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
+            for (int i = 0; i < Size; i++)
             {
-                DestroyImmediate(MultiMeshRightHeart[i]);
-                MultiMeshManager.Instance.SetNewObjects(MultiMeshLeftHeart[i], i);
+                DestroyImmediate(RightHeart[i]);
+                MultiMeshManager.Instance.SetNewObject(LeftHeart[i], i);
             }
         }
     }

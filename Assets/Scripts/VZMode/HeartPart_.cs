@@ -12,9 +12,9 @@ public class HeartPart_ : MonoBehaviour
         string objectName = this.GetComponentInChildren<Text>().text;
         for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
         {
-            if (objectName == MultiMeshManager.Instance.HeartParts[i].name)
+            if (objectName == MultiMeshManager.Instance.Parts[i].name)
             {
-                if(MultiMeshManager.Instance.HeartParts[i].activeSelf)
+                if(MultiMeshManager.Instance.Parts[i].activeSelf)
                 {
                     ColorBlock tempColorBlock = this.GetComponent<Button>().colors;
                     tempColorBlock.normalColor = selectedColor;
@@ -28,7 +28,7 @@ public class HeartPart_ : MonoBehaviour
                     tempColorBlock.selectedColor = unselectedColor;
                     this.GetComponent<Button>().colors = tempColorBlock;
                 }
-                MultiMeshManager.Instance.HeartParts[i].SetActive(!MultiMeshManager.Instance.HeartParts[i].activeSelf);
+                MultiMeshManager.Instance.Parts[i].SetActive(!MultiMeshManager.Instance.Parts[i].activeSelf);
             }
         }
         //active all, deactive all 일때 버튼 색 조정 아직
@@ -36,13 +36,13 @@ public class HeartPart_ : MonoBehaviour
         {
             for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
             {
-                MultiMeshManager.Instance.HeartParts[i].SetActive(true);
+                MultiMeshManager.Instance.Parts[i].SetActive(true);
             }
         }
         else if (objectName == "DeActive All")
         {
             for (int i = 0; i < MultiMeshManager.Instance.Size; i++)
-                MultiMeshManager.Instance.HeartParts[i].SetActive(false);
+                MultiMeshManager.Instance.Parts[i].SetActive(false);
         }
     }
 }

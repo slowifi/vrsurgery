@@ -99,18 +99,8 @@ public class Player : MonoBehaviour, IPointerEnterHandler, IPointerUpHandler
         {
 #if UNITY_STANDALONE_WIN
             float wheel = Input.GetAxis("Mouse ScrollWheel");
-            if (wheel != 0 && boolScaling)
+            /*if (wheel != 0 && boolScaling)
             {
-                /*// Single Object
-                // 여기에 UI 추가. + init scale저장 해놓고 0 밑으로 안가도록.
-                MeshManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
-                
-                if (MeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
-                    MeshManager.Instance.pivotTransform.localScale = Vector3.one * 0.2f;
-
-                AdjacencyList.Instance.WorldPositionUpdate();*/
-                
-                //Multi Object
                 MultiMeshManager.Instance.pivotTransform.localScale += Vector3.one * (wheel * 0.8f);
 
                 if (MultiMeshManager.Instance.pivotTransform.localScale.x <= 0.2f)
@@ -120,13 +110,6 @@ public class Player : MonoBehaviour, IPointerEnterHandler, IPointerUpHandler
             }
             else if (Input.GetMouseButton(1) && boolRotation)
             {
-                /*// 여기에 UI 추가.
-                float x = Input.GetAxis("Mouse X");
-                float y = Input.GetAxis("Mouse Y");
-                MeshManager.Instance.pivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
-                MeshManager.Instance.pivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
-                AdjacencyList.Instance.WorldPositionUpdate();*/
-
                 float x = Input.GetAxis("Mouse X");
                 float y = Input.GetAxis("Mouse Y");
                 MultiMeshManager.Instance.pivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
@@ -135,22 +118,41 @@ public class Player : MonoBehaviour, IPointerEnterHandler, IPointerUpHandler
             }
             else if (Input.GetMouseButton(2) && boolTranslation)
             {
-                /*// 여기에 UI 추가.
-                // 전체 이동.
-                float xPos = Input.GetAxis("Mouse X");
-                float yPos = Input.GetAxis("Mouse Y");
-
-                MeshManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
-                MeshManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
-                AdjacencyList.Instance.WorldPositionUpdate();*/
-
                 float xPos = Input.GetAxis("Mouse X");
                 float yPos = Input.GetAxis("Mouse Y");
 
                 MultiMeshManager.Instance.pivotTransform.position += Vector3.left * (xPos * 2f);
                 MultiMeshManager.Instance.pivotTransform.position += Vector3.up * (yPos * 2f);
                 MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
+            }*/
+
+            if (wheel != 0 && boolScaling)
+            {
+                MultiMeshManager.Instance.PivotTransform.localScale += Vector3.one * (wheel * 0.8f);
+
+                if (MultiMeshManager.Instance.PivotTransform.localScale.x <= 0.2f)
+                    MultiMeshManager.Instance.PivotTransform.localScale = Vector3.one * 0.2f;
+
+                MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
             }
+            else if (Input.GetMouseButton(1) && boolRotation)
+            {
+                float x = Input.GetAxis("Mouse X");
+                float y = Input.GetAxis("Mouse Y");
+                MultiMeshManager.Instance.PivotTransform.RotateAround(Vector3.up, (-x * 0.1f));
+                MultiMeshManager.Instance.PivotTransform.RotateAround(Vector3.right, (-y * 0.1f));
+                MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
+            }
+            else if (Input.GetMouseButton(2) && boolTranslation)
+            {
+                float xPos = Input.GetAxis("Mouse X");
+                float yPos = Input.GetAxis("Mouse Y");
+
+                MultiMeshManager.Instance.PivotTransform.position += Vector3.left * (xPos * 2f);
+                MultiMeshManager.Instance.PivotTransform.position += Vector3.up * (yPos * 2f);
+                MultiMeshAdjacencyList.Instance.WorldPositionUpdate();
+            }
+
             // 특정 움직임이 있었을 때만 업데이트 하도록 해야됨.
             // AdjacencyList.Instance.WorldPositionUpdate();
 #endif

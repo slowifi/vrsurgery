@@ -628,49 +628,49 @@ public class CGAL
             newTriangles[newCount++] = ++newVertexCount;
         }
     }
-    public static void MultiMeshGenerateStampWithHeart(List<Vector3> verticesPos, List<Ray> rayList, ref Vector3[] newVertices, ref int[] newTriangles,int k)
-    {
-        int vertexCount = rayList.Count;
+    //public static void MultiMeshGenerateStampWithHeart(List<Vector3> verticesPos, List<Ray> rayList, ref Vector3[] newVertices, ref int[] newTriangles,int k)
+    //{
+    //    int vertexCount = rayList.Count;
 
-        int newCount = 0;
+    //    int newCount = 0;
 
-        for (int i = 0; i < rayList.Count * 2; i++)
-        {
-            if (i >= vertexCount)
-            {
-                // vertex들 넣어줘야됨.
-                newVertices[i] = verticesPos[newCount] + (Vector3.Normalize(rayList[newCount++].direction) * MultiMeshManager.Instance.objsTransform[k].lossyScale.z * 8);
-            }
-            else
-            {
-                newVertices[i] = rayList[i].origin + rayList[i].direction * 1f;
-            }
-        }
+    //    for (int i = 0; i < rayList.Count * 2; i++)
+    //    {
+    //        if (i >= vertexCount)
+    //        {
+    //            // vertex들 넣어줘야됨.
+    //            newVertices[i] = verticesPos[newCount] + (Vector3.Normalize(rayList[newCount++].direction) * MultiMeshManager.Instance.objsTransform[k].lossyScale.z * 8);
+    //        }
+    //        else
+    //        {
+    //            newVertices[i] = rayList[i].origin + rayList[i].direction * 1f;
+    //        }
+    //    }
 
-        newCount = 0;
-        int newVertexCount = vertexCount;
-        for (int i = 0; i < vertexCount; i++)
-        {
-            if (i == vertexCount - 1)
-            {
-                newTriangles[newCount++] = i;
-                newTriangles[newCount++] = newVertexCount;
-                newTriangles[newCount++] = 0;
+    //    newCount = 0;
+    //    int newVertexCount = vertexCount;
+    //    for (int i = 0; i < vertexCount; i++)
+    //    {
+    //        if (i == vertexCount - 1)
+    //        {
+    //            newTriangles[newCount++] = i;
+    //            newTriangles[newCount++] = newVertexCount;
+    //            newTriangles[newCount++] = 0;
 
-                newTriangles[newCount++] = 0;
-                newTriangles[newCount++] = newVertexCount;
-                newTriangles[newCount++] = vertexCount;
-                break;
-            }
-            newTriangles[newCount++] = i;
-            newTriangles[newCount++] = newVertexCount;
-            newTriangles[newCount++] = i + 1;
+    //            newTriangles[newCount++] = 0;
+    //            newTriangles[newCount++] = newVertexCount;
+    //            newTriangles[newCount++] = vertexCount;
+    //            break;
+    //        }
+    //        newTriangles[newCount++] = i;
+    //        newTriangles[newCount++] = newVertexCount;
+    //        newTriangles[newCount++] = i + 1;
 
-            newTriangles[newCount++] = i + 1;
-            newTriangles[newCount++] = newVertexCount;
-            newTriangles[newCount++] = ++newVertexCount;
-        }
-    }
+    //        newTriangles[newCount++] = i + 1;
+    //        newTriangles[newCount++] = newVertexCount;
+    //        newTriangles[newCount++] = ++newVertexCount;
+    //    }
+    //}
 
     public static float[] GeneratePlane(Vector3 v1, Vector3 v2, Vector3 v3)
     {
@@ -774,5 +774,51 @@ public class CGAL
         newMesh.triangles = newTriangles;
         newMesh.RecalculateNormals();
         return newObject;
+    }
+
+
+    //----------------------------------------------------------
+    public static void MultiMeshGenerateStampWithHeart(List<Vector3> verticesPos, List<Ray> rayList, ref Vector3[] newVertices, ref int[] newTriangles, int k)
+    {
+        int vertexCount = rayList.Count;
+
+        int newCount = 0;
+
+        for (int i = 0; i < rayList.Count * 2; i++)
+        {
+            if (i >= vertexCount)
+            {
+                // vertex들 넣어줘야됨.
+                newVertices[i] = verticesPos[newCount] + (Vector3.Normalize(rayList[newCount++].direction) * MultiMeshManager.Instance.Transforms[k].lossyScale.z * 8);
+            }
+            else
+            {
+                newVertices[i] = rayList[i].origin + rayList[i].direction * 1f;
+            }
+        }
+
+        newCount = 0;
+        int newVertexCount = vertexCount;
+        for (int i = 0; i < vertexCount; i++)
+        {
+            if (i == vertexCount - 1)
+            {
+                newTriangles[newCount++] = i;
+                newTriangles[newCount++] = newVertexCount;
+                newTriangles[newCount++] = 0;
+
+                newTriangles[newCount++] = 0;
+                newTriangles[newCount++] = newVertexCount;
+                newTriangles[newCount++] = vertexCount;
+                break;
+            }
+            newTriangles[newCount++] = i;
+            newTriangles[newCount++] = newVertexCount;
+            newTriangles[newCount++] = i + 1;
+
+            newTriangles[newCount++] = i + 1;
+            newTriangles[newCount++] = newVertexCount;
+            newTriangles[newCount++] = ++newVertexCount;
+        }
     }
 }

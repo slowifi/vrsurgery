@@ -26,54 +26,9 @@ public class Intersections
     public static IntersectedValues MultiMeshGetIntersectedValues(int i)
     {
         Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        int[] triangles = MultiMeshManager.Instance.meshes[i].triangles;
-        List<Vector3> worldPosition = MultiMeshAdjacencyList.Instance.MultiMeshWorldPositionVertices[i];
+        int[] triangles = MultiMeshManager.Instance.Meshes[i].triangles;
+        List<Vector3> worldPosition = MultiMeshAdjacencyList.Instance.WorldPositionVertices[i];
         return GetIntersectedValues(ray, triangles, worldPosition);
-    }
-    public static IntersectedValues GetIntersectedValues()
-    {
-        Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        return GetIntersectedValues(ray, triangles, worldPosition);
-    }
-
-    public static IntersectedValues GetIntersectedValues(Ray ray)
-    {
-        int[] triangles = MeshManager.Instance.mesh.triangles;
-        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
-        return GetIntersectedValues(ray, triangles, worldPosition);
-    }
-
-    public static IntersectedValues GetIntersectedValues(Ray cameraRay, int[] triangles, List<Vector3> worldPosition)
-    {
-        IntersectedValues temp = new IntersectedValues();
-        float dst_min = 10000000;
-        Vector3 intersectionTemp = Vector3.zero;
-
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            if (RayTriangleIntersection(
-                worldPosition[triangles[i]],
-                worldPosition[triangles[i + 1]],
-                worldPosition[triangles[i + 2]],
-                cameraRay,
-                ref intersectionTemp))
-            {
-                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
-                if (dst_min > dst_temp)
-                {
-                    temp.Disance = dst_temp;
-                    temp.VertexIndex = triangles[i];
-                    temp.TriangleIndex = i;
-                    temp.IntersectedPosition = intersectionTemp;
-                    temp.ray = cameraRay;
-                    dst_min = dst_temp;
-                }
-            }
-        }
-        temp.Intersected = dst_min != 10000000;
-        return temp;
     }
     public static int MultiMeshTriangleEdgeIntersection(
         ref int edgeIdx,
@@ -95,7 +50,7 @@ public class Intersections
 
         Vector3 screenMiddlePoint = Vector3.Lerp(screenStartRay.origin, screenEndRay.origin, 0.5f);
 
-        Vector3[] vertices = MultiMeshManager.Instance.meshes[MeshIndex].vertices;
+        Vector3[] vertices = MultiMeshManager.Instance.Meshes[MeshIndex].vertices;
         // 여기를 다시 한 번 보자.
         int intersectionCount = 0;
         for (int i = 0; i < 3; i++)
@@ -164,6 +119,148 @@ public class Intersections
         }
         return -1;
     }
+
+    //public static IntersectedValues MultiMeshGetIntersectedValues(int i)
+    //{
+    //    Ray ray = MultiMeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+    //    int[] triangles = MultiMeshManager.Instance.meshes[i].triangles;
+    //    List<Vector3> worldPosition = MultiMeshAdjacencyList.Instance.MultiMeshWorldPositionVertices[i];
+    //    return GetIntersectedValues(ray, triangles, worldPosition);
+    //}
+    public static IntersectedValues GetIntersectedValues()
+    {
+        Ray ray = MeshManager.Instance.cam.ScreenPointToRay(Input.mousePosition);
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        return GetIntersectedValues(ray, triangles, worldPosition);
+    }
+
+    public static IntersectedValues GetIntersectedValues(Ray ray)
+    {
+        int[] triangles = MeshManager.Instance.mesh.triangles;
+        List<Vector3> worldPosition = AdjacencyList.Instance.worldPositionVertices;
+        return GetIntersectedValues(ray, triangles, worldPosition);
+    }
+
+    public static IntersectedValues GetIntersectedValues(Ray cameraRay, int[] triangles, List<Vector3> worldPosition)
+    {
+        IntersectedValues temp = new IntersectedValues();
+        float dst_min = 10000000;
+        Vector3 intersectionTemp = Vector3.zero;
+
+        for (int i = 0; i < triangles.Length; i += 3)
+        {
+            if (RayTriangleIntersection(
+                worldPosition[triangles[i]],
+                worldPosition[triangles[i + 1]],
+                worldPosition[triangles[i + 2]],
+                cameraRay,
+                ref intersectionTemp))
+            {
+                float dst_temp = Vector3.Magnitude(cameraRay.origin - intersectionTemp);
+                if (dst_min > dst_temp)
+                {
+                    temp.Disance = dst_temp;
+                    temp.VertexIndex = triangles[i];
+                    temp.TriangleIndex = i;
+                    temp.IntersectedPosition = intersectionTemp;
+                    temp.ray = cameraRay;
+                    dst_min = dst_temp;
+                }
+            }
+        }
+        temp.Intersected = dst_min != 10000000;
+        return temp;
+    }
+    //public static int MultiMeshTriangleEdgeIntersection(
+    //    ref int edgeIdx,
+    //    ref Vector3 edgePoint,
+    //    Vector3 incisionStartPoint,
+    //    Vector3 incisionEndPoint,
+    //    ref int incisionTriangleIndex,
+    //    Ray screenStartRay,
+    //    Ray screenEndRay,
+    //    List<Edge> edgeList,
+    //    List<Vector3> worldVertices,
+    //    int MeshIndex)
+    //{
+    //    // return side number : 1, 2, 0 / 1 : couter-clockwise, 2 : clockwise, 0 : 첫 시작, -1 : error 반환
+    //    int currentEdgeIndex = edgeIdx;
+
+    //    Vector3 intersectionPoint = Vector3.zero;
+    //    Vector3 intersectionTemp = Vector3.zero;
+
+    //    Vector3 screenMiddlePoint = Vector3.Lerp(screenStartRay.origin, screenEndRay.origin, 0.5f);
+
+    //    Vector3[] vertices = MultiMeshManager.Instance.meshes[MeshIndex].vertices;
+    //    // 여기를 다시 한 번 보자.
+    //    int intersectionCount = 0;
+    //    for (int i = 0; i < 3; i++)
+    //    {
+    //        bool checkIntersection = true;
+
+    //        if (currentEdgeIndex != -1 &&
+    //            edgeList[currentEdgeIndex].vtx1 == edgeList[incisionTriangleIndex + i].vtx1 &&
+    //            edgeList[currentEdgeIndex].vtx2 == edgeList[incisionTriangleIndex + i].vtx2)
+    //            continue;
+
+    //        // 이거 자체를 바꿔야하나?
+
+    //        if (RayTriangleIntersection(
+    //            screenMiddlePoint,
+    //            incisionStartPoint + screenStartRay.direction * 10,
+    //            incisionEndPoint + screenEndRay.direction * 10,
+    //            worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
+    //            worldVertices[edgeList[incisionTriangleIndex + i].vtx2] - worldVertices[edgeList[incisionTriangleIndex + i].vtx1],
+    //            ref intersectionTemp))
+    //        {
+    //            //intersectionPoint = intersectionTemp;
+    //            if (!(intersectionTemp.x <= Mathf.Min(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)) &&
+    //                !(intersectionTemp.x >= Mathf.Max(worldVertices[edgeList[incisionTriangleIndex + i].vtx1].x, worldVertices[edgeList[incisionTriangleIndex + i].vtx2].x)))
+    //            {
+    //                intersectionPoint = intersectionTemp;
+
+    //            }
+    //            else
+    //                checkIntersection = false;
+    //        }
+    //        else
+    //            checkIntersection = false;
+
+    //        if (checkIntersection)
+    //        {
+    //            intersectionCount++;
+    //            edgeIdx = incisionTriangleIndex + i;
+    //            incisionTriangleIndex = edgeList[edgeIdx].tri2;
+    //            edgePoint = intersectionPoint;
+    //            break;
+    //        }
+    //    }
+
+    //    if (currentEdgeIndex == -1)
+    //    {
+
+    //        if (edgeIdx != -1)
+    //            return 0;
+    //        else
+    //        {
+    //            Debug.Log("intersection이 안됨.");
+    //            return -1;
+    //        }
+    //    }
+    //    else if (edgeList[currentEdgeIndex].vtx1 == edgeList[edgeIdx].vtx2)
+    //    {
+    //        // counter-clockwise
+    //        // 이게 왜 여기서 쓸 때 반대가 됐을까?
+    //        return 1;
+    //    }
+    //    else if (edgeList[currentEdgeIndex].vtx2 == edgeList[edgeIdx].vtx1)
+    //    {
+    //        // clockwise
+    //        return 2;
+    //    }
+    //    return -1;
+    //}
 
     public static bool RayTriangleIntersection(Vector3 v0, Vector3 v1, Vector3 v2, Ray ray, ref Vector3 intersectionTemp)
     {

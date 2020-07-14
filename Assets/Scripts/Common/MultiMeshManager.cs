@@ -1,120 +1,110 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-// Check SetMeshInfo need?
-// If oldmesh and firstmesh used, shold add oldmesh and firstmesh
 public class MultiPatchs
 {
-    public GameObject OuterPatch;
-    public GameObject InnerPatch;
+    public GameObject Patch;
 }
 public class MultiMeshManager : Singleton<MultiMeshManager>
 {
-    
     public List<MultiPatchs> PatchList;
 
-    public GameObject ListButton;
-    public GameObject MultiMeshStartMeasurePoint;
-    public GameObject MultiMeshEndMeasurePoint;
-    public GameObject[] HeartParts;
-
     public Camera cam;
-     
-    public Material HeartPartMaterial;
+
+    public Shader NewShader;
+
+    public Material PartMaterial;
+
+    public GameObject[] Parts;
+
+    public GameObject StartMeasurePoint;
+    public GameObject EndMeasurePoint;
+
+    public Mesh[] Meshes;
     
-    public Transform[] objsTransform;
-    public Transform pivotTransform;
+    public Transform[] Transforms;
     
-    public Mesh[] meshes;
-    
+    public Transform PivotTransform;
+
     public int Size;
+    public int PatchNum = 0;
+    public int MeshIndex;
 
-    public Shader newShader;
-    void Awake()
-    {
-        newShader = Resources.Load("Shaders/CulloffShader", typeof(Shader)) as Shader;
-    }
-    public void InitObjSize()
+    public bool IncisionOk = false;
+    public bool PatchOk = false;
+
+    public void InitSize()
     {
         Size = GameObject.Find("ImportButton").GetComponent<ImportMesh>().Length;
-        objsTransform = new Transform[Size];
-        meshes = new Mesh[Size];
-        HeartParts = new GameObject[Size];
-    }
-    public void GetObjsSize()
-    {
-        Size = GameObject.Find("ImportButton").GetComponent<ImportMesh>().Length;
-        objsTransform = new Transform[Size];
-        meshes = new Mesh[Size];
-        HeartParts = new GameObject[Size];
-    }
-    public void ObjsUpdate()
-    {
-        //objsTransform = new Transform[Size];
-        for (int i = 0; i < Size; i++)
-            objsTransform[i] = objsTransform[i].GetComponent<Transform>();
-        pivotTransform = pivotTransform.GetComponent<Transform>();
-    }
-
-    public void SetNewObjects(GameObject newHeartPart, int i)
-    {
-        Destroy(HeartParts[i]);
-        HeartParts[i] = newHeartPart;
-        objsTransform[i] = HeartParts[i].transform;
-        meshes[i] = HeartParts[i].GetComponent<MeshFilter>().mesh;
-        HeartParts[i].GetComponent<MeshRenderer>().material = HeartPartMaterial;
-        HeartParts[i].GetComponent<MeshRenderer>().material.shader = newShader;
-        HeartParts[i].name = GameObject.Find("PartialModel").transform.GetChild(i).name;
-    }
-    //Should Check Making Heart array is right?!
-    public void MeshesUpdate()
-    {
-        for (int i = 0; i < Size; i++)
-        {
-            meshes[i] = HeartParts[i].GetComponent<MeshFilter>().mesh;
-            meshes[i].RecalculateNormals();
-        }
-    }
-    public void Reinitialize()
-    {
-        GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().Initialize();
-        Renderer[] mat = new Renderer[Size];
-        for(int i=0;i<Size;i++)
-        {
-            mat[i] = HeartParts[i].GetComponent<Renderer>();
-            mat[i].material = HeartPartMaterial;
-            meshes[i] = HeartParts[i].GetComponent<MeshFilter>().mesh;
-            PatchList.Clear();
-            meshes[i].RecalculateNormals();
-            GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().OriginalMesh.Add(Instantiate(meshes[i]));
-            //Check Path need reinitialize !!!
-        }
+        Transforms = new Transform[Size];
+        Meshes = new Mesh[Size];
+        Parts = new GameObject[Size];
+        PatchList = new List<MultiPatchs>();
     }
     protected override void InitializeChild()
     {
-        GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().Initialize();
-        Renderer[] mat = new Renderer[Size];
+        Renderer[] MeshRenderer = new Renderer[Size];
+
         for (int i = 0; i < Size; i++)
         {
-            mat[i] = HeartParts[i].GetComponent<Renderer>();
-            mat[i].material = HeartPartMaterial;
-            meshes[i] = HeartParts[i].GetComponent<MeshFilter>().mesh;
-            PatchList = new List<MultiPatchs>();
-            meshes[i].RecalculateNormals();
-            GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().OriginalMesh.Add(Instantiate(meshes[i]));
-        }
-    }
-    public void InitSingleFace()
-    {
-        for(int i=0;i<Size;i++)
-        {
+            Transforms[i] = Transforms[i].GetComponent<Transform>();
+
+            MeshRenderer[i] = Parts[i].GetComponent<MeshRenderer>();
+            MeshRenderer[i].material = PartMaterial;
+
+            Meshes[i] = Parts[i].GetComponent<MeshFilter>().mesh;
+            Meshes[i].RecalculateNormals();
+
             GetHeartPartChild(i).name = GameObject.Find("PartialModel").transform.GetChild(i).name;
             GetHeartPartChild(i).gameObject.AddComponent<MeshCollider>();
-            GetHeartPartChild(i).gameObject.GetComponent<MeshRenderer>().material.shader = newShader;
+            GetHeartPartChild(i).gameObject.GetComponent<MeshRenderer>().material.shader = NewShader;
         }
+
+        PivotTransform = PivotTransform.GetComponent<Transform>();
+    }
+    // (만약)Initialize에서 PatchList 선언해주면 여기서는 Clear시켜줘야함
+    // 근데 Initialize와 달라지는 내용이 없으면 이부분 지우고 그냥 Initialize 써도됨(일단은 살려 놓음)
+    public void ReInitialize()
+    {
+        Renderer[] MeshRenderer = new Renderer[Size];
+
+        for (int i = 0; i < Size; i++)
+        {
+            Transforms[i] = Transforms[i].GetComponent<Transform>();
+
+            MeshRenderer[i] = Parts[i].GetComponent<MeshRenderer>();
+            MeshRenderer[i].material = PartMaterial;
+
+            Meshes[i] = Parts[i].GetComponent<MeshFilter>().mesh;
+            Meshes[i].RecalculateNormals();
+
+            GetHeartPartChild(i).name = GameObject.Find("PartialModel").transform.GetChild(i).name;
+            GetHeartPartChild(i).gameObject.AddComponent<MeshCollider>();
+            GetHeartPartChild(i).gameObject.GetComponent<MeshRenderer>().material.shader = NewShader;
+        }
+
+        PivotTransform = PivotTransform.GetComponent<Transform>();
     }
     public Transform GetHeartPartChild(int i)
     {
         return GameObject.Find("PartialModel").transform.GetChild(i).transform.GetChild(0);
+    }
+    public void MeshUpdate()
+    {
+        for (int i = 0; i < Size; i++)
+        {
+            Meshes[i] = Parts[i].GetComponent<MeshFilter>().mesh;
+            Meshes[i].RecalculateNormals();
+        }
+    }
+    public void SetNewObject(GameObject newPart, int i)
+    {
+        Destroy(Parts[i]);
+        Parts[i] = newPart;
+        Transforms[i] = Parts[i].transform;
+        Meshes[i] = Parts[i].GetComponent<MeshFilter>().mesh;
+        Parts[i].GetComponent<MeshRenderer>().material = PartMaterial;
+        Parts[i].GetComponent<MeshRenderer>().material.shader = NewShader;
+        Parts[i].name = GameObject.Find("PartialModel").transform.GetChild(i).name;
     }
 }
