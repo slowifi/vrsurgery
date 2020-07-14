@@ -1,12 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
-using UnityEditor;
-using System.IO;
-using UnityEngine.UIElements;
-
 public class MultiMeshUndoRedo : MonoBehaviour
 {
     // ActionList
@@ -70,6 +64,7 @@ public class MultiMeshUndoRedo : MonoBehaviour
     public void SliceSave()
     {
         ActionList.Add(0);
+        
         for (int i = 0; i < Size; i++)
         {
             MeshList[i].Add(GetIndexMesh(i));

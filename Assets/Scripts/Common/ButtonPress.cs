@@ -156,7 +156,10 @@ public class ButtonPress : Singleton<ButtonPress>
             PatchButton.image.sprite = patchImage[0];
             EventManager.Instance.Events.InvokeModeChanged("Exit");
             if (MultiMeshManager.Instance.PatchOk == true)
+            {
                 GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().PatchSave();
+                GameObject.Find("Main").GetComponent<CHD>().SetPatchUI(false);
+            }
             MultiMeshManager.Instance.PatchOk = false;
         }
         else
@@ -210,6 +213,7 @@ public class ButtonPress : Singleton<ButtonPress>
             {
                 GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().MeshList[MultiMeshManager.Instance.MeshIndex].Add(Instantiate(MultiMeshManager.Instance.Meshes[MultiMeshManager.Instance.MeshIndex]));
                 GameObject.Find("Undo Button").GetComponent<MultiMeshUndoRedo>().IBSave(GameObject.Find("Main").GetComponent<CHD>().MeshIndex);
+                GameObject.Find("Main").GetComponent<CHD>().ExtendBar.SetActive(false);
             }
             MultiMeshManager.Instance.IncisionOk = false;
         }
