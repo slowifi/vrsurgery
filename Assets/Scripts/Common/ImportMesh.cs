@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using Dummiesman;
 using System.IO;
+using System;
+using System.Collections.Generic;
 #if UNITY_ANDROID
 using SimpleFileBrowser;
 #endif
@@ -27,7 +29,7 @@ public class ImportMesh : MonoBehaviour
     private string FolderPath;
     
 
-#if UNITY_STANDALONE_WIN
+
     public void FilesBrowsing()
     {
         int tempCount = 0;
@@ -87,7 +89,7 @@ public class ImportMesh : MonoBehaviour
         ///////// 이부분도 확인 ////////////////////
         //UIManager.Instance.SetFileName(FilesName);
         ///////////////////////////////////////////
-        ///
+        
         if (MainObject.activeSelf)
         {
             DestroyImmediate(PartialModel);
@@ -134,78 +136,71 @@ public class ImportMesh : MonoBehaviour
             MultiMeshManager.Instance.Parts[i] = HeartPart[i].transform.GetChild(0).gameObject;
             MultiMeshManager.Instance.Parts[i].transform.localPosition = Vector3.zero;
             MultiMeshManager.Instance.Transforms[i] = MultiMeshManager.Instance.Parts[i].transform;
-        } 
-    }
-#endif
-#if UNITY_ANDROID
-
-    IEnumerator ShowLoadDialogCoroutine()
-    {
-        yield return FileBrowser.WaitForLoadDialog(false, "/storage/emulated/0/hearts", "Load File", "Load");
-
-        if (FileBrowser.Success)
-        {
-            SetMesh(FileBrowser.Result);
-            EventManager.Instance.Events.InvokeUIChanged();
-            playerObject.SetActive(true);
         }
-        
-        EventManager.Instance.Events.InvokeUIFixed();
-    }
+        MultiMeshManager.Instance.MeshUpdate();
 
-    public void FileBrowsing()
-    {
-        FileBrowser.SetFilters(false, new FileBrowser.Filter("obj files", ".obj"));
-        EventManager.Instance.Events.InvokeUIFixed();
-        playerObject.SetActive(false);
-        StartCoroutine(ShowLoadDialogCoroutine());
-    }
+        long start = DateTime.Now.Ticks;
 
-    public void SetMesh(string path)
-    {
-        string fileName = Path.GetFileName(path);
-        fileName = fileName.Substring(0, fileName.Length - 4);
-        UIManager.Instance.SetFileName(fileName);
-        
-        
-        Debug.Log(path);
-        
-        //var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
-        // 여기에 추가 해야될 것은 새로 읽어들였을 때, 리셋 기능.
+        float xMin, yMin, zMin, xMax, yMax, zMax;
+        BinaryTree binaryTree = new BinaryTree();
+        binaryTree.copyMeshFromOriginal(MultiMeshManager.Instance.Meshes[0]);
 
-        //ObjImporter asdf = new ObjImporter();
-
-        if (mainObject.activeSelf)
+        xMin = float.MaxValue; xMax = float.MinValue; yMin = float.MaxValue; yMax = float.MinValue; zMin = float.MaxValue; zMax = float.MinValue;
+        Vector3[] savedVertices;
+        int length = MultiMeshManager.Instance.Meshes[0].vertices.Length;
+        int[] triangles = MultiMeshManager.Instance.Meshes[0].triangles;
+        binaryTree.root.vertices = new int[length];
+        binaryTree.root.length = length;
+        binaryTree.root.faces = new int[triangles.Length / 3];
+        for (int i = 0; i < length; i++)
         {
-            pivotObject.transform.localPosition = Vector3.zero;
-            pivotObject.transform.localScale = Vector3.one;
-            pivotObject.transform.localEulerAngles = Vector3.zero;
-
-            Destroy(GameObject.Find("PartialModel"));
-            GameObject newLocalHeart = new OBJLoader().Load(path);
-            newLocalHeart.name = "PartialModel";
-            newLocalHeart.transform.SetParent(GameObject.Find("HumanHeart").transform);
-            MeshManager.Instance.Heart = newLocalHeart.transform.GetChild(0).gameObject;
-            MeshManager.Instance.Heart.transform.localPosition = Vector3.zero;
-            MeshManager.Instance.objTransform = MeshManager.Instance.Heart.transform;
-            mainObject.SendMessage("ResetMain");
-            buttonPressScript.SendMessage("ResetButton");
-            return;
+            binaryTree.root.vertices[i] = i;
+        }
+        //BinaryTree.Initialize();
+        savedVertices = MultiMeshManager.Instance.Meshes[0].vertices;
+        for (int i = 0; i < binaryTree.root.vertices.Length; i++)
+        {
+            if (xMin > savedVertices[binaryTree.root.vertices[i]].x) xMin = savedVertices[binaryTree.root.vertices[i]].x;
+            if (xMax < savedVertices[binaryTree.root.vertices[i]].x) xMax = savedVertices[binaryTree.root.vertices[i]].x;
+            if (yMin > savedVertices[binaryTree.root.vertices[i]].y) yMin = savedVertices[binaryTree.root.vertices[i]].y;
+            if (yMax < savedVertices[binaryTree.root.vertices[i]].y) yMax = savedVertices[binaryTree.root.vertices[i]].y; 
+            if (zMin > savedVertices[binaryTree.root.vertices[i]].z) zMin = savedVertices[binaryTree.root.vertices[i]].z;
+            if (zMax < savedVertices[binaryTree.root.vertices[i]].z) zMax = savedVertices[binaryTree.root.vertices[i]].z;
+        }
+        binaryTree.root.maxPos.Set(xMax, yMax, zMax);
+        binaryTree.root.minPos.Set(xMin, yMin, zMin);
+        for (int i = 0; i < triangles.Length/3; i++)
+        {
+            binaryTree.root.faces[i] = i;
         }
 
-        GameObject newHeart = new OBJLoader().Load(path);
+        /*GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.transform.position = (binaryTree.root.minPos + binaryTree.root.maxPos) / 2;
+        cube.GetComponent<Renderer>().material.color = new Color(0.5f, 0, 0.5f, 0.1f);
 
-        newHeart.name = "PartialModel";
-        ChatManager.Instance.GenerateMessage(newHeart.name);
-        newHeart.transform.SetParent(GameObject.Find("HumanHeart").transform);
-        newHeart.transform.localScale = Vector3.one;
-        MeshManager.Instance.Heart = newHeart.transform.GetChild(0).gameObject;
-        MeshManager.Instance.Heart.transform.localPosition = Vector3.zero;
-        MeshManager.Instance.objTransform = MeshManager.Instance.Heart.transform;
+        cube.transform.localScale = new Vector3(xMax - xMin, yMax - yMin, zMax - zMin);
+        cube.GetComponent<Renderer>().material.shader = Shader.Find("Transparent/Diffuse");*/
 
-        mainObject.SetActive(true);
+
+        binaryTree.root.curDepth = 1;
+        binaryTree.root.index = 0;
+        BinaryTree.savedNode = binaryTree.root;
+        BinaryTree.MakeInitialChild(BinaryTree.savedNode);
+
+        /*Mesh mesh = MultiMeshManager.Instance.Meshes[0];
+        for (int i = 0; i < binaryTree.root.vertices.Length/3; i++)
+        {
+            //Debug.DrawLine(transform.TransformPoint(mesh.vertices[i]), transform.TransformPoint(mesh.vertices[i]) + transform.TransformVector(mesh.normals[i]));
+                        
+            Debug.Log(i.ToString() + "번째 normal : " + mesh.normals[i]);
+            GameObject a = GameObject.CreatePrimitive(PrimitiveType.Sphere);            
+            a.transform.position = transform.TransformPoint(mesh.vertices[i]) + mesh.normals[i];
+            a.transform.localScale = Vector3.one * 0.05f;
+            a.name = "normal" + i.ToString();
+        }*/
+
+        long end = DateTime.Now.Ticks;
+        Debug.Log("ImportMesh tick timer: " + (double)(end - start) / 10000000.0f);
+        HapticGrabber.meshChecker();
     }
-#endif
-
-
 }
